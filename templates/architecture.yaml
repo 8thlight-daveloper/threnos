@@ -1,0 +1,49 @@
+# The dependency rules, as data. A checker compares this with a graph that a
+# language adapter extracts from the code. Protected like a contract.
+
+components_root: <components>
+model: <model>
+contracts_root: contracts
+entry_point: <entry point folder>
+
+naming:
+  component_path: "<noun>/<role>"
+  segment_pattern: "^[a-z][a-z0-9]*$"
+
+# Categories core components may not use. The stack docs map each to the
+# current language's libraries.
+banned_in_core:
+  - filesystem
+  - network
+  - process
+  - terminal
+  - clock
+  - randomness
+  - environment
+
+# Drivers do input and output, so the banned list does not apply to them.
+drivers:
+  - tui
+
+# A component may depend only on components at an earlier position, and on
+# the model. Two components at one position may not depend on each other.
+components:
+  - name: condition/evaluator
+    position: 1
+    depends_on: []
+  - name: section/hasher
+    position: 1
+    depends_on: []
+  - name: section/selector
+    position: 2
+    depends_on: [condition/evaluator]
+  - name: question/finder
+    position: 3
+    depends_on: [section/selector, condition/evaluator]
+  - name: tui
+    position: 4
+    depends_on: [question/finder]
+
+contracts:
+  may_import: [model, contracts/harness]
+  wiring_test_may_import: own_component
