@@ -33,7 +33,7 @@ It mutates `<components>/<component>` over an overlay, so no source file changes
 | `--workers <n>` | Tests this many mutants at once |
 | `--timeout <s>` | Seconds one mutant's tests may take |
 | `--short` | Runs the tests with `-short`. A mutant that only a skipped test kills shows as a survivor |
-| `--cached` | Reuses results for source files whose text, contract suite, and gomu version are unchanged |
+| `--cached` | Reuses the results when the component's source files, contract suite, and gomu version are all unchanged. A change to any one source file mutates the whole component again, because a file's mutants are judged by tests that run the rest of the component. A change outside the component and its contract folder, such as the shared model, does not invalidate the cache |
 | `--components`, `--contracts`, `--accepted` | The folders, set by the recipe variables |
 | `--gomu-version` | Part of the cache key, set by the recipe variable |
 

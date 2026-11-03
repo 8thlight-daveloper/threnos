@@ -32,6 +32,20 @@ func sourceFiles(root string, place layout, component string) ([]string, error) 
 	return names, nil
 }
 
+func sourceDigest(root string, place layout, component string, names []string) (string, error) {
+	hash := sha256.New()
+	for _, name := range names {
+		data, err := os.ReadFile(filepath.Join(root, place.components, component, name))
+		if err != nil {
+			return "", err
+		}
+		hash.Write([]byte(name + cacheSeparator))
+		hash.Write(data)
+		hash.Write([]byte(cacheSeparator))
+	}
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
 func suiteDigest(root string, place layout, component string) (string, error) {
 	base := filepath.Join(root, place.contracts, component)
 	var paths []string

@@ -69,7 +69,7 @@ func TestSourceFilesLeavesOutTestsAndFolders(t *testing.T) {
 	}
 }
 
-func TestCachedResultsMutateOnlyFilesWhoseKeyChanged(t *testing.T) {
+func TestCachedResultsMutateEveryFileWhenAnySourceFileChanges(t *testing.T) {
 	root := t.TempDir()
 	folder := filepath.Join(root, "internal", "noun", "role")
 	if err := os.MkdirAll(folder, 0o755); err != nil {
@@ -99,11 +99,13 @@ func TestCachedResultsMutateOnlyFilesWhoseKeyChanged(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(folder, "b.go"), []byte("package role // edited"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := cachedResults(root, defaultLayout(), "noun/role", mutate, false); err != nil || len(mutated) != 1 || mutated[0] != "b.go" {
+	if _, err := cachedResults(root, defaultLayout(), "noun/role", mutate, false); err != nil || len(mutated) != 2 {
 		t.Fatalf("third run mutated %v: %v", mutated, err)
 	}
-	matches, _ := filepath.Glob(filepath.Join(root, cacheFolder, "noun_role", "b.go.*.json"))
-	if len(matches) != 1 {
-		t.Fatalf("stale cache files remain: %v", matches)
+	for _, name := range []string{"a.go", "b.go"} {
+		matches, _ := filepath.Glob(filepath.Join(root, cacheFolder, "noun_role", name+".*.json"))
+		if len(matches) != 1 {
+			t.Fatalf("stale cache files remain for %s: %v", name, matches)
+		}
 	}
 }

@@ -92,13 +92,14 @@ func cachedResults(root string, place layout, component string, mutate func(targ
 	if err != nil {
 		return nil, err
 	}
+	sources, err := sourceDigest(root, place, component, names)
+	if err != nil {
+		return nil, err
+	}
+	key := cacheKey([]byte(sources), suite, place.gomuVersion, short)
 	var all []result
 	for _, name := range names {
-		source, err := os.ReadFile(filepath.Join(root, place.components, component, name))
-		if err != nil {
-			return nil, err
-		}
-		path := cachePath(root, component, name, cacheKey(source, suite, place.gomuVersion, short))
+		path := cachePath(root, component, name, key)
 		if results, ok := readCached(path); ok {
 			fmt.Fprintf(os.Stderr, "%s: reused %d results\n", name, len(results))
 			all = append(all, results...)
