@@ -25,14 +25,33 @@ The idea comes from Chad Fowler's [Regenerative Software](https://aicoding.leafl
 | Folder | Holds |
 | -- | -- |
 | [process/](process/README.md) | The process, one topic per file, in the order you meet it |
+| [rules/](rules/regenerative.md) | The shared rules every agent follows on a project built this way |
 | [skills/](skills/README.md) | Agent skills that carry out parts of the process, vendor-neutral |
 | [templates/](templates/README.md) | Starting files for a new project: `AGENTS.md`, a contract, a scenario, ADRs, issue templates, the dependency rules |
 | [languages/](languages/README.md) | How the neutral structure maps to a language. Go is worked out; others are candidates |
 
+## How a project uses it
+
+A project holds its own settings and a read-only copy of the shared rules, side by side where agents already look:
+
+```text
+your-project/
+  AGENTS.md                          Your settings and rules. You edit it
+  CLAUDE.md                          Imports AGENTS.md and the shared rules
+  .agents/
+    rules/regenerative.md            The shared rules, copied from here. Read-only
+    skills/                          The skills you copied from here
+  docs/
+    decisions/                       Your ADRs
+    stack/                           Your language and tooling choices
+```
+
+The shared rules and the project's settings are separate files on purpose. A project can add rules in `AGENTS.md` and cannot relax the shared ones. An update to the shared rules arrives as a new copy that shows up in the project's diff. `AGENTS.md` names the rules file by path, because some search tools skip hidden folders. The process docs stay here, since the rules and the project's own ADRs hold what an agent needs.
+
 ## Start a project
 
 1. Read [principles](process/principles.md), [structure](process/structure.md), and the proposed [decomposition guidance](process/decomposition.md).
-2. Copy [templates/AGENTS.md](templates/AGENTS.md) to the new repo and fill in the placeholders.
+2. Copy [rules/regenerative.md](rules/regenerative.md) to `.agents/rules/` in the new repo and make it read-only. Copy [templates/AGENTS.md](templates/AGENTS.md) to the repo root and fill in the project settings.
 3. Copy the skills you want into `.agents/skills/`, including the [writing reference](skills/ai-tells/SKILL.md), as [skills/README.md](skills/README.md) describes.
 4. Write the first ADRs: the functional core, the structure, and contracts and tests. [templates/decisions/](templates/decisions/) has starting versions.
 5. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs. Copy the [Repowise guide](templates/repowise.md) to `docs/stack/repowise.md` and follow its local, no-model-spend setup.

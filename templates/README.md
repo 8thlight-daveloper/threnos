@@ -4,8 +4,8 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 
 | File | Goes to | Is |
 | -- | -- | -- |
-| [AGENTS.md](AGENTS.md) | Repo root | The instructions every agent reads |
-| [CLAUDE.md](CLAUDE.md) | Repo root | One line that imports `AGENTS.md` for Claude Code |
+| [AGENTS.md](AGENTS.md) | Repo root | The project's settings and rules. The shared rules are in [rules/regenerative.md](../rules/regenerative.md), copied read-only to `.agents/rules/` |
+| [CLAUDE.md](CLAUDE.md) | Repo root | Two lines that import `AGENTS.md` and `.agents/rules/regenerative.md` for Claude Code |
 | [architecture.yaml](architecture.yaml) | Repo root | The dependency rules, as data |
 | [decisions/](decisions/) | `docs/decisions/` | The ADR skeleton and four starting ADRs: functional core, structure, contracts and tests, behavior judgment |
 | [contract/](contract/) | `contracts/<noun>/<role>/` | A contract description and a fixture manifest |
@@ -18,7 +18,7 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 
 ## Order
 
-1. `AGENTS.md`, `CLAUDE.md`, and the skills.
+1. `.agents/rules/regenerative.md`, `AGENTS.md`, `CLAUDE.md`, and the skills.
 2. ADRs 0010 to 0040. Write the product principles in 0040 before the first survivor review, not after.
 3. `docs/stack/code-layout.md` from a [language mapping](../languages/README.md), then `docs/stack/repowise.md` from the setup guide. Initialize the local index and connect the project's agent as that guide describes.
 4. `architecture.yaml` with the first components.

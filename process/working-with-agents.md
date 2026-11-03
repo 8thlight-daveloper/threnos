@@ -4,8 +4,9 @@ Agents do most of the drafting and building. The process gives them small, fixed
 
 ## One instructions file, any vendor
 
-- `AGENTS.md` at the repo root holds the instructions every agent reads. [templates/AGENTS.md](../templates/AGENTS.md) is a starting version.
-- A vendor-specific file imports it rather than repeating it. For Claude Code, `CLAUDE.md` holds the single line `@AGENTS.md`.
+- `AGENTS.md` at the repo root holds the project's settings and its own rules. [templates/AGENTS.md](../templates/AGENTS.md) is a starting version.
+- The shared rules live in `.agents/rules/regenerative.md`, a read-only copy of [rules/regenerative.md](../rules/regenerative.md). A project may add rules in `AGENTS.md` and may not relax the shared ones. Only a person changes the shared copy, by taking a new version.
+- A vendor-specific file imports both rather than repeating them. For Claude Code, `CLAUDE.md` holds the two lines `@AGENTS.md` and `@.agents/rules/regenerative.md`.
 - Skills live in `.agents/skills/<name>/`, written with no vendor in mind. A vendor's discovery path, such as `.claude/skills/<name>`, is a symlink to the shared folder. Edit the shared files, never a copy.
 - `AGENTS.md` lists the documents to read first: the README, the architecture and stack overviews, and the ADRs.
 
@@ -13,7 +14,6 @@ Agents do most of the drafting and building. The process gives them small, fixed
 
 A rebuild needs the component's contract, its architecture doc, the dependency rules, and the domain model. Nothing else. The functional core makes that true: with no hidden state, there is nothing else to trace. If an agent needs to read three other components to change one, the boundary is wrong.
 
-## Briefs
 ## Retrieve focused repository context
 
 Use local Repowise to find relevant modules, inspect dependencies, and assess
@@ -29,6 +29,7 @@ implementation, including summaries, call flows, and history. Its brief contains
 only the permitted specifications and dependency interfaces. Restrict retrieval
 to those sources or leave the full index disconnected from that builder.
 
+## Briefs
 
 A delegated agent starts with nothing but the brief. Write it like a handover to a capable colleague:
 
