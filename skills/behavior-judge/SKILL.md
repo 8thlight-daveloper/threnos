@@ -12,8 +12,8 @@ not a model dependency in the shipped product.
 ## Read the authority
 
 Read `AGENTS.md`, the shared rules it imports, and the project's complete behavior judgment ADR, which holds
-the product principles and the judge's delegated authority. `AGENTS.md` names
-it. Read any specific rules that ADR or `AGENTS.md` points to, then the
+the product principles and the judge's delegated authority. The project
+settings in `AGENTS.md` name it. Read the further behavior rules those settings list and any rules that ADR points to, then the
 contracts and accepted decisions relevant to the question. Resolve paths from
 the repository root or this skill's canonical directory, not from a process's
 working directory. Vendor-specific discovery paths may be symlinks to this

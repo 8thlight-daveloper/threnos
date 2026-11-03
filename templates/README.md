@@ -14,6 +14,7 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 | [accepted-survivors.txt](accepted-survivors.txt) | `tools/mutation/accepted/<component>.txt` | The header of a component's accepted survivor list |
 | [repowise.md](repowise.md) | `docs/stack/repowise.md` | Local open-source repository context, with model and embedding API calls disabled |
 | [osv-scanner.md](osv-scanner.md) | `docs/stack/osv-scanner.md` | Dependency vulnerability scan from OSV, with an offline path for projects that cannot send their dependency list |
+| [issue-sizing.md](issue-sizing.md) | `docs/reference/issue-sizing.md` | The project's own examples for each issue size, which the `writing-issues` skill reads |
 | [stack-topic.md](stack-topic.md) | `docs/stack/<topic>.md` | A stack topic with Current, Retired, and Considered tables |
 
 ## Order

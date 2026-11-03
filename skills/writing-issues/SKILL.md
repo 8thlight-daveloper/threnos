@@ -30,7 +30,7 @@ Small issues get reviewed, finish, and unblock each other. Big ones sit in progr
 
 ## Sizes
 
-Size is the review surface: what a person has to read to accept the work. It is not a time estimate and not a count of code lines, because nobody reads the regenerated code. A build takes the size of the contract it builds. The calibration column comes from onboard-kit, the first project built this way. Replace it with your own examples as they accumulate.
+Size is the review surface: what a person has to read to accept the work. It is not a time estimate and not a count of code lines, because nobody reads the regenerated code. A build takes the size of the contract it builds. The calibration column comes from onboard-kit, the first project built this way. A project keeps its own examples in the issue sizing doc that the project settings in `AGENTS.md` name, and those replace this column.
 
 | Size | A leaf issue of this size is | Calibration |
 | -- | -- | -- |
