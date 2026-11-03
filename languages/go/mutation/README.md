@@ -51,7 +51,7 @@ A different mutation tool must print that line, or the project replaces `summari
 
 `gomurun` exits 0 when the run finishes, even with survivors. It exits 1 when gomu fails and 2 on a usage mistake.
 
-Floors are optional. `seedfloors.sh <results-dir> <margin>` writes `floor/<component>.txt` beside the scripts, set a margin below each score. `report.sh` shows each score against its floor and marks a component `BELOW`. Nothing here fails a build on a floor. A project that wants that adds the check to `mutate-report`.
+Floors are optional. `seedfloors.sh <results-dir> <margin>` writes `floor/<component>.txt` beside the scripts, set a margin below each score. `report.sh` shows each score against its floor and marks a component `BELOW`. A floor does not fail a build by default. `report.sh` lists each component below its floor on stderr and exits 0. Set `FAIL_BELOW_FLOOR=1` in the environment and it exits 1 instead.
 
 ## What stays the project's
 

@@ -68,4 +68,4 @@ while IFS=$'\t' read -r component score; do
         below=$((below + 1))
     fi
 done < <(echo "$rows" | jq -r '.[] | [.component, (.score // "none")] | @tsv')
-[ "$below" = "0" ]
+[ "${FAIL_BELOW_FLOOR:-0}" != "1" ] || [ "$below" = "0" ]
