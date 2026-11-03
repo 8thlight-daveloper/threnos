@@ -1,12 +1,12 @@
-# Regenerative software
+# <picture><source media="(prefers-color-scheme: dark)" srcset="images/threnos-lockup-dark.svg"><img src="images/threnos-lockup.svg" alt="Threnos" width="420"></picture>
 
-A working process for building software that an agent or a person can delete and rebuild, one component at a time, without losing what the software is supposed to do.
+A process for building software that an agent or a person can delete and rebuild, one component at a time, without losing what the software is supposed to do.
 
-Status: draft. It describes the process used on onboard-kit, a Go command-line tool, from October 2026. It has been used on one project, in one language. Treat every rule as a starting point.
+Two Go command-line tools, [onboard-kit](https://github.com/8thlight/onboard-kit) and [repo-tutor](https://github.com/8thlight/repo-tutor), are built this way.
 
 ## The idea
 
-Code is cheap to write now, and cheap to throw away. What is expensive is knowing what correct means. So the process keeps that knowledge in a few small, slow-changing artifacts and treats the code as disposable.
+With Agentic tooling, code is now cheap to write, and cheap to throw away. What is expensive is knowing what correct means. So this process keeps that knowledge in a few small, slow-changing artifacts and treats the code as disposable.
 
 | Permanent, changed deliberately | Disposable, rebuilt freely |
 | -- | -- |
