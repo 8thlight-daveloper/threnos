@@ -57,7 +57,7 @@ _go-packages:
 | Need | Used | Notes |
 | -- | -- | -- |
 | Test runner | `go test -race`, `t.Parallel()`, `t.TempDir()` | Run a build's tests with `-count=3` too, to catch hidden state |
-| Mutation | gomu, through a small wrapper program | gomu builds mutants over an overlay and leaves non-compiling mutants out of the score. The wrapper points it at the contract package, runs one mutant at a time with `GOFLAGS=-p=2`, passes `-timeout` to `go test` so looping mutants die, and prints survivors with stable keys |
+| Mutation | gomu, through a small wrapper program | gomu builds mutants over an overlay and leaves non-compiling mutants out of the score. The wrapper points it at the contract package, runs one mutant at a time with `GOFLAGS=-p=2`, passes `-timeout` to `go test` so looping mutants die, and prints survivors with stable keys. See the [mutation adapter](go/mutation/README.md). |
 | Not chosen for mutation | gremlins, go-mutesting, ooze | gremlins runs only the package's own tests. go-mutesting edits files in place and skipped struct, slice, and map assignments. ooze counts non-compiling mutants as killed |
 | Dependency check | Rules in `architecture.yaml`. ArchUnitGo was being evaluated | `depguard` would duplicate the dependency table one package at a time |
 | Banned in core | `os`, `io/fs`, `path/filepath`, `net`, `os/exec`, `syscall`, `math/rand`, `crypto/rand`, terminal packages, and clock calls in `time` | `time` also holds types the model needs, so an import ban alone is too coarse |
