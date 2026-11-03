@@ -2,7 +2,9 @@
 
 The Go implementation of the mutation recipes in [task recipes](../../../process/task-recipes.md). It runs [gomu](https://github.com/sivchari/gomu) through a small wrapper, `gomurun`, and summarizes the result for CI.
 
-It was generalized from onboard-kit's `tools/mutation/`. The wrapper's folders are now flags, and the scripts read the component and contract folders from the environment. The unit tests pass on Go 1.26. The scripts were run against made-up logs and a throwaway Git repository. The generalized wrapper has not run gomu itself, because this repository has no Go project and the unit tests do not call gomu.
+It was generalized from onboard-kit's `tools/mutation/`. The wrapper's folders are now flags, and the scripts read the component and contract folders from the environment. The unit tests pass on Go 1.26. The scripts were run against made-up logs and a throwaway Git repository. The generalized wrapper ran gomu v0.3.0 on Go 1.26.8 against one component of a real project, with and without `--cached` and with an accepted survivor. The cached and uncached runs gave the same score, and the second cached run reused every result. A components folder two levels deep (`--components internal/parts`) gave the same score. `--short` has not run against gomu.
+
+Build gomu with the same Go version that runs the tests. A gomu built with Go 1.26 panics with `export data version 5 is greater than maximum supported version 2` when the shell's `go` is newer.
 
 ## Use it
 
