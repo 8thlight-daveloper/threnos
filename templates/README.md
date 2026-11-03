@@ -10,6 +10,7 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 | [decisions/](decisions/) | `docs/decisions/` | The ADR skeleton and four starting ADRs: functional core, structure, contracts and tests, behavior judgment |
 | [contract/](contract/) | `contracts/<noun>/<role>/` | A contract description and a fixture manifest |
 | [acceptance/](acceptance/README.md) | `docs/reference/` and `acceptance/scenarios/` | The scenario format and two example scenarios |
+| [workflows/](workflows/) | `.github/workflows/` | The `check` and `mutate` GitHub Actions workflows. They call only the [task recipes](../process/task-recipes.md) |
 | [issues/](issues/) | `.github/ISSUE_TEMPLATE/` | Decision, contract, build, and integration issues |
 | [accepted-survivors.txt](accepted-survivors.txt) | `tools/mutation/accepted/<component>.txt` | The header of a component's accepted survivor list |
 | [repowise.md](repowise.md) | `docs/stack/repowise.md` | Local open-source repository context, with model and embedding API calls disabled |

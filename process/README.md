@@ -11,6 +11,7 @@ One topic per file. Read them in this order the first time.
 | [acceptance.md](acceptance.md) | Whole-program scenarios written as data |
 | [building.md](building.md) | Building and rebuilding a component, and when to regenerate |
 | [mutation-testing.md](mutation-testing.md) | Survivors as contract gaps, proving equivalence, the accepted list |
+| [task-recipes.md](task-recipes.md) | The justfile recipes that CI and agents call, with their arguments and output |
 | [judgment.md](judgment.md) | Principles documents, and the judges that apply them |
 | [review-and-approval.md](review-and-approval.md) | Who changes what, and what a reviewer reads |
 | [docs-and-decisions.md](docs-and-decisions.md) | Where each kind of document goes, and how fast it changes |
