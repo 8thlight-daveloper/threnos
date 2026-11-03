@@ -12,13 +12,14 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 | [acceptance/](acceptance/README.md) | `docs/reference/` and `acceptance/scenarios/` | The scenario format and two example scenarios |
 | [issues/](issues/) | `.github/ISSUE_TEMPLATE/` | Decision, contract, build, and integration issues |
 | [accepted-survivors.txt](accepted-survivors.txt) | `tools/mutation/accepted/<component>.txt` | The header of a component's accepted survivor list |
+| [repowise.md](repowise.md) | `docs/stack/repowise.md` | Local open-source repository context, with model and embedding API calls disabled |
 | [stack-topic.md](stack-topic.md) | `docs/stack/<topic>.md` | A stack topic with Current, Retired, and Considered tables |
 
 ## Order
 
 1. `AGENTS.md`, `CLAUDE.md`, and the skills.
 2. ADRs 0010 to 0040. Write the product principles in 0040 before the first survivor review, not after.
-3. `docs/stack/code-layout.md` from a [language mapping](../languages/README.md).
+3. `docs/stack/code-layout.md` from a [language mapping](../languages/README.md), then `docs/stack/repowise.md` from the setup guide. Initialize the local index and connect the project's agent as that guide describes.
 4. `architecture.yaml` with the first components.
 5. The scenario format, then the first scenario.
 6. The domain model, then the first contract.

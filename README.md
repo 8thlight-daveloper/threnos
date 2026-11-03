@@ -35,7 +35,7 @@ The idea comes from Chad Fowler's [Regenerative Software](https://aicoding.leafl
 2. Copy [templates/AGENTS.md](templates/AGENTS.md) to the new repo and fill in the placeholders.
 3. Copy the skills you want into `.agents/skills/`, including the [writing reference](skills/ai-tells/SKILL.md), as [skills/README.md](skills/README.md) describes.
 4. Write the first ADRs: the functional core, the structure, and contracts and tests. [templates/decisions/](templates/decisions/) has starting versions.
-5. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs.
+5. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs. Copy the [Repowise guide](templates/repowise.md) to `docs/stack/repowise.md` and follow its local, no-model-spend setup.
 6. Write the domain model, then the first contract, then build against it. [The lifecycle](process/README.md) gives the order.
 
 ## When it pays off
