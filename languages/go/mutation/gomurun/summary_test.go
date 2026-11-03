@@ -34,6 +34,43 @@ func TestAScoreWithNothingJudgedIsOne(t *testing.T) {
 	}
 }
 
+func TestARunWhereEveryMutantIsNotViableJudgedNothing(t *testing.T) {
+	cases := map[string]struct {
+		counts tally
+		want   bool
+	}{
+		"only not viable":          {tally{notViable: 4}, true},
+		"not viable and timed out": {tally{notViable: 4, timedOut: 2}, true},
+		"one killed":               {tally{killed: 1, notViable: 4}, false},
+		"one survivor":             {tally{survived: 1, notViable: 4}, false},
+		"every survivor accepted":  {tally{accepted: 2, notViable: 4}, false},
+		"no mutants at all":        {tally{}, false},
+	}
+	for name, each := range cases {
+		if got := each.counts.judgedNothing(); got != each.want {
+			t.Errorf("%s: judgedNothing = %v, want %v", name, got, each.want)
+		}
+	}
+}
+
+func TestARunThatJudgedNothingIsAProblemNotAPerfectScore(t *testing.T) {
+	root := t.TempDir()
+	source := filepath.Join(root, "internal", "noun", "role", "a.go")
+	if err := os.MkdirAll(filepath.Dir(source), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(source, []byte("package role\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	results := []result{
+		{Mutant: mutant{FilePath: source, Line: 1}, Status: statusNotViable},
+		{Mutant: mutant{FilePath: source, Line: 1, Column: 2}, Status: statusNotViable},
+	}
+	if code := summarize(root, defaultLayout(), "noun/role", results); code != exitProblem {
+		t.Fatalf("exit code is %d, want %d", code, exitProblem)
+	}
+}
+
 func TestTheScoreLineSaysMutationScore(t *testing.T) {
 	var output bytes.Buffer
 	printScore(&output, tally{killed: 3, survived: 1, accepted: 2, notViable: 5})

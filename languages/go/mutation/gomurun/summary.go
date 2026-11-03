@@ -40,6 +40,10 @@ func tallyOf(results []result, survivors []survivor, accepted map[string]bool) (
 	return counts, unreviewed
 }
 
+func (counts tally) judgedNothing() bool {
+	return counts.killed+counts.survived+counts.accepted == 0 && counts.notViable > 0
+}
+
 func (counts tally) score() float64 {
 	judged := counts.killed + counts.survived
 	if judged == 0 {

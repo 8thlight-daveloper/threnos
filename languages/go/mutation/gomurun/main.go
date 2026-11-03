@@ -183,6 +183,10 @@ func summarize(root string, place layout, component string, results []result) in
 		return exitProblem
 	}
 	counts, unreviewed := tallyOf(results, survivors, accepted)
+	if counts.judgedNothing() {
+		fmt.Fprintf(os.Stderr, "Every one of the %d mutants was not viable, so the run judged nothing. The component or its contract package may not build.\n", counts.notViable)
+		return exitProblem
+	}
 	printSurvivors(os.Stdout, unreviewed)
 	printScore(os.Stdout, counts)
 	return exitSuccess
