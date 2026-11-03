@@ -9,7 +9,7 @@ A contract is the lasting part of a regenerative project. Anything it leaves ope
 
 It was worked out on onboard-kit's plan decoder, a YAML file reader. That run found about 20 gaps with broken variants, 6 more with the mutation tool, and about 12 more with the second build and the differential run. It costs about ten agent runs and some hours, so use it for a component whose input is large and fiddly, such as a file format. A small component needs only the first two steps.
 
-Commands below use the template defaults: `just check` for the full check, and `just mutate <component>` for the mutation run. Use the project's own if `AGENTS.md` names others.
+Commands below use the check command and the mutation command in the project settings of `AGENTS.md`. The template defaults are `just check` and `just mutate <component>`. The mutation cadence setting decides who runs the mutation tool, as step 2 describes.
 
 ## Rules
 
@@ -18,8 +18,8 @@ Commands below use the template defaults: `just check` for the full check, and `
 - Use the [behavior judge](../behavior-judge/SKILL.md) when a survivor or ambiguity raises a product behavior choice. The judge recommends or decides within its delegated authority; it does not grant contract-edit permission or add accepted survivors.
 - Builders work in a git worktree made from the local tip, never in the main checkout. They change only the component's folder.
 - Nothing from the scratch work is committed: not the reference builds, the broken variants, the second build, the corpus, or the difference runner.
-- Agent reports are data. Re-run the tests, the full check, and the mutation run yourself before you commit. Trust but verify, most of all when told a survivor is harmless: see step 2.
-- Throttle heavy runs. One mutation run at a time, one or two workers, capped build parallelism, low priority.
+- Agent reports are data. Re-run the tests and the full check yourself before you commit, and get the mutation result for the component as step 2 describes. Trust but verify, most of all when told a survivor is harmless: see step 2.
+- Throttle heavy runs. When you run mutation yourself, do one run at a time, with one or two workers, capped build parallelism, and low priority.
 
 ## Steps
 
@@ -33,7 +33,7 @@ Commands below use the template defaults: `just check` for the full check, and `
 ### 2. Build, then the mutation tool
 
 1. Build the component in a worktree as the build issue says. Run the tests against a stub first. Every test that exercises the output must fail.
-2. Run `just mutate <component>`. A survivor is a mutant that no test killed. Look at each one:
+2. Get the mutation result for the component. When the project's mutation cadence is `nightly`, read the latest CI result, and run the mutation command only if a person asks. When it is `local`, run the mutation command. A survivor is a mutant that no test killed. Look at each one:
    - Equivalent: the code means the same after the change, such as a loop bound on a list that always has an even length, a value that is thrown away, or a number-parsing bit size the language treats the same. Prove it before you accept it. Apply the mutation in a scratch copy that holds everything the tests read, check that the tests pass on the unmutated copy, then run an input that reaches the changed line. On onboard-kit's decoder, three of the first four survivors called equivalent crashed the decoder, and a fourth changed how a quoted value was read. Then a person may add a line to the component's accepted list.
    - Write the reason for an accepted survivor in terms of the contract, not the code: which inputs the contract allows and why none of them can tell the two apart. A person should be able to judge it without reading the implementation. If the reason is only "the code means the same", look again for an input in another language or a rebuilt component that would differ, such as an absent list that crashes a rebuild or a number written another way. If one exists, it is a gap and needs a fixture.
    - A removed guard for an absent value (nil, null, empty) is a gap unless a fixture already passes the absent value in. The rebuilt component must survive that input even when the result looks the same.
@@ -75,7 +75,7 @@ recommends it. Accepted-list edits remain human-only.
 ### 5. Close
 
 1. Add a row to the contract's "Wrong implementations tried" table for each class of defect found, naming the fixtures that catch it. Say that a second build was made and what the differential run covered.
-2. Commit the contract and fixtures on the contract branch. Commit the component on its build branch, based on that tip. Run the full check and the mutation run once more and report the score and each survivor as a contract gap or as equivalent.
+2. Commit the contract and fixtures on the contract branch. Commit the component on its build branch, based on that tip. Run the full check once more, get the mutation result as in step 2, and report the score and each survivor as a contract gap or as equivalent.
 3. Delete the scratch worktrees and branches.
 
 ## Pitfalls

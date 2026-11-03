@@ -45,4 +45,4 @@ Edit the copies in `.agents/skills/`, never the links. To share an improvement a
 
 ## Commands the skills assume
 
-The process skills use the template's defaults: `just check` runs every check, and `just mutate <component>` runs the mutation tool on one component and prints survivors in the accepted list's format. A project with other commands names them in `AGENTS.md`, and the skills follow that.
+The process skills read the check command, the mutation command, and the mutation cadence from the project settings in `AGENTS.md`. The template defaults are `just check`, which runs every check, and `just mutate <component>`, which runs the mutation tool on one component and prints survivors in the accepted list's format. The cadence is `nightly`, where CI runs mutation and agents read the result, or `local`, where agents run it. A project with other commands or a different cadence sets them there, and the skills follow that.

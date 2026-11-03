@@ -11,7 +11,7 @@ not a model dependency in the shipped product.
 
 ## Read the authority
 
-Read `AGENTS.md` and the project's complete behavior judgment ADR, which holds
+Read `AGENTS.md`, the shared rules it imports, and the project's complete behavior judgment ADR, which holds
 the product principles and the judge's delegated authority. `AGENTS.md` names
 it. Read any specific rules that ADR or `AGENTS.md` points to, then the
 contracts and accepted decisions relevant to the question. Resolve paths from
