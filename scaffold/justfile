@@ -1,0 +1,8 @@
+# Recipes CI and agents call. See process/task-recipes.md in Threnos.
+
+default:
+    @just --list
+
+check:
+    @echo "Replace with the project's format, lint, tests, and acceptance scenarios." >&2
+    @exit 1

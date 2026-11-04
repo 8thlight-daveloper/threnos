@@ -1,0 +1,22 @@
+# What the flake knows about each skill. A skill not listed here defaults to "on"
+# and has no dependencies.
+#
+# default       "on", "off", or "ejected". What a project gets with no entry of its own.
+# requires      Skills this one cannot work without. The flake refuses a project that
+#               has this skill present and a required one off.
+# citedByRules  The shared rules name this skill. The flake warns when a project turns it off.
+
+[skills.ai-tells]
+citedByRules = true
+
+[skills.comments-review]
+citedByRules = true
+
+[skills.commit-message]
+citedByRules = true
+
+[skills.writing-issues]
+citedByRules = true
+
+[skills.contract-hardening]
+requires = ["behavior-judge"]
