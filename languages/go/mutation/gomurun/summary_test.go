@@ -34,13 +34,16 @@ func TestAScoreWithNothingJudgedIsOne(t *testing.T) {
 	}
 }
 
-func TestARunWhereEveryMutantIsNotViableJudgedNothing(t *testing.T) {
+func TestARunWhereNoMutantWasKilledOrSurvivedJudgedNothing(t *testing.T) {
 	cases := map[string]struct {
 		counts tally
 		want   bool
 	}{
 		"only not viable":          {tally{notViable: 4}, true},
 		"not viable and timed out": {tally{notViable: 4, timedOut: 2}, true},
+		"only timed out":           {tally{timedOut: 6}, true},
+		"only errors":              {tally{errored: 3}, true},
+		"timed out, one killed":    {tally{killed: 1, timedOut: 6}, false},
 		"one killed":               {tally{killed: 1, notViable: 4}, false},
 		"one survivor":             {tally{survived: 1, notViable: 4}, false},
 		"every survivor accepted":  {tally{accepted: 2, notViable: 4}, false},
@@ -62,12 +65,14 @@ func TestARunThatJudgedNothingIsAProblemNotAPerfectScore(t *testing.T) {
 	if err := os.WriteFile(source, []byte("package role\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	results := []result{
-		{Mutant: mutant{FilePath: source, Line: 1}, Status: statusNotViable},
-		{Mutant: mutant{FilePath: source, Line: 1, Column: 2}, Status: statusNotViable},
-	}
-	if code := summarize(root, defaultLayout(), "noun/role", results); code != exitProblem {
-		t.Fatalf("exit code is %d, want %d", code, exitProblem)
+	for _, status := range []string{statusNotViable, statusTimedOut, statusError} {
+		results := []result{
+			{Mutant: mutant{FilePath: source, Line: 1}, Status: status},
+			{Mutant: mutant{FilePath: source, Line: 1, Column: 2}, Status: status},
+		}
+		if code := summarize(root, defaultLayout(), "noun/role", results); code != exitProblem {
+			t.Errorf("all %s: exit code is %d, want %d", status, code, exitProblem)
+		}
 	}
 }
 
@@ -128,6 +133,7 @@ func TestGoFlagsKeepAnExistingLimitAndAddOneOtherwise(t *testing.T) {
 		"":               "-p=2",
 		"-race":          "-race -p=2",
 		"-p=4 -race":     "-p=4 -race",
+		"-race -p 4":     "-race -p 4",
 		"-tags=mutation": "-tags=mutation -p=2",
 	}
 	for existing, want := range cases {
@@ -182,6 +188,38 @@ func TestAnotherLayoutMovesTheContractFolderAndTheTarget(t *testing.T) {
 	}
 	if got, want := componentTarget(place, "record/joiner"), "./src/parts/record/joiner"; got != want {
 		t.Errorf("componentTarget = %q, want %q", got, want)
+	}
+}
+
+func TestFolderFlagsAreCleanedBeforeTheContractPathIsBuilt(t *testing.T) {
+	for _, components := range []string{"internal", "./internal", "internal/", "./internal/"} {
+		place, err := layout{components: components, contracts: "./contracts/", accepted: "tools/mutation/accepted"}.normalized()
+		if err != nil {
+			t.Fatalf("%q: %v", components, err)
+		}
+		if got, want := contractPathFrom(place, "record/joiner"), "../../../contracts/record/joiner/"; got != want {
+			t.Errorf("components %q: contractPathFrom = %q, want %q", components, got, want)
+		}
+		if got, want := componentTarget(place, "record/joiner"), "./internal/record/joiner"; got != want {
+			t.Errorf("components %q: componentTarget = %q, want %q", components, got, want)
+		}
+	}
+}
+
+func TestAFolderFlagOutsideTheProjectIsRefused(t *testing.T) {
+	for _, bad := range []string{"/abs/internal", "../internal", ".."} {
+		if _, err := (layout{components: bad, contracts: "contracts", accepted: "accepted"}).normalized(); err == nil {
+			t.Errorf("--components %q was accepted", bad)
+		}
+	}
+}
+
+func TestAComponentOutsideTheComponentsFolderIsRefused(t *testing.T) {
+	root := t.TempDir()
+	for _, bad := range []string{"..", "../x", "/abs", "."} {
+		if err := checkComponent(root, defaultLayout(), bad); err == nil || !strings.Contains(err.Error(), "is not a component folder") {
+			t.Errorf("component %q: got %v", bad, err)
+		}
 	}
 }
 

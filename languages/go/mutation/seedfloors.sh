@@ -18,6 +18,6 @@ find "$results" -name result.json -exec cat {} + | jq -r 'select(.score != null)
         continue
     fi
     mkdir -p "$(dirname "$target")"
-    awk -v s="$score" -v m="$margin" 'BEGIN { f = s - m; if (f < 0) f = 0; printf "%.4f\n", f }' > "$target"
+    awk -v s="$score" -v m="$margin" 'BEGIN { f = s - m; if (f < 0) f = 0; printf "%.4f\n", int(f * 10000 + 0.000001) / 10000 }' > "$target"
     echo "$component $(cat "$target")"
 done

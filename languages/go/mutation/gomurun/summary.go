@@ -41,7 +41,11 @@ func tallyOf(results []result, survivors []survivor, accepted map[string]bool) (
 }
 
 func (counts tally) judgedNothing() bool {
-	return counts.killed+counts.survived+counts.accepted == 0 && counts.notViable > 0
+	return counts.killed+counts.survived+counts.accepted == 0 && counts.unjudged() > 0
+}
+
+func (counts tally) unjudged() int {
+	return counts.notViable + counts.timedOut + counts.errored
 }
 
 func (counts tally) score() float64 {

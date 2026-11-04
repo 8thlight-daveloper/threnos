@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -38,10 +39,15 @@ func run(args []string) int {
 	options.StringVar(&place.accepted, "accepted", defaults.accepted, "folder that holds the accepted survivor lists")
 	options.StringVar(&place.gomuVersion, "gomu-version", defaults.gomuVersion, "gomu version, which is part of the cache key")
 	if options.Parse(args) != nil || options.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: gomurun [--workers N] [--timeout S] [--short] [--cached] [--components DIR] [--contracts DIR] [--accepted DIR] [--gomu-version V] <noun>/<role>")
+		fmt.Fprintln(os.Stderr, "usage: gomurun [--workers N] [--timeout S] [--short] [--cached] [--gomu PATH] [--components DIR] [--contracts DIR] [--accepted DIR] [--gomu-version V] <noun>/<role>")
 		return exitUsage
 	}
-	component := options.Arg(0)
+	place, err := place.normalized()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return exitUsage
+	}
+	component := path.Clean(filepath.ToSlash(options.Arg(0)))
 	root, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -124,6 +130,9 @@ func cachedResults(root string, place layout, component string, mutate func(targ
 }
 
 func checkComponent(root string, place layout, component string) error {
+	if !insideProject(component) || component == "." {
+		return fmt.Errorf("%q is not a component folder", component)
+	}
 	for _, folder := range []string{place.components, place.contracts} {
 		if info, err := os.Stat(filepath.Join(root, folder, component)); err != nil || !info.IsDir() {
 			return fmt.Errorf("%s/%s is not a folder", folder, component)
@@ -137,7 +146,7 @@ func componentTarget(place layout, component string) string {
 }
 
 func contractPathFrom(place layout, component string) string {
-	depth := len(strings.Split(place.components, "/")) + len(strings.Split(component, "/"))
+	depth := segments(place.components) + segments(component)
 	return strings.Repeat("../", depth) + place.contracts + "/" + component + "/"
 }
 
@@ -165,8 +174,10 @@ func runGomu(gomu string, place layout, target string, component string, workers
 }
 
 func limitedGoFlags(existing string) string {
-	if strings.Contains(existing, "-p=") {
-		return existing
+	for _, flag := range strings.Fields(existing) {
+		if flag == "-p" || strings.HasPrefix(flag, "-p=") {
+			return existing
+		}
 	}
 	return strings.TrimSpace(existing + " -p=2")
 }
@@ -184,7 +195,7 @@ func summarize(root string, place layout, component string, results []result) in
 	}
 	counts, unreviewed := tallyOf(results, survivors, accepted)
 	if counts.judgedNothing() {
-		fmt.Fprintf(os.Stderr, "Every one of the %d mutants was not viable, so the run judged nothing. The component or its contract package may not build.\n", counts.notViable)
+		fmt.Fprintf(os.Stderr, "Every one of the %d mutants was not viable, timed out, or errored (%d not viable, %d timed out, %d errors), so the run judged nothing. The component or its contract package may not build, or the tests may need a longer --timeout.\n", counts.unjudged(), counts.notViable, counts.timedOut, counts.errored)
 		return exitProblem
 	}
 	printSurvivors(os.Stdout, unreviewed)

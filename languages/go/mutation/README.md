@@ -51,9 +51,15 @@ A different mutation tool must print that line, or the project replaces `summari
 
 ## Exit codes and floors
 
-`gomurun` exits 0 when the run finishes, even with survivors. It exits 1 when gomu fails, and when every mutant is not viable with none killed, surviving, or accepted, which usually means the component or its contract package does not build. It exits 2 on a usage mistake.
+`gomurun` exits 0 when the run finishes, even with survivors. It exits 1 when gomu fails, and when every mutant is not viable, timed out, or errored with none killed, surviving, or accepted. That usually means the component or its contract package does not build, or `--timeout` is too short. It exits 2 on a usage mistake.
 
 Floors are optional. `seedfloors.sh <results-dir> <margin>` writes `floor/<component>.txt` beside the scripts, set a margin below each score. `report.sh` shows each score against its floor and marks a component `BELOW`. A floor does not fail a build by default. `report.sh` lists each component below its floor on stderr and exits 0. Set `FAIL_BELOW_FLOOR=1` in the environment and it exits 1 instead.
+
+## How the score is counted
+
+The score is passed divided by passed plus failed. Not viable mutants, timed-out mutants, and errors stay out of it, and the log line reports each count so a reader can see them. A timed-out mutant is not counted as killed, so a slow test suite does not raise the score. An accepted survivor also leaves the score, so accepting survivors raises it. Seed floors after the accepted lists are settled.
+
+`seedfloors.sh` rounds each floor down to four decimals, so a floor never sits above the score it came from.
 
 ## What stays the project's
 
