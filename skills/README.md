@@ -28,7 +28,23 @@ General skills the process leans on. They work in any project.
 
 ## Install into a project
 
-1. Copy each skill folder into the project's `.agents/skills/`. Include `ai-tells` when using the agent instructions template; it supplies the shared writing reference.
+With Nix, a project takes the skills through its flake. [scaffold/](../scaffold/) is the starting flake. `nix run .#sync` installs each skill into `.agents/skills/` read-only, links it from `.claude/skills/`, and removes any the project turned off. `nix flake check` fails when an installed file differs from Threnos, or when the justfile lacks a recipe the project lists.
+
+The project's `.agents/threnos.toml` sets each skill to one of three states:
+
+| State | Sync does | Use it when |
+| -- | -- | -- |
+| `on` | Installs the skill read-only and keeps it current | The skill fits as written. This is the default |
+| `off` | Removes the skill, so the project has none | The skill does not apply. Disabled means absent, which works for any agent vendor |
+| `ejected` | Leaves the files alone and stops owning them | The project needs a different policy and will edit its own copy |
+
+`manifest.toml` in this folder records what the flake knows about each skill. Turning off a skill that another present skill `requires` is refused. Turning off a skill the shared rules name is a warning. Sync also refuses to overwrite a file that exists, differs, and was not installed by sync, so a project with its own copy sets it to `ejected` first.
+
+Edit a skill here, never in a project's `.agents/skills/`. To change one for a single project, eject it.
+
+### Without Nix
+
+1. Copy each skill folder into the project's `.agents/skills/`. Include `ai-tells`; it supplies the shared writing reference.
 2. Link each one into the vendor's discovery folder. For Claude Code:
 
    ```sh
@@ -39,9 +55,7 @@ General skills the process leans on. They work in any project.
    done
    ```
 
-3. Name them in the project's `AGENTS.md`, as [the template](../templates/AGENTS.md) does.
-
-Edit the copies in `.agents/skills/`, never the links. To share an improvement across projects, bring it back here.
+3. Copy [rules/regenerative.md](../rules/regenerative.md) to `.agents/rules/` and [templates/AGENTS.md](../templates/AGENTS.md) to the repo root.
 
 ## Commands the skills assume
 
