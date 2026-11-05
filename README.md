@@ -68,6 +68,10 @@ The process costs more up front than a single tree of code. It pays when:
 
 It does not pay for a throwaway script, or for code whose correctness is mostly visual. Those are better judged by a person using them.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for what to check before a pull request.
+
 ## License
 
 Copyright © 2026 8th Light, LLC. Licensed under the GNU General Public License, version 3 or later. See [LICENSE](LICENSE).
