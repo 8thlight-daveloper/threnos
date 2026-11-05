@@ -67,3 +67,9 @@ The process costs more up front than a single tree of code. It pays when:
 - The project will outlive its first implementation, or its first language.
 
 It does not pay for a throwaway script, or for code whose correctness is mostly visual. Those are better judged by a person using them.
+
+## License
+
+Copyright © 2026 8th Light, LLC. Licensed under the GNU General Public License, version 3 or later. See [LICENSE](LICENSE).
+
+8th Light® and the 8th Light logo are trademarks of 8th Light, LLC and are not covered by the GNU General Public License.
