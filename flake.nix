@@ -37,7 +37,6 @@
         default = threnos.mkTree pkgs (threnos.resolve ./scaffold/.agents/threnos.toml);
       });
 
-      # The scaffold must resolve and pass its own drift check against a synced tree.
       checks = forAllSystems (pkgs:
         let
           resolved = threnos.resolve ./scaffold/.agents/threnos.toml;
