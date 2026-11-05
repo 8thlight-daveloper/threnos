@@ -28,7 +28,7 @@ General skills the process leans on. They work in any project.
 
 ## Install into a project
 
-With Nix, a project takes the skills through its flake. [scaffold/](../scaffold/) is the starting flake. `nix run .#sync` installs each skill into `.agents/skills/` read-only, links it from `.claude/skills/`, and removes any the project turned off. `nix flake check` fails when an installed file differs from Threnos, or when the justfile lacks a recipe the project lists.
+With Nix, a project takes the skills through its flake. [scaffold/](../scaffold/) is the starting flake. `nix run .#sync` installs each skill into `.agents/skills/` read-only, links it from `.claude/skills/`, and removes any the project turned off. `nix flake check` fails when an installed file differs from Threnos, or when the justfile lacks a recipe the project lists. A flake in a Git repository sees only tracked files, so run `git add .agents .claude` after sync and before the check. Until then the drift check fails on the new files.
 
 The project's `.agents/threnos.toml` sets each skill to one of three states:
 
