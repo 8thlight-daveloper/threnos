@@ -91,7 +91,7 @@ let
   mkSync = pkgs: tree:
     pkgs.writeShellApplication {
       name = "threnos-sync";
-      runtimeInputs = [ pkgs.coreutils pkgs.diffutils ];
+      runtimeInputs = [ pkgs.coreutils pkgs.diffutils pkgs.gnugrep ];
       text = ''
         tree=${tree}
         owned_file=.agents/.threnos-owned
