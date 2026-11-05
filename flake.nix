@@ -6,7 +6,7 @@
   outputs = { self, nixpkgs }:
     let
       lib = nixpkgs.lib;
-      systems = [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
+      systems = [ "aarch64-darwin" "aarch64-linux" "x86_64-linux" ];
       forAllSystems = build: lib.genAttrs systems (system: build nixpkgs.legacyPackages.${system});
       threnos = import ./nix/lib.nix { inherit lib self; };
 
