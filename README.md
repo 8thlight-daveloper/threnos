@@ -2,8 +2,6 @@
 
 A process for building software that an agent or a person can delete and rebuild, one component at a time, without losing what the software is supposed to do.
 
-Two Go command-line tools, [onboard-kit](https://github.com/8thlight/onboard-kit) and [repo-tutor](https://github.com/8thlight/repo-tutor), are built this way.
-
 ## The idea
 
 With Agentic tooling, code is now cheap to write, and cheap to throw away. What is expensive is knowing what correct means. So this process keeps that knowledge in a few small, slow-changing artifacts and treats the code as disposable.
@@ -67,6 +65,11 @@ The process costs more up front than a single tree of code. It pays when:
 - The project will outlive its first implementation, or its first language.
 
 It does not pay for a throwaway script, or for code whose correctness is mostly visual. Those are better judged by a person using them.
+
+## Projects that use Threnos
+
+- [onboard-kit](https://github.com/8thlight/onboard-kit), a Go command-line tool.
+- [repo-tutor](https://github.com/8thlight/repo-tutor), a Go command-line tool.
 
 ## Contributing
 
