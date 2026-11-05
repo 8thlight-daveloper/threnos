@@ -4,7 +4,8 @@ Thanks for helping improve Threnos. This page says what to check before you open
 
 Threnos holds process docs, shared rules, skills, templates, a flake, and a Go mutation adapter. For a change to the
 process, the shared rules, or what a skill tells an agent to do, open an issue first so we can agree on the approach.
-Fixes to wording, links, and examples can go straight to a pull request.
+Fixes to wording, links, and examples can go straight to a pull request. Report a security problem privately, as
+[SECURITY.md](SECURITY.md) describes.
 
 ## Keep clients and employers out
 
@@ -47,6 +48,9 @@ you push:
 
 Run the last two on the files you change. Many existing docs do not pass them yet, so do not reformat a file you are not
 otherwise changing. Match the configs in `.markdownlint-cli2.jsonc` and `.mdformat.toml` in the files you write.
+
+To run the flake and link checks on every commit, run `git config core.hooksPath .githooks`. The same two checks run in
+CI on each pull request.
 
 To test a flake change from a project's side, scaffold a project in a scratch directory and sync it against your
 checkout:
