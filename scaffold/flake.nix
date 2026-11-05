@@ -1,8 +1,7 @@
 {
   description = "A project built the regenerative way";
 
-  # Replace with the place this repository is published.
-  inputs.threnos.url = "github:8thlight/threnos";
+  inputs.threnos.url = "github:8thlight-daveloper/threnos";
   inputs.nixpkgs.follows = "threnos/nixpkgs";
 
   outputs = { self, threnos, ... }:
