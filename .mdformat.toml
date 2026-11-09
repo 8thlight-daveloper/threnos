@@ -1,1 +1,8 @@
 wrap = 120
+exclude = [
+  "templates/contract/contract.md",
+  "templates/decisions/adr.md",
+  "templates/issue-sizing.md",
+  "templates/product-principles.md",
+  "templates/stack-topic.md",
+]

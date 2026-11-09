@@ -1,15 +1,17 @@
 # Issues
 
-An issue is one unit of work a person can review in one sitting and accept or reject. What the person reviews is a contract, a scenario, or a decision, not code. The [writing-issues skill](../skills/writing-issues/SKILL.md) has the full rules, the size table, and a checklist.
+An issue is one unit of work a person can review in one sitting and accept or reject. What the person reviews is a
+contract, a scenario, or a decision, not code. The [writing-issues skill](../skills/writing-issues/SKILL.md) has the
+full rules, the size table, and a checklist.
 
 ## Four kinds
 
-| Kind | Settles | Ends when | Template |
-| -- | -- | -- | -- |
-| Decision | One question | The answer is in an ADR, a doc, or a stack row, and a person accepted it | [decision.md](../templates/issues/decision.md) |
-| Contract | One component's contract, or one increment of it | All four parts exist, wrong implementations were tried, a person approved | [contract.md](../templates/issues/contract.md) |
-| Build | One component, once | Tests failed against a stub, then passed. Survivors reported. Only the folder changed | [build.md](../templates/issues/build.md) |
-| Integration | Wiring components into the program | Named scenarios pass. No component's folder changed | [integration.md](../templates/issues/integration.md) |
+| Kind        | Settles                                          | Ends when                                                                             | Template                                             |
+| ----------- | ------------------------------------------------ | ------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Decision    | One question                                     | The answer is in an ADR, a doc, or a stack row, and a person accepted it              | [decision.md](../templates/issues/decision.md)       |
+| Contract    | One component's contract, or one increment of it | All four parts exist, wrong implementations were tried, a person approved             | [contract.md](../templates/issues/contract.md)       |
+| Build       | One component, once                              | Tests failed against a stub, then passed. Survivors reported. Only the folder changed | [build.md](../templates/issues/build.md)             |
+| Integration | Wiring components into the program               | Named scenarios pass. No component's folder changed                                   | [integration.md](../templates/issues/integration.md) |
 
 ## The short version
 

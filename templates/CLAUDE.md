@@ -1,2 +1,1 @@
-@AGENTS.md
-@.agents/rules/regenerative.md
+@AGENTS.md @.agents/rules/regenerative.md
