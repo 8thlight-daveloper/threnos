@@ -75,7 +75,7 @@ The `threnos-records` flake check runs over `docs/decisions/`, `architecture.yam
   A citation is `[0360]`, a path such as `decisions/0360-`, or `ADR 0360`. A bare four-digit
   number is not one, because file modes such as 0640 look the same.
 
-Without an `architecture.yaml`, the `affects` id check and the contract citation check are skipped and the check prints a warning. A project with no `docs/decisions/` passes.
+Without an `architecture.yaml`, the `affects` id check and the contract citation check are skipped and the check prints a warning that names the expected path. A project that has a `contracts/` folder and no `architecture.yaml` fails, so a misnamed or missing file cannot hide behind the skip. A project with no `docs/decisions/` passes.
 
 A check also reports, without failing, an `affects` component whose contract
 does not cite the record. Contracts hold rules and fixtures and keep no history, so many

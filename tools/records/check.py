@@ -175,7 +175,11 @@ def check(root):
     contracts = load_contracts(root, contracts_root)
     warnings = []
     if components is None:
-        warnings.append("no architecture.yaml, so the affects id check and the contract citation check are skipped")
+        expected = root / "architecture.yaml"
+        if (root / contracts_root).is_dir():
+            problems.append(f"{contracts_root}/ exists but {expected} does not, so affects ids and contract citations cannot be checked")
+        else:
+            warnings.append(f"no {expected}, so the affects id check and the contract citation check are skipped")
         contracts = {}
     by_number = {one.number: one for one in records}
     notes = []

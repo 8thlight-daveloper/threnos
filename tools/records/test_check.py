@@ -126,14 +126,23 @@ class RecordChecks(unittest.TestCase):
         )
         self.assertEqual(problems, [])
 
-    def test_without_an_architecture_file_the_id_and_citation_checks_are_skipped_with_a_warning(self):
+    def test_contracts_without_an_architecture_file_is_a_problem_that_names_the_path(self):
         files = {
             "docs/decisions/0010-first.md": record("0010", "category: behavior\nstatus: proposed\naffects: [anything]\n"),
             "contracts/x/y/contract.md": "Cites [0010].\n",
         }
         problems, _, warnings = run(files, architecture=None)
+        self.assertProblem(problems, "architecture.yaml does not")
+        self.assertEqual(warnings, [])
+
+    def test_without_an_architecture_file_or_contracts_the_id_and_citation_checks_are_skipped_with_a_warning(self):
+        files = {
+            "docs/decisions/0010-first.md": record("0010", "category: behavior\nstatus: proposed\naffects: [anything]\n"),
+        }
+        problems, _, warnings = run(files, architecture=None)
         self.assertEqual(problems, [])
         self.assertEqual(len(warnings), 1)
+        self.assertIn("architecture.yaml", warnings[0])
 
     def test_a_project_with_no_decisions_folder_passes(self):
         problems, _, _ = run({})
