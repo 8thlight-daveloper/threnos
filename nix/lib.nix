@@ -201,7 +201,7 @@ let
     pkgs.just
     pkgs.lychee
     pkgs.markdownlint-cli2
-    (pkgs.python3.withPackages (ps: [ ps.mdformat ps.mdformat-gfm ps.mdformat-frontmatter ]))
+    (pkgs.python3.withPackages (ps: [ ps.mdformat ps.mdformat-gfm ps.mdformat-frontmatter ps.pyyaml ]))
     pkgs.osv-scanner
     pkgs.uv
     pkgs.vale
