@@ -43,7 +43,19 @@
         let
           resolved = threnos.resolve ./scaffold/.agents/threnos.toml;
         in
-        { scaffold-resolves = pkgs.writeText "scaffold-resolves" (builtins.toJSON resolved); });
+        {
+          scaffold-resolves = pkgs.writeText "scaffold-resolves" (builtins.toJSON resolved);
+          records-tests = pkgs.runCommand "records-tests" { } ''
+            cd ${./tools/records}
+            ${threnos.recordsPython pkgs}/bin/python -B -m unittest
+            touch $out
+          '';
+          # Threnos's own records are method decisions, so the check runs on them here.
+          records-self = pkgs.runCommand "records-self" { } ''
+            ${threnos.recordsPython pkgs}/bin/python ${./tools/records/check.py} ${./.}
+            touch $out
+          '';
+        });
 
       templates.default = {
         path = ./scaffold;

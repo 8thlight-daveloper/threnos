@@ -62,9 +62,10 @@ being affected by it.
 
 ## Checks
 
-A check over `docs/decisions/` and `architecture.yaml` reports:
+The `threnos-records` flake check runs over `docs/decisions/`, `architecture.yaml`, and `contracts/**/contract.md`. `nix flake check` runs it with the rest. Its source is `tools/records/check.py` in Threnos, and a project that does not use Nix can run it with Python and PyYAML. It reports:
 
-- a missing field, or a value outside its list;
+- a missing field, an unknown field, or a value outside its list;
+- a first heading that does not start with the record's number;
 - an `affects` id that is not a component in `architecture.yaml`;
 - a `builds-on` or replacement id that is not a record;
 - a replacement that is not listed on both records;
@@ -73,6 +74,8 @@ A check over `docs/decisions/` and `architecture.yaml` reports:
 - a contract that cites a product record missing from its `affects`.
   A citation is `[0360]`, a path such as `decisions/0360-`, or `ADR 0360`. A bare four-digit
   number is not one, because file modes such as 0640 look the same.
+
+Without an `architecture.yaml`, the `affects` id check and the contract citation check are skipped and the check prints a warning. A project with no `docs/decisions/` passes.
 
 A check also reports, without failing, an `affects` component whose contract
 does not cite the record. Contracts hold rules and fixtures and keep no history, so many

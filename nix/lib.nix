@@ -167,7 +167,14 @@ let
     pkgs.vale
   ];
 
+  recordsPython = pkgs: pkgs.python3.withPackages (ps: [ ps.pyyaml ]);
+
   mkChecks = { pkgs, src, resolved, tree, recipes }: {
+    threnos-records = pkgs.runCommand "threnos-records" { } ''
+      ${recordsPython pkgs}/bin/python ${../tools/records/check.py} ${src}
+      touch $out
+    '';
+
     threnos-drift = pkgs.runCommand "threnos-drift" { nativeBuildInputs = [ pkgs.diffutils ]; } ''
       ${same}
       cd ${src}
@@ -228,5 +235,5 @@ let
     };
 in
 {
-  inherit resolve mkTree mkSync mkChecks mkProject devPackages registry;
+  inherit resolve mkTree mkSync mkChecks mkProject devPackages recordsPython registry;
 }
