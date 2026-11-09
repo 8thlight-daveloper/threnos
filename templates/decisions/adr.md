@@ -10,7 +10,7 @@ builds-on: ['<NNNN>']
 
 # <NNNN>. <Decision, as a noun phrase or a short imperative>
 
-Builds on [<NNNN>](<NNNN>-<name>.md). Relates to <issue link>.
+Builds on `<NNNN>`. Relates to <issue link>.
 
 ## Context
 

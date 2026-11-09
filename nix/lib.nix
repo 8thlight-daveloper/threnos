@@ -32,6 +32,7 @@ let
       present = name: stateOf name != "off";
       rules = (manifest.rules or { }).regenerative or "on";
       repositoryContext = (manifest.rules or { }).repository_context or "on";
+      seedSkip = (manifest.seeds or { }).skip or [ ];
 
       missing = lib.concatMap
         (name: map (needed: { inherit name needed; }) (builtins.filter (needed: !(present needed)) (requiresOf name)))
@@ -44,6 +45,7 @@ let
     assert lib.assertMsg (badState == [ ]) "Each skill must be on, off, or ejected. Fix: ${toString badState}";
     assert lib.assertMsg (builtins.elem rules [ "on" "ejected" ]) "rules.regenerative must be on or ejected";
     assert lib.assertMsg (builtins.elem repositoryContext [ "on" "off" ]) "rules.repository_context must be on or off";
+    assert lib.assertMsg (builtins.isList seedSkip && builtins.all builtins.isString seedSkip) "seeds.skip must be a list of paths";
     assert lib.assertMsg (missing == [ ])
       (lib.concatMapStringsSep "; " (each: "${each.name} requires ${each.needed}, which is off") missing);
     warn
@@ -51,7 +53,7 @@ let
         on = inState "on";
         off = inState "off";
         ejected = inState "ejected";
-        inherit rules repositoryContext;
+        inherit rules repositoryContext seedSkip;
       }
       (if rules == "on" then mentionRules else [ ]);
 
@@ -72,7 +74,6 @@ let
       { dest = "AGENTS.md"; src = ../templates/AGENTS.md; }
       { dest = "CLAUDE.md"; src = ../templates/CLAUDE.md; }
       { dest = "docs/reference/decision-record-front-matter.md"; src = ../templates/decision-record-front-matter.md; }
-      { dest = "docs/reference/issue-sizing.md"; src = ../templates/issue-sizing.md; }
       { dest = "docs/stack/repowise.md"; src = ../templates/repowise.md; }
       { dest = "docs/stack/osv-scanner.md"; src = ../templates/osv-scanner.md; }
       { dest = "docs/reference/acceptance-scenarios.md"; src = ../templates/acceptance/README.md; }
@@ -85,6 +86,7 @@ let
       { dest = "docs/reference/templates/contract/contract.md"; src = ../templates/contract/contract.md; }
       { dest = "docs/reference/templates/contract/cases.json"; src = ../templates/contract/cases.json; }
       { dest = "docs/reference/templates/stack-topic.md"; src = ../templates/stack-topic.md; }
+      { dest = "docs/reference/templates/issue-sizing.md"; src = ../templates/issue-sizing.md; }
       { dest = "docs/reference/templates/accepted-survivors.txt"; src = ../templates/accepted-survivors.txt; }
     ]
     ++ map (each: { dest = ".github/workflows/${each.name}"; inherit (each) src; }) (folderOf ../templates/workflows)
@@ -111,6 +113,7 @@ let
         mkdir -p $out/seed/${builtins.dirOf each.dest}
         cp ${each.src} $out/seed/${each.dest}
       '') (seedFilesFor resolved)}
+      cp ${pkgs.writeText "seedskip" (lines resolved.seedSkip)} $out/seedskip.txt
       cp ${pkgs.writeText "owned" (lines (ownedEntries resolved))} $out/owned.txt
       cp ${pkgs.writeText "ejected" (lines (ejectedEntries resolved))} $out/ejected.txt
     '';
@@ -179,20 +182,42 @@ let
           echo "wrote    $entry"
         done
 
+        seeded_file=.agents/.threnos-seeded
+        seeded_before=()
+        if [ -f "$seeded_file" ]; then mapfile -t seeded_before < <(grep -v '^#' "$seeded_file" | grep . || true); fi
+        mapfile -t skip < <(grep . "$tree/seedskip.txt" || true)
+        seeded_now=("''${seeded_before[@]}")
         while IFS= read -r seed; do
           seed=''${seed#./}
-          if [ ! -e "$seed" ]; then
-            mkdir -p "$(dirname "$seed")"
-            cp --no-preserve=mode,ownership "$tree/seed/$seed" "$seed"
-            echo "seeded   $seed"
+          if contains "$seed" "''${skip[@]}"; then
+            continue
+          elif contains "$seed" "''${seeded_before[@]}"; then
+            if [ ! -e "$seed" ]; then
+              echo "skipped  $seed was seeded before and is gone. Remove its line from $seeded_file to restore it."
+            fi
+          else
+            if [ ! -e "$seed" ]; then
+              mkdir -p "$(dirname "$seed")"
+              cp --no-preserve=mode,ownership "$tree/seed/$seed" "$seed"
+              echo "seeded   $seed"
+            fi
+            seeded_now+=("$seed")
           fi
         done < <(cd "$tree/seed" && find . -type f | sort)
+        mkdir -p .agents
+        {
+          echo "# Paths that sync has seeded or found in place. Sync does not seed them again."
+          echo "# Remove a line and run sync to restore that file if it is missing."
+          printf '%s\n' "''${seeded_now[@]}" | grep . | sort -u || true
+        } > "$seeded_file"
 
         mkdir -p .agents
         [ -f "$owned_file" ] && release "$owned_file"
         printf '%s\n' "''${owned[@]}" | sort > "$owned_file"
       '';
     };
+
+  markdownPython = pkgs: pkgs.python3.withPackages (ps: [ ps.mdformat ps.mdformat-gfm ps.mdformat-frontmatter ps.pyyaml ]);
 
   devPackages = pkgs: [
     pkgs.git
@@ -201,7 +226,7 @@ let
     pkgs.just
     pkgs.lychee
     pkgs.markdownlint-cli2
-    (pkgs.python3.withPackages (ps: [ ps.mdformat ps.mdformat-gfm ps.mdformat-frontmatter ps.pyyaml ]))
+    (markdownPython pkgs)
     pkgs.osv-scanner
     pkgs.uv
     pkgs.vale
@@ -275,5 +300,5 @@ let
     };
 in
 {
-  inherit resolve mkTree mkSync mkChecks mkProject devPackages recordsPython registry;
+  inherit resolve mkTree mkSync mkChecks mkProject devPackages recordsPython markdownPython registry;
 }

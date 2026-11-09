@@ -1,6 +1,6 @@
 # <Topic>
 
-Part of the [stack](README.md). The decision this carries out is ADR <NNNN>. This file holds the tools that carry it out in the current language.
+Part of the stack, which `docs/stack/README.md` indexes. The decision this carries out is ADR <NNNN>. This file holds the tools that carry it out in the current language.
 
 ## Current
 

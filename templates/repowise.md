@@ -1,8 +1,8 @@
 # Repowise
 
-Copy this file to `docs/stack/repowise.md`. Record the selected Repowise version and installation method in the stack
-index. This setup uses the local open-source engine with no model or embedding API spend. It is supporting development
-tooling, outside the shipped program and its correctness tests.
+Record the selected Repowise version and installation method in the stack index. This setup uses the local open-source
+engine with no model or embedding API spend. It is supporting development tooling, outside the shipped program and its
+correctness tests.
 
 ## Operating constraints
 

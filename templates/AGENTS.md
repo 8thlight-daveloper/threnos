@@ -19,7 +19,7 @@ The shared rules refer to these by name.
 | Product principles       | `docs/decisions/<product principles record>`                       |
 | Further behavior rules   | `<records the behavior judge also reads>`, or none                 |
 | Testing stack doc        | `docs/stack/testing.md`                                            |
-| Issue sizing examples    | `docs/reference/issue-sizing.md`                                   |
+| Issue sizing examples    | `docs/reference/issue-sizing.md`, or none                          |
 | Repository context guide | `docs/stack/repowise.md`, or none when `repository_context` is off |
 | Check command            | `just check`                                                       |
 | Mutation command         | `just mutate <component>`                                          |

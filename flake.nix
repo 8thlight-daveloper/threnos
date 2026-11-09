@@ -42,6 +42,7 @@
       checks = forAllSystems (pkgs:
         let
           resolved = threnos.resolve ./scaffold/.agents/threnos.toml;
+          seedTree = threnos.mkTree pkgs resolved;
         in
         {
           scaffold-resolves = pkgs.writeText "scaffold-resolves" (builtins.toJSON resolved);
@@ -53,6 +54,17 @@
           acceptance-imports-tests = pkgs.runCommand "acceptance-imports-tests" { } ''
             cd ${./languages/go/acceptance-imports}
             ${threnos.recordsPython pkgs}/bin/python -B -m unittest
+            touch $out
+          '';
+          # The seeds a project gets must stand alone: no broken links, and the live ones formatted.
+          seeds-links = pkgs.runCommand "seeds-links" { nativeBuildInputs = [ pkgs.lychee ]; } ''
+            cd ${seedTree}/seed
+            lychee --offline --include-fragments --no-progress '**/*.md'
+            touch $out
+          '';
+          seeds-formatted = pkgs.runCommand "seeds-formatted" { nativeBuildInputs = [ (threnos.markdownPython pkgs) ]; } ''
+            cd ${seedTree}/seed
+            mdformat --check --wrap 120 $(find . -name '*.md' -not -path './docs/reference/templates/*')
             touch $out
           '';
           # Threnos's own records are method decisions, so the check runs on them here.

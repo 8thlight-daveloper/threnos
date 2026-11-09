@@ -1,8 +1,8 @@
 # OSV-Scanner
 
-Copy this file to `docs/stack/osv-scanner.md`. Record the selected OSV-Scanner version and installation method in the
-stack index. This setup checks the project's dependency lockfiles against the OSV vulnerability database. It is
-supporting development tooling, outside the shipped program and its correctness tests.
+Record the selected OSV-Scanner version and installation method in the stack index. This setup checks the project's
+dependency lockfiles against the OSV vulnerability database. It is supporting development tooling, outside the shipped
+program and its correctness tests.
 
 ## Operating constraints
 

@@ -4,11 +4,27 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 they belong to the project, so they do not link back here. `nix run .#sync` seeds every file here where the project has
 nothing at that path, and never overwrites one. Live files go to their paths: `AGENTS.md`, `CLAUDE.md`, `workflows/`,
 `issues/`, the decision record schema, a short `docs/decisions/README.md`, the acceptance scenario format,
-`issue-sizing.md`, `repowise.md`, and `osv-scanner.md`. The two acceptance examples go to `acceptance/scenarios/` with a
-`.example` suffix, so a runner ignores them until renamed. Skeletons that a project copies once per record, component,
-or stack topic go to `docs/reference/templates/`: `adr.md`, `product-principles.md`, `contract/`, `stack-topic.md`, and
-`accepted-survivors.txt`. Agents in a project read them there. Sync does not write the product principles record,
-because a person has to write it and a placeholder record could pass for a real one.
+`repowise.md`, and `osv-scanner.md`. The two acceptance examples go to `acceptance/scenarios/` with a `.example` suffix,
+so a runner ignores them until renamed. Skeletons with placeholders go to `docs/reference/templates/`: `adr.md`,
+`product-principles.md`, `issue-sizing.md`, `contract/`, `stack-topic.md`, and `accepted-survivors.txt`. A project
+copies each once per record, component, or stack topic, and agents read them there. Sync does not write the product
+principles record or the issue sizing doc, because a person has to fill them in and a placeholder file could pass for a
+real one.
+
+## Seeds are written once
+
+Sync records every path it seeds, or finds already in place, in `.agents/.threnos-seeded`, and does not seed that path
+again. A project can delete a seed for good. To get one back, remove its line from `.agents/.threnos-seeded` and run
+sync. The file is back if it is missing. To keep a seed out from the first sync, list its path under `skip` in a
+`[seeds]` table in `.agents/threnos.toml`.
+
+## Linting the seeds
+
+The live seeds are formatted at a 120 column wrap and have no `<placeholder>` text, and a flake check holds them to
+that. The skeletons in `docs/reference/templates/` keep placeholders, which a Markdown formatter, a prose linter, or a
+link checker can reject. Exclude `docs/reference/templates/**` from those tools in the project, as Threnos does in its
+own `.mdformat.toml`. A prose linter may also object to words in a seed, such as a tool's name in a heading. Add those
+words to the project's vocabulary.
 
 | File                                                               | Goes to                                       | Is                                                                                                                                                |
 | ------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
