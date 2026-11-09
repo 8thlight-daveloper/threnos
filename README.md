@@ -26,7 +26,8 @@ The idea comes from Chad Fowler's [Regenerative Software](https://aicoding.leafl
 | [rules/](rules/regenerative.md) | The shared rules every agent follows on a project built this way |
 | [skills/](skills/README.md) | Agent skills that carry out parts of the process, vendor-neutral |
 | [scaffold/](scaffold/) | A flake template: `nix flake init -t <threnos>` gives a project its flake, justfile, and `.agents/threnos.toml` |
-| [templates/](templates/README.md) | Starting files for a new project: `AGENTS.md`, a contract, a scenario, ADRs, issue templates, the dependency rules |
+| [docs/](docs/decisions/) | Threnos's own decisions: the method ADRs. They explain the process and are not copied into projects |
+| [templates/](templates/README.md) | Starting files for a new project: `AGENTS.md`, a contract, a scenario, an ADR skeleton, product principles, issue templates, the dependency rules |
 | [languages/](languages/README.md) | How the neutral structure maps to a language. Go is worked out; others are candidates |
 
 ## How a project uses it
@@ -52,7 +53,7 @@ The shared rules and the project's settings are separate files on purpose. A pro
 1. Read [principles](process/principles.md), [structure](process/structure.md), and the proposed [decomposition guidance](process/decomposition.md).
 2. Run `nix flake init -t <threnos>` in the new repo, then `nix run .#sync`. That installs the [shared rules](rules/regenerative.md) and every [skill](skills/README.md) read-only into `.agents/`, links the skills for Claude Code, and seeds `AGENTS.md` and `CLAUDE.md` if the repo has none. Fill in the project settings in `AGENTS.md`.
 3. Choose skills in `.agents/threnos.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without Nix, copy the files by hand as that file describes.
-4. Write the first ADRs: the functional core, the structure, and contracts and tests. [templates/decisions/](templates/decisions/) has starting versions.
+4. Write the project's first records: product principles, from [templates/product-principles.md](templates/product-principles.md), and the stack and architecture choices that are the project's own. Copy the [record schema](templates/decision-record-front-matter.md) to `docs/reference/`. The method ADRs in [docs/decisions/](docs/decisions/) are Threnos's own and are not copied. A project's rules file carries what an agent needs from them.
 5. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs. Copy the [Repowise guide](templates/repowise.md) to `docs/stack/repowise.md` and follow its local, no-model-spend setup.
 6. Write the domain model, then the first contract, then build against it. [The lifecycle](process/README.md) gives the order.
 

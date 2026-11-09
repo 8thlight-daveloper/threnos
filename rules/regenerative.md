@@ -14,7 +14,7 @@ defined in the "Project settings" table in `AGENTS.md`.
 
 Repository skills live in `.agents/skills/`. Keep their instructions independent of an agent vendor. A vendor's skill folder, such as `.claude/skills/<name>`, links to the matching shared skill. Edit the canonical files, not a copy. `CLAUDE.md` imports `AGENTS.md` and this file.
 
-Use the behavior judge for open product behavior choices in the assigned task. Its principles and bounded authority are in the behavior judgment ADR. It does not waive the human approval or independent authorship rules below.
+Use the behavior judge for open product behavior choices in the assigned task. Its bounded authority is in the skill, and its principles are in the project's product principles record. It does not waive the human approval or independent authorship rules below.
 
 ## Repository context
 

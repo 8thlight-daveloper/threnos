@@ -57,7 +57,7 @@ On onboard-kit's file decoder this found about 20 gaps from broken variants, 6 f
 
 ## Approval
 
-A person approves a contract once, after hardening, so the approval covers what will bind regeneration. A project can relax this: onboard-kit later let builds start before approval, with the hard decisions listed, and relied on hardening and mutation to find gaps. The acceptance scenarios stayed the main artifact a person approves.
+A person approves a contract once, after hardening, so the approval covers what will bind regeneration. The shared rules do not let a project relax this. onboard-kit later let builds start before approval, with the hard decisions listed, and relied on hardening and mutation to find gaps. That variant is not part of Threnos. Adopting it is a change to the shared rules.
 
 ## Growing a contract
 

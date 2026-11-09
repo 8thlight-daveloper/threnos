@@ -1,12 +1,18 @@
-# 0020. Structure and regenerative components
+---
+category: regenerative-process
+status: accepted
+approval: unrecorded
+builds-on: ['0010']
+note: Generalized from onboard-kit 0020, which is accepted there. Its component table is project state and is not part of this record.
+---
 
-Status: proposed
+# 0020. Structure and regenerative components
 
 Builds on [0010](0010-functional-core-and-imperative-shell.md). The contract and test rules are in [0030](0030-contracts-and-tests.md).
 
 ## Context
 
-We want to rebuild any component from scratch when it proves inadequate, and to limit the debt a rebuild can add, even when a smaller model does the work. That needs boundaries that outlive any implementation, tests that define correct behavior independently of the code, and rules that keep a rebuild inside its own folder.
+This follows Chad Fowler's [regenerative software](https://aicoding.leaflet.pub/3majnyfydzs2y): interfaces, behavior, and evaluations are permanent, and implementations are replaceable. We want to rebuild any component from scratch when it proves inadequate, and to limit the debt a rebuild can add, even when a smaller model does the work. That needs boundaries that outlive any implementation, tests that define correct behavior independently of the code, and rules that keep a rebuild inside its own folder.
 
 ## Decision
 
@@ -14,7 +20,7 @@ We want to rebuild any component from scratch when it proves inadequate, and to 
 
 - One program, built from `<entry point folder>`. Logic lives in components. The entry point is thin glue.
 - Each component is one module, and a component is the unit of rebuild.
-- The domain model, in `<model>`, holds the types several components pass to each other. It is never deleted and rebuilt. Changing it needs an ADR.
+- The domain model, in `<model>`, holds the types several components pass to each other, and nothing else. Components hold the behavior. It is never deleted and rebuilt. Changing it needs an ADR.
 
 ### Choosing component boundaries
 
@@ -51,17 +57,17 @@ boundaries and change examples in `docs/architecture/components.md`.
 | `acceptance/` | Scenarios as data, fixtures, and a replaceable runner | A person approves |
 | `<entry point folder>/` | The thin entry point | Rebuilt with what it wires |
 
-The interface lives in the contract folder, so deleting a component does not delete its specification. A wiring test is the only place a contract touches its implementation, through one constructor call. Contract folders may import only the model and shared test code.
+The interface lives in the contract folder, so deleting a component does not delete its specification. A wiring test is the only place a contract touches its implementation, through one constructor call. A contract folder imports only the model, the component's own interface, and shared test code, and the shared test code is protected like a contract. Each contract carries a language-neutral description of the behavior, so a rebuild in another language starts from the same specification.
 
 The file names for the current language are in `docs/stack/code-layout.md`.
 
 ### Dependency rules
 
-Each component has a position in a dependency order, and may depend only on components at earlier positions. Two components at the same position may not depend on each other. The order lives in `architecture.yaml`, and `docs/architecture/components.md` shows it.
+Each component has a position in a dependency order, and may depend only on components at earlier positions. Two components at the same position may not depend on each other. If one component needs another, they do not share a position. The order lives in `architecture.yaml`, and `docs/architecture/components.md` shows it.
 
 ### Rules as data
 
-`architecture.yaml` holds the components, the order, the naming rule, and the library categories core components may not use. It names no language. An extractor reads the code and emits a graph of imports. A checker compares the graph with the rules. File system checks cover the folder layout, the naming, and that every component has a contract folder. The extractor and the category-to-library map are in `docs/stack/dependency-check.md`.
+`architecture.yaml` holds the components, the order, the naming rule, and the library categories core components may not use. It names no language. It is protected like a contract: a person approves every change, and the file is the current state, so no ADR holds a copy of its table. An extractor reads the code and emits a graph of imports. A checker compares the graph with the rules and reports the import that proves each violation. File system checks cover the folder layout, the naming, and that every component has a contract folder. The extractor and the category-to-library map are in `docs/stack/dependency-check.md`.
 
 ### Rate of change
 

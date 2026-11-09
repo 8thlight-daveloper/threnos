@@ -5,7 +5,7 @@ description: Find and remove the ambiguity in a component contract before a rege
 
 # Contract hardening
 
-A contract is the lasting part of a regenerative project. Anything it leaves open is a choice the next regeneration makes differently. This skill finds those choices and settles them in the contract and its fixtures. It carries out the "a contract must tell right from wrong" rule in the project's contracts and tests ADR, which the project settings in `AGENTS.md` name.
+A contract is the lasting part of a regenerative project. Anything it leaves open is a choice the next regeneration makes differently. This skill finds those choices and settles them in the contract and its fixtures. It carries out the "a contract must tell right from wrong" rule in the shared rules.
 
 It was worked out on onboard-kit's plan decoder, a YAML file reader. That run found about 20 gaps with broken variants, 6 more with the mutation tool, and about 12 more with the second build and the differential run. It costs about ten agent runs and some hours, so use it for a component whose input is large and fiddly, such as a file format. A small component needs only the first two steps.
 

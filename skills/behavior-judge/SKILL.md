@@ -11,20 +11,45 @@ not a model dependency in the shipped product.
 
 ## Read the authority
 
-Read `AGENTS.md`, the shared rules it imports, and the project's complete behavior judgment ADR, which holds
-the product principles and the judge's delegated authority. The project
-settings in `AGENTS.md` name it. Read the further behavior rules those settings list and any rules that ADR points to, then the
+Read `AGENTS.md`, the shared rules it imports, and the project's product principles record. The project
+settings in `AGENTS.md` name that record. Read the further behavior rules those settings list and any rules the record points to, then the
 contracts and accepted decisions relevant to the question. Resolve paths from
 the repository root or this skill's canonical directory, not from a process's
 working directory. Vendor-specific discovery paths may be symlinks to this
 directory.
 
-The ADR contains the product principles and delegated authority. Do not
-duplicate them here or expand them through a skill edit. The person may
+The project's record holds the product principles. This skill holds the delegated authority below. Do not
+expand either through a skill edit. The person may
 authorize a narrower trial; label trial outcomes as trial judgments, not
 adopted policy or human approval.
 
-If the project has no principles ADR yet, stop and say so. Offer to draft one
+The principles are not points in a score. Privacy, correctness, ownership,
+and explicit commitments constrain convenience. Within those constraints,
+reduce avoidable work and uncertainty, then prefer a smaller and more
+reversible change. A general principle does not silently supersede a specific
+accepted decision or resolve a contract conflict. Neither the current
+implementation nor a mutation score is product authority.
+
+### Delegated authority
+
+Choose a new behavior without another product discussion only when all of
+these hold:
+
+- It stays within the person's assigned task.
+- The principles clearly favor one option without an unresolved tradeoff.
+- It is local and practically reversible, with no new privacy, security,
+  ownership, destructive, stored-format, or hash-compatibility consequence.
+- It contradicts no accepted decision, contract, or explicit direction.
+- It has an observable acceptance criterion and a valid independent test oracle.
+
+This selects a product direction. It does not permit editing protected
+artifacts, approving tests, or weakening a requirement. A person still approves
+protected contract and test changes and adds accepted-survivor entries. A
+recorded choice separates product judgment from evidence and implementation.
+Contract conflicts are reported, not repaired. A plausible test does not
+justify inventing behavior without product authority.
+
+If the project has no product principles record yet, stop and say so. Offer to draft one
 for a person to approve. Do not judge from principles you invented.
 
 ## Make the call
@@ -45,8 +70,8 @@ for a person to approve. Do not judge from principles you invented.
    implementation path it judges. A test plan is not a verified safeguard.
 5. Record the choice, rationale, assumptions, evidence status, test plan, and
    implementation authority. Keep decided, test planned, test verified, and
-   implemented separate. Put working records in `output/`. Follow repository
-   ADR rules for durable decisions.
+   implemented separate. Put working records in `output/`. A decision that
+   contracts or acceptance tests depend on goes in an ADR.
 
 When principles conflict, consequences exceed the delegation, relevant facts
 are missing, or no valid practical test can be established, escalate with a

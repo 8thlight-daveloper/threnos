@@ -8,7 +8,7 @@ These exist because of the regenerative process, and assume its structure.
 
 | Skill | Use it to | Reads |
 | -- | -- | -- |
-| [behavior-judge](behavior-judge/SKILL.md) | Decide an open product behavior question, or escalate it | The project's behavior judgment ADR |
+| [behavior-judge](behavior-judge/SKILL.md) | Decide an open product behavior question, or escalate it | The project's product principles record |
 | [contract-hardening](contract-hardening/SKILL.md) | Remove ambiguity from a contract with broken variants, mutation, a second build, and a differential run | The contract, the mutation tool, the [dump format](contract-hardening/references/dump-format.md) |
 | [writing-issues](writing-issues/SKILL.md) | Write, split, and size issues so each is reviewable in one sitting | The issue templates |
 

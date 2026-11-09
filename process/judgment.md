@@ -16,7 +16,7 @@ A good principle:
 
 Principles are not points in a score. Privacy, correctness, ownership, and explicit commitments constrain convenience. A general principle never silently overrides a specific accepted decision.
 
-[templates/decisions/0040-behavior-judgment.md](../templates/decisions/0040-behavior-judgment.md) is a starting ADR with the authority rules filled in and the principles left for the project.
+[ADR 0040](../docs/decisions/0040-behavior-judgment.md) holds the authority rules. [templates/product-principles.md](../templates/product-principles.md) is a starting record for the principles, which each project writes itself.
 
 ## A judge applies them
 

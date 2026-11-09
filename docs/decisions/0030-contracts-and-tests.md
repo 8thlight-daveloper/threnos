@@ -1,6 +1,12 @@
-# 0030. Contracts and tests
+---
+category: regenerative-process
+status: accepted
+approval: unrecorded
+builds-on: ['0010', '0020']
+note: Generalized from onboard-kit 0025, which is accepted there.
+---
 
-Status: proposed
+# 0030. Contracts and tests
 
 Builds on [0010](0010-functional-core-and-imperative-shell.md) and [0020](0020-structure-and-regenerative-components.md).
 
@@ -42,13 +48,13 @@ Contract fixtures are plain data, written by hand. A tool may draft them, but a 
 
 A contract has four parts: a plain description, fixtures, contract tests, and the interface binding.
 
-- **An agent drafts, a person approves.** The run that drafts a contract does not build the component.
+- **An agent drafts, a person approves.** A separate agent run writes the first version of every part, so nobody starts from a blank page. A person reads all of it and gives feedback before anything is built against it. The run that drafts a contract does not build the component.
 - **Fixtures cite their source.**
 - **The builder reads the contract and does not edit it.** It reports a conflict, a gap, or a mistake, and stops.
-- **A contract must tell right from wrong.**
-  - Drafting: the drafter lists plausible wrong implementations and shows the tests fail each one.
-  - Building: the builder runs the tests against a stub first, and every test that exercises the output must fail. After the tests pass, it runs the mutation tool and reports survivors as contract gaps.
-  - Hardening, for a component with a rich input: a second independent build and a differential run. See the `contract-hardening` skill.
+- **A contract must tell right from wrong.** One agent writes the spec and the tests together, so a shared misunderstanding could pass review. Two checks guard against it. Both are workflow steps, not optional requests.
+  - Drafting: the drafter lists plausible wrong implementations and shows the tests fail each one. The lists are scratch work and are not committed.
+  - Building: the builder runs the tests against a stub first, and every test that exercises the output must fail. A test of a property, such as determinism, can pass against a stub that returns nothing. After the tests pass, mutation testing reports surviving mutants as contract gaps. The tool generates the mutants, not the agent, so the agent does not grade itself. The project's mutation cadence says whether the builder runs the tool or reads the latest CI result.
+  - Hardening, for a component with a rich input: a second independent build and a differential run. Where two builds differ, the contract is ambiguous. See the `contract-hardening` skill.
 
 ### Rebuilding a component
 
@@ -57,15 +63,15 @@ A contract has four parts: a plain description, fixtures, contract tests, and th
 3. Run contract tests and acceptance tests.
 4. CI checks that the change touches only that folder.
 
-A rebuild that needs a contract change stops and asks.
+Any change to the contracts, the acceptance tests, `architecture.yaml`, or the domain model is a separate change with human approval. A rebuild that needs a contract change stops and asks.
 
 ### When to regenerate
 
 - A failing contract test does not trigger regeneration. Patch a local defect in place.
 - Regenerate when the design is inadequate, when the domain model under it changes, or when patches have piled up.
-- A mutation survivor is a gap in the contract. The fix goes to the contract, approved by a person.
+- A mutation survivor is a gap in the contract. The fix goes to the contract's tests or fixtures, approved by a person. The code changes only if the new tests fail against it.
 - A contract change runs first against the existing component. Someone other than the author of the new tests patches it.
-- After a large contract change, regenerate once from the contract alone.
+- After a large contract change, regenerate once from the contract alone. That checks the contract is enough: a second independent build must also pass, and where two builds differ, the contract is ambiguous.
 - A person reviews every regeneration. Do not regenerate faster than that review keeps up.
 
 ### Accepted survivors
@@ -74,7 +80,7 @@ A survivor a person has checked and accepted goes in `tools/mutation/accepted/<c
 
 ### Review
 
-A person reviews a rebuild by reading the contract, the acceptance results, the survivor report, and any change to tests, not the regenerated code. CI enforces the folder scope, approval on protected paths, the dependency check, and the full suite.
+A person reviews a rebuild by reading the contract, the acceptance results, the survivor report, and any change to tests, not the regenerated code. The review passes if every test passes and no test changed without approval. Reading the code stays optional. CI enforces the folder scope, approval on protected paths, the dependency check and architecture tests before every commit, and the full suite.
 
 ## Consequences
 

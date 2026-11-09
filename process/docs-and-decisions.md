@@ -17,8 +17,8 @@ Only ADRs are numbered. The rest are named for their topic.
 
 - An ADR records a decision that the contracts or acceptance tests depend on.
 - Number by tens, so a missed decision can slot in between.
-- A status line says proposed, accepted, or superseded, and links the ADR that changed it.
-- Write the context, the decision, the consequences, and the alternatives considered. [templates/decisions/adr.md](../templates/decisions/adr.md) is the skeleton.
+- Front matter holds the category, status, approval, the components it affects, and links to related records. The schema is [decision record front matter](../templates/decision-record-front-matter.md). The method decisions are Threnos's own ADRs in [docs/decisions/](../docs/decisions/). They are not copied into projects, and a project record does not restate them.
+- Write the context, the decision, the consequences, and the alternatives considered. [templates/decisions/adr.md](../templates/decisions/adr.md) is the skeleton for a project record.
 - The language-specific half of a decision goes in the stack docs, so a change of language leaves the ADR in place.
 
 ## Stack docs

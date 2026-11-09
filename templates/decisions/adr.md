@@ -1,6 +1,14 @@
-# <NNNN>. <Decision, as a noun phrase or a short imperative>
+---
+category: <architecture | behavior | ux | operations>
+status: proposed
+approval: <person | agent | unrecorded, once accepted>
+affects: [<component id>]
+builds-on: ['<NNNN>']
+---
 
-Status: proposed
+<!-- Schema: docs/reference/decision-record-front-matter.md. Delete fields that do not apply. A project does not use the regenerative-process category. -->
+
+# <NNNN>. <Decision, as a noun phrase or a short imperative>
 
 Builds on [<NNNN>](<NNNN>-<name>.md). Relates to <issue link>.
 

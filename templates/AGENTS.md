@@ -14,10 +14,8 @@ The shared rules refer to these by name.
 | -- | -- |
 | Components folder | `<components>`, such as `internal/` or `src/` |
 | Model folder | `<model>`, the folder that holds the domain model |
-| Contracts and tests ADR | `docs/decisions/<contracts and tests ADR>` |
-| Structure ADR | `docs/decisions/<structure ADR>` |
-| Behavior judgment ADR | `docs/decisions/<behavior judgment ADR>` |
-| Further behavior rules | `<ADRs the behavior judge also reads>`, or none |
+| Product principles | `docs/decisions/<product principles record>` |
+| Further behavior rules | `<records the behavior judge also reads>`, or none |
 | Testing stack doc | `docs/stack/testing.md` |
 | Issue sizing examples | `docs/reference/issue-sizing.md` |
 | Repository context guide | `docs/stack/repowise.md` |

@@ -1,6 +1,11 @@
-# 0010. Functional core and imperative shell
+---
+category: regenerative-process
+status: accepted
+approval: unrecorded
+note: Generalized from onboard-kit 0015, which is accepted there.
+---
 
-Status: proposed
+# 0010. Functional core and imperative shell
 
 ## Context
 
@@ -16,14 +21,14 @@ Every component except the drivers and the entry point.
 
 - **Values are immutable.** No function alters an argument. A function that needs a different value returns a new one.
 - **Functions are pure.** The same inputs give the same output. A function reads nothing but its arguments.
-- **No hidden state.** No module-level mutable state, and no state held between calls.
+- **No hidden state.** No module-level mutable state, and no state held between calls. State a function needs is passed in, and changed state is returned.
 - **No clock, no randomness, no environment.** The caller passes the time in.
 - **No input or output.** The core never reads or writes files, the network, or the terminal, and never runs commands.
 - **Expected failures are values.** A problem is a returned result. A crash means a bug.
 
 ### The shell
 
-The drivers and the entry point. It reads and writes files, reads the clock and the environment, asks the person, shows results, holds the current value, and replaces it with the value the core returns. It holds no rules about the domain.
+The drivers and the entry point. It reads and writes files, reads the clock and the environment, asks the person, shows results, holds the current value, and replaces it with the value the core returns. It writes stored files and documents only after a confirmed action or an explicit command. It holds no rules about the domain. A decision that depends on the content of a value belongs in the core.
 
 ### Testing boundaries
 
@@ -41,7 +46,7 @@ continue to judge the program after an implementation is regenerated.
 
 ### Sharing
 
-A returned value may share unchanged parts with its input. Nothing is mutated, so sharing is safe.
+A returned value may share unchanged parts with its input. Nothing is mutated, so sharing is safe. Where a language cannot guard against mutation, a test enforces the rule, as below.
 
 ### Enforcement
 

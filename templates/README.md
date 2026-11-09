@@ -7,7 +7,9 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 | [AGENTS.md](AGENTS.md) | Repo root | The project's settings and rules. The shared rules are in [rules/regenerative.md](../rules/regenerative.md), copied read-only to `.agents/rules/` |
 | [CLAUDE.md](CLAUDE.md) | Repo root | Two lines that import `AGENTS.md` and `.agents/rules/regenerative.md` for Claude Code |
 | [architecture.yaml](architecture.yaml) | Repo root | The dependency rules, as data |
-| [decisions/](decisions/) | `docs/decisions/` | The ADR skeleton and four starting ADRs: functional core, structure, contracts and tests, behavior judgment |
+| [decisions/](decisions/) | `docs/decisions/` | The ADR skeleton, with front matter. The method ADRs are Threnos's own in [docs/decisions/](../docs/decisions/) and are not copied |
+| [decision-record-front-matter.md](decision-record-front-matter.md) | `docs/reference/` | The front matter every decision record starts with, and the checks over it |
+| [product-principles.md](product-principles.md) | `docs/decisions/` | The project's product principles, which the behavior judge reads |
 | [contract/](contract/) | `contracts/<noun>/<role>/` | A contract description and a fixture manifest |
 | [acceptance/](acceptance/README.md) | `docs/reference/` and `acceptance/scenarios/` | The scenario format and two example scenarios |
 | [workflows/](workflows/) | `.github/workflows/` | The `check` and `mutate` GitHub Actions workflows. They call only the [task recipes](../process/task-recipes.md) |
@@ -21,7 +23,7 @@ Starting files for a new project. Copy them, replace each `<placeholder>`, and c
 ## Order
 
 1. `.agents/rules/regenerative.md`, `AGENTS.md`, `CLAUDE.md`, and the skills.
-2. ADRs 0010 to 0040. Write the product principles in 0040 before the first survivor review, not after.
+2. The product principles record, from [product-principles.md](product-principles.md). Write it before the first survivor review, not after. Link the Threnos method ADRs from `AGENTS.md`.
 3. `docs/stack/code-layout.md` from a [language mapping](../languages/README.md), then `docs/stack/repowise.md` from the setup guide. Initialize the local index and connect the project's agent as that guide describes.
 4. `architecture.yaml` with the first components.
 5. The scenario format, then the first scenario.

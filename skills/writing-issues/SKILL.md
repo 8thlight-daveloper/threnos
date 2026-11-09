@@ -5,7 +5,7 @@ description: Write, split, and size GitHub issues for a regenerative software pr
 
 # Writing issues
 
-A regenerative project's lasting artifacts are the ADRs, the domain model, the contracts, and the acceptance scenarios. A component is disposable: it is rebuilt from its contract, and nobody reads its code to accept it. The project's structure and contracts ADRs say so. Issues follow the same shape. An issue is one unit of work a person can review in one sitting and accept or reject, and what the person reviews is a contract, a scenario, or a decision, not code.
+A regenerative project's lasting artifacts are the ADRs, the domain model, the contracts, and the acceptance scenarios. A component is disposable: it is rebuilt from its contract, and nobody reads its code to accept it. The shared rules say so. Issues follow the same shape. An issue is one unit of work a person can review in one sitting and accept or reject, and what the person reviews is a contract, a scenario, or a decision, not code.
 
 Small issues get reviewed, finish, and unblock each other. Big ones sit in progress and hide their real size. The mechanics of creating one, such as the templates and `gh` flags, are in the Issues section of the shared rules, `.agents/rules/regenerative.md`.
 
