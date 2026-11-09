@@ -10,6 +10,9 @@ of a real project, with and without `--cached` and with an accepted survivor. Th
 score, and the second cached run reused every result. A components folder two levels deep
 (`--components internal/parts`) gave the same score. `--short` has not run against gomu.
 
+`just mutate` builds gomu into `.direnv/bin/` and writes `.direnv/bin/gomu.stamp` with the gomu version and the Go
+version. It rebuilds gomu when the stamp is missing or differs, so a Go upgrade never leaves a stale binary.
+
 Build gomu with the same Go version that runs the tests. A gomu built with Go 1.26 panics with
 `export data version 5 is greater than maximum supported version 2` when the shell's `go` is newer.
 
