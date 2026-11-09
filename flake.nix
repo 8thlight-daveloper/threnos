@@ -57,7 +57,8 @@
             touch $out
           '';
           # The seeds a project gets must stand alone: no broken links, and the live ones formatted.
-          seeds-links = pkgs.runCommand "seeds-links" { nativeBuildInputs = [ pkgs.lychee ]; } ''
+          # lychee builds an HTTP client even offline, and the build sandbox on Linux has no certificates.
+          seeds-links = pkgs.runCommand "seeds-links" { nativeBuildInputs = [ pkgs.lychee ]; SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"; } ''
             cd ${seedTree}/seed
             lychee --offline --include-fragments --no-progress '**/*.md'
             touch $out
