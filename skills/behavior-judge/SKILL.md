@@ -10,11 +10,12 @@ skill is a development workflow, not a model dependency in the shipped product.
 
 ## Read the authority
 
-Read `AGENTS.md`, the shared rules it imports, and the project's product principles record. The project settings in
-`AGENTS.md` name that record. Read the further behavior rules those settings list and any rules the record points to,
-then the contracts and accepted decisions relevant to the question. Resolve paths from the repository root or this
-skill's canonical directory, not from a process's working directory. Vendor-specific discovery paths may be symlinks to
-this directory.
+Read `README.md`, `AGENTS.md`, the shared rules it imports, and the project's product principles record. The project
+settings in `AGENTS.md` name that record. Read the further behavior rules those settings list and any rules the record
+points to, then the project's architecture docs in `docs/architecture/`, the contracts, and the accepted decisions
+relevant to the question. The architecture views hold interaction and layout rules that bear on behavior calls. Resolve
+paths from the repository root or this skill's canonical directory, not from a process's working directory.
+Vendor-specific discovery paths may be symlinks to this directory.
 
 The project's record holds the product principles. This skill holds the delegated authority below. Do not expand either
 through a skill edit. The person may authorize a narrower trial; label trial outcomes as trial judgments, not adopted
