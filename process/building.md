@@ -17,9 +17,9 @@ the builder and checking what it reports.
 
 ## Contracts run only once their component exists
 
-A contract can be approved and merged ahead of its component. The check command includes a contract's tests only when
-the matching component folder exists. The build turns them on by creating the folder, watches them fail against the stub
-on its own branch, and merges only when they pass. The main branch is never left red.
+A contract can be approved and merged ahead of its component. `just check` includes a contract's tests only when the
+matching component folder exists. The build turns them on by creating the folder, watches them fail against the stub on
+its own branch, and merges only when they pass. The main branch is never left red.
 
 ## A build touches one folder
 

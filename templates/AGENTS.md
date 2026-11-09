@@ -6,24 +6,19 @@ Read first: `README.md`, `docs/architecture/README.md`, `docs/stack/README.md`, 
 `.agents/rules/regenerative.md`.
 
 The rules in `.agents/rules/regenerative.md` are part of these instructions and apply to every task. This file adds the
-project's settings and its own rules. It may add to those rules and may not relax them.
+project's document pointers and its own rules. It may add to those rules and may not relax them.
 
-## Project settings
+## Document pointers
 
-The shared rules refer to these by name.
+The documents a person chooses. The shared rules and skills read them from here. Values that a tool reads live in
+`architecture.yaml` and `.agents/threnos.toml`, not in this table.
 
-| Setting                  | Value                                                              |
-| ------------------------ | ------------------------------------------------------------------ |
-| Components folder        | `<components>`, such as `internal/` or `src/`                      |
-| Model folder             | `<model>`, the folder that holds the domain model                  |
-| Product principles       | `docs/decisions/<product principles record>`                       |
-| Further behavior rules   | `<records the behavior judge also reads>`, or none                 |
-| Testing stack doc        | `docs/stack/testing.md`                                            |
-| Issue sizing examples    | `docs/reference/issue-sizing.md`, or none                          |
-| Repository context guide | `docs/stack/repowise.md`, or none when `repository_context` is off |
-| Check command            | `just check`                                                       |
-| Mutation command         | `just mutate <component>`                                          |
-| Mutation cadence         | `nightly` or `local`                                               |
+| Document               | Path                                               |
+| ---------------------- | -------------------------------------------------- |
+| Product principles     | `docs/decisions/<product principles record>`       |
+| Further behavior rules | `<records the behavior judge also reads>`, or none |
+| Testing stack doc      | `docs/stack/testing.md`                            |
+| Issue sizing examples  | `docs/reference/issue-sizing.md`, or none          |
 
 ## Project rules
 

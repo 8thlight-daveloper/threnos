@@ -5,7 +5,7 @@ evidence rather than by their account of it.
 
 ## One instructions file, any vendor
 
-- `AGENTS.md` at the repo root holds the project's settings and its own rules.
+- `AGENTS.md` at the repo root holds the project's document pointers and its own rules.
   [templates/AGENTS.md](../templates/AGENTS.md) is a starting version.
 - The shared rules live in `.agents/rules/regenerative.md`, a read-only copy of
   [rules/regenerative.md](../rules/regenerative.md). A project may add rules in `AGENTS.md` and may not relax the shared

@@ -11,7 +11,7 @@ skill is a development workflow, not a model dependency in the shipped product.
 ## Read the authority
 
 Read `README.md`, `AGENTS.md`, the shared rules it imports, and the project's product principles record. The project
-settings in `AGENTS.md` name that record. Read the further behavior rules those settings list and any rules the record
+pointers in `AGENTS.md` name that record. Read the further behavior rules those pointers list and any rules the record
 points to, then the project's architecture docs in `docs/architecture/`, the contracts, and the accepted decisions
 relevant to the question. The architecture views hold interaction and layout rules that bear on behavior calls. Resolve
 paths from the repository root or this skill's canonical directory, not from a process's working directory.

@@ -66,6 +66,13 @@ when someone actually ran an input that reached them.
 Contract and acceptance tests are ordinary deterministic tests. "Eval" is reserved for checks a model judges. If the
 product runs no model, its checks have none either.
 
+## Settings live in settings files
+
+A value that a tool or an agent reads as a setting goes in a file that a check can validate, and in one place. Program
+shape is in `architecture.yaml`. How a project takes Threnos is in `.agents/threnos.toml`. `AGENTS.md` holds pointers to
+documents that a person chooses, and no value a tool needs. A setting that follows from another is derived, not written
+twice. A table in prose cannot be checked, so it drifts.
+
 ## Rules without ceremony
 
 Keep process work proportional to its contribution to rebuildability. Defer what has no work yet. A failing test does

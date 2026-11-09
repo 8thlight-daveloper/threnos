@@ -32,6 +32,7 @@ let
       present = name: stateOf name != "off";
       rules = (manifest.rules or { }).regenerative or "on";
       repositoryContext = (manifest.rules or { }).repository_context or "on";
+      mutationCadence = (manifest.rules or { }).mutation_cadence or "nightly";
       seedSkip = (manifest.seeds or { }).skip or [ ];
 
       missing = lib.concatMap
@@ -45,6 +46,7 @@ let
     assert lib.assertMsg (badState == [ ]) "Each skill must be on, off, or ejected. Fix: ${toString badState}";
     assert lib.assertMsg (builtins.elem rules [ "on" "ejected" ]) "rules.regenerative must be on or ejected";
     assert lib.assertMsg (builtins.elem repositoryContext [ "on" "off" ]) "rules.repository_context must be on or off";
+    assert lib.assertMsg (builtins.elem mutationCadence [ "nightly" "local" ]) "rules.mutation_cadence must be nightly or local";
     assert lib.assertMsg (builtins.isList seedSkip && builtins.all builtins.isString seedSkip) "seeds.skip must be a list of paths";
     assert lib.assertMsg (missing == [ ])
       (lib.concatMapStringsSep "; " (each: "${each.name} requires ${each.needed}, which is off") missing);
@@ -53,7 +55,7 @@ let
         on = inState "on";
         off = inState "off";
         ejected = inState "ejected";
-        inherit rules repositoryContext seedSkip;
+        inherit rules repositoryContext mutationCadence seedSkip;
       }
       (if rules == "on" then mentionRules else [ ]);
 

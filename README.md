@@ -53,7 +53,7 @@ your-project/
     stack/                           Your language and tooling choices
 ```
 
-The shared rules and the project's settings are separate files on purpose. A project can add rules in `AGENTS.md` and
+The shared rules and the project's own rules are separate files on purpose. A project can add rules in `AGENTS.md` and
 cannot relax the shared ones. An update to the shared rules arrives as a new copy that shows up in the project's diff.
 `AGENTS.md` names the rules file by path, because some search tools skip hidden folders. The process docs stay here,
 since the rules and the project's own ADRs hold what an agent needs.
@@ -68,8 +68,9 @@ since the rules and the project's own ADRs hold what an agent needs.
    workflows, the issue templates, the decision record schema, the stack and reference docs, and skeletons for new
    records, contracts, and stack topics. Sync writes each seeded file once, never overwrites it, and records it in
    `.agents/.threnos-seeded`, so a deleted seed stays deleted. Remove a line there to restore that file. The project
-   owns every seeded file. Fill in the project settings in `AGENTS.md`, and the components in `architecture.yaml`, which
-   `nix flake init` seeds empty. A project needs one, and the flake check fails without it.
+   owns every seeded file. Fill in the document pointers in `AGENTS.md`, the settings in `.agents/threnos.toml`, and the
+   components in `architecture.yaml`, which `nix flake init` seeds empty. A project needs one, and the flake check fails
+   without it.
 1. Choose skills in `.agents/threnos.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without
    Nix, copy the files by hand as that file describes.
 1. Write the project's first records: product principles, from the seeded skeleton

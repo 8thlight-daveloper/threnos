@@ -15,8 +15,8 @@ are not rewritten.
 
 Write the product principles first, from `docs/reference/templates/product-principles.md`. The behavior judge skill
 reads them to decide open product questions, and it stops when the project has none. Name the file in the "Product
-principles" row of the settings table in `AGENTS.md`. A person writes and approves it before the first mutation survivor
-review.
+principles" row of the document pointers in `AGENTS.md`. A person writes and approves it before the first mutation
+survivor review.
 
 ## Not here
 
