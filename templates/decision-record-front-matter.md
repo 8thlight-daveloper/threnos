@@ -72,9 +72,9 @@ use Nix can run it with Python and PyYAML. It reports:
 - a contract that cites a product record missing from its `affects`. A citation is `[0360]`, a path such as
   `decisions/0360-`, or `ADR 0360`. A bare four-digit number is not one, because file modes such as 0640 look the same.
 
-Without an `architecture.yaml`, the `affects` id check and the contract citation check are skipped and the check prints
-a warning that names the expected path. A project that has a `contracts/` folder and no `architecture.yaml` fails, so a
-misnamed or missing file cannot hide behind the skip. A project with no `docs/decisions/` passes.
+Every project needs an `architecture.yaml`. A project without one fails, and the message names the expected path, so a
+misnamed or missing file cannot hide behind a skipped check. A project with no `docs/decisions/` folder passes the
+record checks.
 
 A check also reports, without failing, an `affects` component whose contract does not cite the record. Contracts hold
 rules and fixtures and keep no history, so many never cite the decision that shaped them. Components with no contract,

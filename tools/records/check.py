@@ -1,9 +1,10 @@
 """Check a project's decision records against the front matter schema.
 
-Usage: check.py [-v] [project root]
+Usage: check.py [-v] [--framework] [project root]
 
 The schema is templates/decision-record-front-matter.md. Exits 1 when a check
-fails. Notes are printed only with -v.
+fails. Notes are printed only with -v. A project must have an architecture.yaml.
+--framework is for Threnos itself, which holds records but is not a project, and skips that requirement.
 """
 import re
 import sys
@@ -168,19 +169,15 @@ def uncited_note(one, contracts):
     return f"{one.file}: contracts of {', '.join(missing)} do not cite it" if missing else None
 
 
-def check(root):
-    """Return (problems, notes, warnings) for the project at root."""
+def check(root, require_architecture=True):
+    """Return (problems, notes) for the project at root."""
     records, problems = load_records(root)
     components, contracts_root = load_architecture(root)
     contracts = load_contracts(root, contracts_root)
-    warnings = []
     if components is None:
-        expected = root / "architecture.yaml"
-        if (root / contracts_root).is_dir():
-            problems.append(f"{contracts_root}/ exists but {expected} does not, so affects ids and contract citations cannot be checked")
-        else:
-            warnings.append(f"no {expected}, so the affects id check and the contract citation check are skipped")
         contracts = {}
+        if require_architecture:
+            problems.append(f"{root / 'architecture.yaml'} does not exist. Every project needs one, and affects ids and contract citations are checked against it")
     by_number = {one.number: one for one in records}
     notes = []
     for one in records:
@@ -189,15 +186,13 @@ def check(root):
         note = uncited_note(one, contracts)
         if note:
             notes.append(note)
-    return sorted(problems), notes, warnings
+    return sorted(problems), notes
 
 
 def main(args):
     verbose = "-v" in args
-    paths = [each for each in args if each != "-v"]
-    problems, notes, warnings = check(Path(paths[0]) if paths else Path("."))
-    for warning in warnings:
-        print("warning:", warning)
+    paths = [each for each in args if each not in ("-v", "--framework")]
+    problems, notes = check(Path(paths[0]) if paths else Path("."), require_architecture="--framework" not in args)
     if verbose:
         for note in notes:
             print("note:", note)
