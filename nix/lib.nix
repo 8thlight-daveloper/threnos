@@ -208,7 +208,7 @@ let
   # The outputs a project flake exposes for each system.
   # devShell is { packages, env, shellHook }. Its packages add to devPackages, and env sets variables in the shell.
   # packages holds the project's own outputs and may not use the name threnos-tree.
-  mkProject = { pkgs, src, recipes ? [ "check" ], devShell ? { }, packages ? { } }:
+  mkProject = { pkgs, src, recipes ? [ "check" "mutate" "mutate-plan" "mutate-summary" "mutate-report" ], devShell ? { }, packages ? { } }:
     let
       resolved = resolve (src + "/.agents/threnos.toml");
       tree = mkTree pkgs resolved;

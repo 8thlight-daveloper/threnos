@@ -1,8 +1,25 @@
 # Recipes CI and agents call. See process/task-recipes.md in Threnos.
+# Each stub fails until the project writes the recipe.
 
 default:
     @just --list
 
 check:
-    @echo "Replace with the project's format, lint, tests, and acceptance scenarios." >&2
+    @echo "just check is not implemented. See process/task-recipes.md in Threnos." >&2
+    @exit 1
+
+mutate component *flags:
+    @echo "just mutate is not implemented. See process/task-recipes.md in Threnos." >&2
+    @exit 1
+
+mutate-plan base:
+    @echo "just mutate-plan is not implemented. See process/task-recipes.md in Threnos." >&2
+    @exit 1
+
+mutate-summary component log seconds:
+    @echo "just mutate-summary is not implemented. See process/task-recipes.md in Threnos." >&2
+    @exit 1
+
+mutate-report results:
+    @echo "just mutate-report is not implemented. See process/task-recipes.md in Threnos." >&2
     @exit 1

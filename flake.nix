@@ -12,7 +12,7 @@
 
       # What a project flake exposes. See scaffold/flake.nix.
       # devShell and packages are functions of pkgs. devShell returns { packages, env, shellHook }.
-      projectOutputs = { src, recipes ? [ "check" ], devShell ? (_: { }), packages ? (_: { }) }:
+      projectOutputs = { src, recipes ? [ "check" "mutate" "mutate-plan" "mutate-summary" "mutate-report" ], devShell ? (_: { }), packages ? (_: { }) }:
         let
           each = forAllSystems (pkgs: threnos.mkProject {
             inherit pkgs src recipes;
