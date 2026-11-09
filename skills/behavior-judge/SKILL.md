@@ -80,6 +80,6 @@ the current contract already requires.
 ## Approval boundaries
 
 This skill does not grant permission to change contracts, tests, implementation, accepted lists, issues, or approval
-rules. Follow the task's authorization and the repository's protected-artifact rules. Keep test and implementation
-authorship separate. Report contract conflicts rather than silently repairing them. Never mark a judge's decision as a
-person's approval.
+rules. Follow the task's authorization and the repository's protected-artifact rules. Define expected behavior before
+implementing it, and verify it with observable examples. Keep test and implementation authorship separate. Report
+contract conflicts rather than silently repairing them. Never mark a judge's decision as a person's approval.
