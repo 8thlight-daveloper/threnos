@@ -80,7 +80,8 @@ rules.
   language. It is protected like a contract.
 - **An extractor** reads the source and emits a plain graph: each component and what it imports. It is the only
   language-specific part, along with the map from each banned category to that language's libraries.
-- **A checker** compares the graph with the rules, and reports each violation with the import that proves it.
+- **A checker** compares the graph with the rules, and reports each violation with the import that proves it. It also
+  checks that `acceptance/` imports only what `acceptance.may_import` lists, never the project's own implementation.
 - **File system checks** need no parser: the folder layout, the naming, that every component has a contract folder, and
   that the docs' tables match `architecture.yaml`.
 

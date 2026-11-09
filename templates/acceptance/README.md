@@ -1,5 +1,9 @@
 # Acceptance scenario format
 
+This format is for data scenarios, the default. A project that writes scenarios as code sets
+`acceptance.scenarios: code` in `architecture.yaml` and follows the boundary rules in `process/acceptance.md` in
+Threnos.
+
 Copy this to `docs/reference/acceptance-scenarios.md` in a new project and adjust it. The format is protected: the
 runner and every scenario depend on it. [process/acceptance.md](../../process/acceptance.md) explains why scenarios are
 data.

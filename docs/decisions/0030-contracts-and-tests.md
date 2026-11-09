@@ -3,7 +3,8 @@ category: regenerative-process
 status: accepted
 approval: unrecorded
 builds-on: ['0010', '0020']
-note: Generalized from onboard-kit 0025, which is accepted there.
+partly-superseded-by: ['0060']
+note: Generalized from onboard-kit 0025, which is accepted there. 0060 replaces the rule that scenarios are data.
 ---
 
 # 0030. Contracts and tests
@@ -38,6 +39,8 @@ Rules for both:
   wherever iteration order could leak. Golden regeneration is an explicit command, never a side effect of a test.
 
 ### Acceptance tests are language-neutral
+
+0060 replaces this part: scenarios are data by default and may be code when the project says so.
 
 Scenarios are data under `acceptance/scenarios/`. A replaceable runner drives the built program. Tests never import the
 implementation. The scenario format is protected. See `docs/reference/acceptance-scenarios.md`.

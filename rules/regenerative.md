@@ -87,8 +87,9 @@ out or use a common short form such as `config`. Do not coin abbreviations.
   adds one after checking the reason.
 - When asked to draft a contract, write all four parts, cite the source of each fixture, list plausible wrong
   implementations and show that the tests fail them, and do not build the component in the same run.
-- Write acceptance scenarios as data under `acceptance/scenarios/`. Never write acceptance tests in implementation code
-  or import implementation modules.
+- Write acceptance scenarios in the form `acceptance.scenarios` names in `architecture.yaml`, which is data under
+  `acceptance/scenarios/` unless the project says `code`. A scenario drives the built program from outside. Never import
+  an implementation module, in either form. Import only what `acceptance.may_import` lists.
 - Respect the dependency rules. Do not add a dependency they do not allow.
 - Write core components as pure functions over immutable values. Never alter an argument, hold state between calls, or
   do input or output. Return a new value. Drivers and the entry point do input and output.

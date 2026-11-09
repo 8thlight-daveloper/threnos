@@ -33,3 +33,9 @@ components: []
 contracts:
   may_import: [model, contracts/harness]
   wiring_test_may_import: own_component
+
+# Acceptance scenarios drive the built program from outside. They never import the project's own implementation.
+# scenarios is data (the default) or code. may_import lists test libraries and runner helpers only.
+acceptance:
+  scenarios: data
+  may_import: []

@@ -14,7 +14,7 @@ implementation is regenerated.
 A pure core makes component tests straightforward. Whole-program acceptance tests also exercise the shell, so they still
 need environment setup and control over relevant external dependencies.
 
-## Scenarios are data
+## Scenarios are data by default
 
 A scenario is one file. It names the files a run starts with, the arguments and input it sends, and what must be true
 afterward: the exit code, the output, and the files written. It never imports the implementation, so it keeps working if
@@ -36,6 +36,21 @@ steps:
 
 `source` says where the expectation comes from, so a person can check the scenario against something trusted.
 [templates/acceptance/](../templates/acceptance/README.md) has the full format.
+
+## Scenarios may be code
+
+Some programs cannot be driven from a data file. A terminal interface needs an emulator, a screen check, and timing. A
+project may write its scenarios as code, and records that choice as `acceptance.scenarios: code` in `architecture.yaml`.
+The point is a whole-program judgment that outlasts every rebuild, so the form matters less than the boundary:
+
+- A scenario starts the built program and drives it from outside. It never calls the implementation.
+- A scenario imports no implementation module. It gets a constant such as the version from the built program or a
+  fixture. `acceptance.may_import` in `architecture.yaml` lists the test libraries and runner helpers it may use, and
+  the dependency check reports any other import.
+- The scenarios, their fixtures, and the helpers are protected, and a person approves each change.
+
+The cost is language. Data scenarios keep working if the language changes, and code scenarios do not. A project that
+chooses code accepts a rewrite of its scenarios if it ever changes language. ADR 0060 in Threnos records the decision.
 
 ## A protocol mode makes scenarios cheap
 
