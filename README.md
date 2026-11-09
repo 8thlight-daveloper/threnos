@@ -44,6 +44,7 @@ A project holds its own settings and a read-only copy of the shared rules, side 
 your-project/
   AGENTS.md                          Your settings and rules. You edit it
   CLAUDE.md                          Imports AGENTS.md and the shared rules
+  architecture.yaml                  The dependency rules, as data. Required. You edit it
   .agents/
     rules/regenerative.md            The shared rules, copied from here. Read-only
     skills/                          The skills you copied from here
@@ -64,7 +65,8 @@ since the rules and the project's own ADRs hold what an agent needs.
 1. Run `nix flake init -t <threnos>` in the new repo, then `nix run .#sync`. That installs the
    [shared rules](rules/regenerative.md) and every [skill](skills/README.md) read-only into `.agents/`, links the skills
    for Claude Code, and seeds `AGENTS.md` and `CLAUDE.md` if the repo has none. Fill in the project settings in
-   `AGENTS.md`.
+   `AGENTS.md`, and the components in `architecture.yaml`, which `nix flake init` seeds empty. A project needs one, and
+   the flake check fails without it.
 1. Choose skills in `.agents/threnos.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without
    Nix, copy the files by hand as that file describes.
 1. Write the project's first records: product principles, from

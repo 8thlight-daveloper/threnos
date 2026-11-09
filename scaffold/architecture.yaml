@@ -1,0 +1,35 @@
+# The dependency rules, as data. A checker compares this with a graph that a
+# language adapter extracts from the code. Protected like a contract.
+# Fill in the placeholders. templates/architecture.yaml in Threnos has a worked example.
+
+components_root: <components>
+model: <model>
+contracts_root: contracts
+entry_point: <entry point folder>
+
+naming:
+  component_path: "<noun>/<role>"
+  segment_pattern: "^[a-z][a-z0-9]*$"
+
+# Categories core components may not use. The stack docs map each to the
+# current language's libraries.
+banned_in_core:
+  - filesystem
+  - network
+  - process
+  - terminal
+  - clock
+  - randomness
+  - environment
+
+# Drivers do input and output, so the banned list does not apply to them.
+drivers: []
+
+# A component may depend only on components at an earlier position, and on
+# the model. Two components at one position may not depend on each other.
+# Add each component as: { name: <noun>/<role>, position: <n>, depends_on: [] }
+components: []
+
+contracts:
+  may_import: [model, contracts/harness]
+  wiring_test_may_import: own_component
