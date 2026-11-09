@@ -62,7 +62,7 @@ let
     ++ lib.concatMap (name: [ ".agents/skills/${name}" ".claude/skills/${name}" ]) resolved.ejected;
 
   # Starting files that sync writes once, only when the project has nothing at that path. They belong to the project.
-  # Each is { dest, src }. The product principles record gets the first free record number.
+  # Each is { dest, src }.
   folderOf = folder: builtins.map (name: { dest = null; src = folder + "/${name}"; inherit name; })
     (builtins.attrNames (lib.filterAttrs (_: kind: kind == "regular") (builtins.readDir folder)));
   seedFiles =
@@ -79,6 +79,7 @@ let
       # Skeletons a project copies once per record, component, or stack topic.
       { dest = "docs/reference/templates/adr.md"; src = ../templates/decisions/adr.md; }
       { dest = "docs/reference/templates/product-principles.md"; src = ../templates/product-principles.md; }
+      { dest = "docs/decisions/README.md"; src = ../templates/decisions/README.md; }
       { dest = "docs/reference/templates/contract/contract.md"; src = ../templates/contract/contract.md; }
       { dest = "docs/reference/templates/contract/cases.json"; src = ../templates/contract/cases.json; }
       { dest = "docs/reference/templates/stack-topic.md"; src = ../templates/stack-topic.md; }
@@ -101,8 +102,6 @@ let
         mkdir -p $out/seed/${builtins.dirOf each.dest}
         cp ${each.src} $out/seed/${each.dest}
       '') seedFiles}
-      mkdir -p $out/seed/docs/decisions
-      sed 's/<NNNN>/0010/g' ${../templates/product-principles.md} > $out/seed/docs/decisions/0010-product-principles.md
       cp ${pkgs.writeText "owned" (lines (ownedEntries resolved))} $out/owned.txt
       cp ${pkgs.writeText "ejected" (lines (ejectedEntries resolved))} $out/ejected.txt
     '';
@@ -173,9 +172,7 @@ let
 
         while IFS= read -r seed; do
           seed=''${seed#./}
-          if [ "$seed" = docs/decisions/0010-product-principles.md ] && ls docs/decisions/[0-9][0-9][0-9][0-9]-*.md > /dev/null 2>&1; then
-            echo "skipped  $seed because docs/decisions already has records. Copy docs/reference/templates/product-principles.md by hand."
-          elif [ ! -e "$seed" ]; then
+          if [ ! -e "$seed" ]; then
             mkdir -p "$(dirname "$seed")"
             cp --no-preserve=mode,ownership "$tree/seed/$seed" "$seed"
             echo "seeded   $seed"

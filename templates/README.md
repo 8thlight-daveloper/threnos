@@ -3,12 +3,12 @@
 Starting files for a new project. Copy them, replace each `<placeholder>`, and change what does not fit. Once copied
 they belong to the project, so they do not link back here. `nix run .#sync` seeds every file here where the project has
 nothing at that path, and never overwrites one. Live files go to their paths: `AGENTS.md`, `CLAUDE.md`, `workflows/`,
-`issues/`, the decision record schema, the acceptance scenario format, `issue-sizing.md`, `repowise.md`,
-`osv-scanner.md`, and `product-principles.md` as record `0010`. Sync skips that record when `docs/decisions/` already
-has records. The two acceptance examples go to `acceptance/scenarios/` with a `.example` suffix, so a runner ignores
-them until renamed. Skeletons that a project copies once per record, component, or stack topic go to
-`docs/reference/templates/`: `adr.md`, `product-principles.md`, `contract/`, `stack-topic.md`, and
-`accepted-survivors.txt`. Agents in a project read them there.
+`issues/`, the decision record schema, a short `docs/decisions/README.md`, the acceptance scenario format,
+`issue-sizing.md`, `repowise.md`, and `osv-scanner.md`. The two acceptance examples go to `acceptance/scenarios/` with a
+`.example` suffix, so a runner ignores them until renamed. Skeletons that a project copies once per record, component,
+or stack topic go to `docs/reference/templates/`: `adr.md`, `product-principles.md`, `contract/`, `stack-topic.md`, and
+`accepted-survivors.txt`. Agents in a project read them there. Sync does not write the product principles record,
+because a person has to write it and a placeholder record could pass for a real one.
 
 | File                                                               | Goes to                                       | Is                                                                                                                                                |
 | ------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -17,7 +17,7 @@ them until renamed. Skeletons that a project copies once per record, component, 
 | [architecture.yaml](architecture.yaml)                             | Repo root                                     | The dependency rules, as data. Required. `nix flake init` seeds an empty one                                                                      |
 | [decisions/](decisions/)                                           | `docs/decisions/`                             | The ADR skeleton, with front matter. The method ADRs are Threnos's own in [docs/decisions/](../docs/decisions/) and are not copied                |
 | [decision-record-front-matter.md](decision-record-front-matter.md) | `docs/reference/`                             | The front matter every decision record starts with, and the checks over it                                                                        |
-| [product-principles.md](product-principles.md)                     | `docs/decisions/`                             | The project's product principles, which the behavior judge reads                                                                                  |
+| [product-principles.md](product-principles.md)                     | `docs/decisions/<NNNN>-product-principles.md` | The project's product principles, which the behavior judge reads                                                                                  |
 | [contract/](contract/)                                             | `contracts/<noun>/<role>/`                    | A contract description and a fixture manifest                                                                                                     |
 | [acceptance/](acceptance/README.md)                                | `docs/reference/` and `acceptance/scenarios/` | The scenario format and two example scenarios                                                                                                     |
 | [workflows/](workflows/)                                           | `.github/workflows/`                          | The `check` and `mutate` GitHub Actions workflows. They call only the [task recipes](../process/task-recipes.md)                                  |

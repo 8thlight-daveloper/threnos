@@ -42,8 +42,8 @@ requirement. A person still approves protected contract and test changes and add
 choice separates product judgment from evidence and implementation. Contract conflicts are reported, not repaired. A
 plausible test does not justify inventing behavior without product authority.
 
-If the project has no product principles record yet, stop and say so. Offer to draft one for a person to approve. Do not
-judge from principles you invented.
+If the project has no product principles record yet, or the `AGENTS.md` row for it still holds a placeholder or names a
+missing file, stop and say so. Offer to draft one for a person to approve. Do not judge from principles you invented.
 
 ## Make the call
 

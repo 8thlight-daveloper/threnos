@@ -65,17 +65,17 @@ since the rules and the project's own ADRs hold what an agent needs.
 1. Run `nix flake init -t <threnos>` in the new repo, then `nix run .#sync`. That installs the
    [shared rules](rules/regenerative.md) and every [skill](skills/README.md) read-only into `.agents/`, links the skills
    for Claude Code, and seeds the project's starting files where nothing exists yet: `AGENTS.md`, `CLAUDE.md`, the CI
-   workflows, the issue templates, the product principles record, the decision record schema, and the stack and
-   reference docs. Sync writes each seeded file once and never overwrites it, and the project owns it. Fill in the
-   project settings in `AGENTS.md`, and the components in `architecture.yaml`, which `nix flake init` seeds empty. A
-   project needs one, and the flake check fails without it.
+   workflows, the issue templates, the decision record schema, the stack and reference docs, and skeletons for new
+   records, contracts, and stack topics. Sync writes each seeded file once and never overwrites it, and the project owns
+   it. Fill in the project settings in `AGENTS.md`, and the components in `architecture.yaml`, which `nix flake init`
+   seeds empty. A project needs one, and the flake check fails without it.
 1. Choose skills in `.agents/threnos.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without
    Nix, copy the files by hand as that file describes.
-1. Write the project's first records: product principles, from
-   [templates/product-principles.md](templates/product-principles.md), and the stack and architecture choices that are
-   the project's own. Copy the [record schema](templates/decision-record-front-matter.md) to `docs/reference/`. The
-   method ADRs in [docs/decisions/](docs/decisions/) are Threnos's own and are not copied. A project's rules file
-   carries what an agent needs from them.
+1. Write the project's first records: product principles, from the seeded skeleton
+   `docs/reference/templates/product-principles.md` ([source](templates/product-principles.md)), and the stack and
+   architecture choices that are the project's own. Copy the [record schema](templates/decision-record-front-matter.md)
+   to `docs/reference/`. The method ADRs in [docs/decisions/](docs/decisions/) are Threnos's own and are not copied. A
+   project's rules file carries what an agent needs from them.
 1. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs. Copy the
    [Repowise guide](templates/repowise.md) to `docs/stack/repowise.md` and follow its local, no-model-spend setup.
 1. Write the domain model, then the first contract, then build against it. [The lifecycle](process/README.md) gives the
