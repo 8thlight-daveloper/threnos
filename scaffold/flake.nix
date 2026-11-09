@@ -9,7 +9,10 @@
       src = self;
       # Recipes the justfile must define. Add the mutation recipes when CI runs them.
       recipes = [ "check" ];
-      # Tools this project needs beyond the Threnos set, such as pkgs.go.
-      extraPackages = pkgs: [ ];
+      # The project's dev shell, added to the Threnos tools. Each field is optional.
+      # Example: { packages = [ pkgs.go ]; env.GODEBUG = "gcshrinkstackoff=1"; shellHook = "unset GOROOT"; }
+      devShell = pkgs: { packages = [ ]; env = { }; shellHook = ""; };
+      # The project's own outputs, such as its built binary as packages.default.
+      packages = pkgs: { };
     };
 }

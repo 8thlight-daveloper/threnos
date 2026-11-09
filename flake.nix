@@ -11,11 +11,13 @@
       threnos = import ./nix/lib.nix { inherit lib self; };
 
       # What a project flake exposes. See scaffold/flake.nix.
-      projectOutputs = { src, recipes ? [ "check" ], extraPackages ? (_: [ ]) }:
+      # devShell and packages are functions of pkgs. devShell returns { packages, env, shellHook }.
+      projectOutputs = { src, recipes ? [ "check" ], devShell ? (_: { }), packages ? (_: { }) }:
         let
           each = forAllSystems (pkgs: threnos.mkProject {
             inherit pkgs src recipes;
-            extraPackages = extraPackages pkgs;
+            devShell = devShell pkgs;
+            packages = packages pkgs;
           });
         in
         {
@@ -34,7 +36,7 @@
 
       # Everything with each skill at its default. Projects build their own through lib.projectOutputs.
       packages = forAllSystems (pkgs: {
-        default = threnos.mkTree pkgs (threnos.resolve ./scaffold/.agents/threnos.toml);
+        threnos-tree = threnos.mkTree pkgs (threnos.resolve ./scaffold/.agents/threnos.toml);
       });
 
       checks = forAllSystems (pkgs:
