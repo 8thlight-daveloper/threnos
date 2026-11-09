@@ -66,9 +66,10 @@ since the rules and the project's own ADRs hold what an agent needs.
    [shared rules](rules/regenerative.md) and every [skill](skills/README.md) read-only into `.agents/`, links the skills
    for Claude Code, and seeds the project's starting files where nothing exists yet: `AGENTS.md`, `CLAUDE.md`, the CI
    workflows, the issue templates, the decision record schema, the stack and reference docs, and skeletons for new
-   records, contracts, and stack topics. Sync writes each seeded file once and never overwrites it, and the project owns
-   it. Fill in the project settings in `AGENTS.md`, and the components in `architecture.yaml`, which `nix flake init`
-   seeds empty. A project needs one, and the flake check fails without it.
+   records, contracts, and stack topics. Sync writes each seeded file once, never overwrites it, and records it in
+   `.agents/.threnos-seeded`, so a deleted seed stays deleted. Remove a line there to restore that file. The project
+   owns every seeded file. Fill in the project settings in `AGENTS.md`, and the components in `architecture.yaml`, which
+   `nix flake init` seeds empty. A project needs one, and the flake check fails without it.
 1. Choose skills in `.agents/threnos.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without
    Nix, copy the files by hand as that file describes.
 1. Write the project's first records: product principles, from the seeded skeleton
