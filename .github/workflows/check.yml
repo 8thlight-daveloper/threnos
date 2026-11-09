@@ -16,7 +16,9 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
         with:
           summarize: false
-      - name: Check the flake
-        run: nix flake check --all-systems
+      - name: Evaluate the flake for every system
+        run: nix flake check --all-systems --no-build
+      - name: Build the checks for this runner
+        run: nix flake check
       - name: Check links
         run: nix develop --quiet --command lychee --offline --include-fragments --no-progress "**/*.md"
