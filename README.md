@@ -64,9 +64,11 @@ since the rules and the project's own ADRs hold what an agent needs.
    [decomposition guidance](process/decomposition.md).
 1. Run `nix flake init -t <threnos>` in the new repo, then `nix run .#sync`. That installs the
    [shared rules](rules/regenerative.md) and every [skill](skills/README.md) read-only into `.agents/`, links the skills
-   for Claude Code, and seeds `AGENTS.md` and `CLAUDE.md` if the repo has none. Fill in the project settings in
-   `AGENTS.md`, and the components in `architecture.yaml`, which `nix flake init` seeds empty. A project needs one, and
-   the flake check fails without it.
+   for Claude Code, and seeds the project's starting files where nothing exists yet: `AGENTS.md`, `CLAUDE.md`, the CI
+   workflows, the issue templates, the product principles record, the decision record schema, and the stack and
+   reference docs. Sync writes each seeded file once and never overwrites it, and the project owns it. Fill in the
+   project settings in `AGENTS.md`, and the components in `architecture.yaml`, which `nix flake init` seeds empty. A
+   project needs one, and the flake check fails without it.
 1. Choose skills in `.agents/threnos.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without
    Nix, copy the files by hand as that file describes.
 1. Write the project's first records: product principles, from

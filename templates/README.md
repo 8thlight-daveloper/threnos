@@ -1,7 +1,11 @@
 # Templates
 
 Starting files for a new project. Copy them, replace each `<placeholder>`, and change what does not fit. Once copied
-they belong to the project, so they do not link back here.
+they belong to the project, so they do not link back here. `nix run .#sync` seeds most of them where the project has
+nothing at that path: `AGENTS.md`, `CLAUDE.md`, `workflows/`, `issues/`, the decision record schema, `issue-sizing.md`,
+`repowise.md`, `osv-scanner.md`, and `product-principles.md` as record `0010`. It never overwrites a seeded file. The
+rest are copied by hand when needed: `decisions/adr.md`, `contract/`, `acceptance/`, `accepted-survivors.txt`, and
+`stack-topic.md`.
 
 | File                                                               | Goes to                                       | Is                                                                                                                                                |
 | ------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |

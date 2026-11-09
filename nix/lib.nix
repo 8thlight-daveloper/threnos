@@ -61,6 +61,22 @@ let
     lib.optional (resolved.rules == "ejected") ".agents/rules/regenerative.md"
     ++ lib.concatMap (name: [ ".agents/skills/${name}" ".claude/skills/${name}" ]) resolved.ejected;
 
+  # Starting files that sync writes once, only when the project has nothing at that path. They belong to the project.
+  # Each is { dest, src }. The product principles record gets the first free record number.
+  folderOf = folder: builtins.map (name: { dest = null; src = folder + "/${name}"; inherit name; })
+    (builtins.attrNames (lib.filterAttrs (_: kind: kind == "regular") (builtins.readDir folder)));
+  seedFiles =
+    [
+      { dest = "AGENTS.md"; src = ../templates/AGENTS.md; }
+      { dest = "CLAUDE.md"; src = ../templates/CLAUDE.md; }
+      { dest = "docs/reference/decision-record-front-matter.md"; src = ../templates/decision-record-front-matter.md; }
+      { dest = "docs/reference/issue-sizing.md"; src = ../templates/issue-sizing.md; }
+      { dest = "docs/stack/repowise.md"; src = ../templates/repowise.md; }
+      { dest = "docs/stack/osv-scanner.md"; src = ../templates/osv-scanner.md; }
+    ]
+    ++ map (each: { dest = ".github/workflows/${each.name}"; inherit (each) src; }) (folderOf ../templates/workflows)
+    ++ map (each: { dest = ".github/ISSUE_TEMPLATE/${each.name}"; inherit (each) src; }) (folderOf ../templates/issues);
+
   lines = list: lib.concatStringsSep "\n" list + "\n";
 
   mkTree = pkgs: resolved:
@@ -71,8 +87,12 @@ let
         cp -r ${../skills + "/${name}"} $out/.agents/skills/${name}
         ln -s ../../.agents/skills/${name} $out/.claude/skills/${name}
       '') resolved.on}
-      cp ${../templates/AGENTS.md} $out/seed/AGENTS.md
-      cp ${../templates/CLAUDE.md} $out/seed/CLAUDE.md
+      ${lib.concatMapStrings (each: ''
+        mkdir -p $out/seed/${builtins.dirOf each.dest}
+        cp ${each.src} $out/seed/${each.dest}
+      '') seedFiles}
+      mkdir -p $out/seed/docs/decisions
+      sed 's/<NNNN>/0010/g' ${../templates/product-principles.md} > $out/seed/docs/decisions/0010-product-principles.md
       cp ${pkgs.writeText "owned" (lines (ownedEntries resolved))} $out/owned.txt
       cp ${pkgs.writeText "ejected" (lines (ejectedEntries resolved))} $out/ejected.txt
     '';
@@ -91,7 +111,7 @@ let
   mkSync = pkgs: tree:
     pkgs.writeShellApplication {
       name = "threnos-sync";
-      runtimeInputs = [ pkgs.coreutils pkgs.diffutils pkgs.gnugrep ];
+      runtimeInputs = [ pkgs.coreutils pkgs.diffutils pkgs.findutils pkgs.gnugrep ];
       text = ''
         tree=${tree}
         owned_file=.agents/.threnos-owned
@@ -141,12 +161,14 @@ let
           echo "wrote    $entry"
         done
 
-        for seed in AGENTS.md CLAUDE.md; do
+        while IFS= read -r seed; do
+          seed=''${seed#./}
           if [ ! -e "$seed" ]; then
+            mkdir -p "$(dirname "$seed")"
             cp --no-preserve=mode,ownership "$tree/seed/$seed" "$seed"
             echo "seeded   $seed"
           fi
-        done
+        done < <(cd "$tree/seed" && find . -type f | sort)
 
         mkdir -p .agents
         [ -f "$owned_file" ] && release "$owned_file"
