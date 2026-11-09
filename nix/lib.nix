@@ -31,6 +31,7 @@ let
       inState = wanted: builtins.filter (name: stateOf name == wanted) skillDirs;
       present = name: stateOf name != "off";
       rules = (manifest.rules or { }).regenerative or "on";
+      repositoryContext = (manifest.rules or { }).repository_context or "on";
 
       missing = lib.concatMap
         (name: map (needed: { inherit name needed; }) (builtins.filter (needed: !(present needed)) (requiresOf name)))
@@ -42,6 +43,7 @@ let
     assert lib.assertMsg (unknown == [ ]) "The manifest names skills that do not exist: ${toString unknown}";
     assert lib.assertMsg (badState == [ ]) "Each skill must be on, off, or ejected. Fix: ${toString badState}";
     assert lib.assertMsg (builtins.elem rules [ "on" "ejected" ]) "rules.regenerative must be on or ejected";
+    assert lib.assertMsg (builtins.elem repositoryContext [ "on" "off" ]) "rules.repository_context must be on or off";
     assert lib.assertMsg (missing == [ ])
       (lib.concatMapStringsSep "; " (each: "${each.name} requires ${each.needed}, which is off") missing);
     warn
@@ -49,7 +51,7 @@ let
         on = inState "on";
         off = inState "off";
         ejected = inState "ejected";
-        inherit rules;
+        inherit rules repositoryContext;
       }
       (if rules == "on" then mentionRules else [ ]);
 
@@ -65,7 +67,7 @@ let
   # Each is { dest, src }.
   folderOf = folder: builtins.map (name: { dest = null; src = folder + "/${name}"; inherit name; })
     (builtins.attrNames (lib.filterAttrs (_: kind: kind == "regular") (builtins.readDir folder)));
-  seedFiles =
+  allSeedFiles =
     [
       { dest = "AGENTS.md"; src = ../templates/AGENTS.md; }
       { dest = "CLAUDE.md"; src = ../templates/CLAUDE.md; }
@@ -88,12 +90,19 @@ let
     ++ map (each: { dest = ".github/workflows/${each.name}"; inherit (each) src; }) (folderOf ../templates/workflows)
     ++ map (each: { dest = ".github/ISSUE_TEMPLATE/${each.name}"; inherit (each) src; }) (folderOf ../templates/issues);
 
+  # The Repowise guide is left out when the project turned repository context off.
+  seedFilesFor = resolved: builtins.filter (each: !(resolved.repositoryContext == "off" && each.dest == "docs/stack/repowise.md")) allSeedFiles;
+
   lines = list: lib.concatStringsSep "\n" list + "\n";
 
   mkTree = pkgs: resolved:
     pkgs.runCommand "threnos-tree" { } ''
       mkdir -p $out/.agents/skills $out/.agents/rules $out/.claude/skills $out/seed
-      ${lib.optionalString (resolved.rules == "on") "cp ${../rules/regenerative.md} $out/.agents/rules/regenerative.md"}
+      ${lib.optionalString (resolved.rules == "on") (
+        if resolved.repositoryContext == "on"
+        then "sed -e '/^<!-- repository-context:start -->$/d' -e '/^<!-- repository-context:end -->$/d' ${../rules/regenerative.md} | cat -s > $out/.agents/rules/regenerative.md"
+        else "sed '/^<!-- repository-context:start -->$/,/^<!-- repository-context:end -->$/d' ${../rules/regenerative.md} | cat -s > $out/.agents/rules/regenerative.md"
+      )}
       ${lib.concatMapStrings (name: ''
         cp -r ${../skills + "/${name}"} $out/.agents/skills/${name}
         ln -s ../../.agents/skills/${name} $out/.claude/skills/${name}
@@ -101,7 +110,7 @@ let
       ${lib.concatMapStrings (each: ''
         mkdir -p $out/seed/${builtins.dirOf each.dest}
         cp ${each.src} $out/seed/${each.dest}
-      '') seedFiles}
+      '') (seedFilesFor resolved)}
       cp ${pkgs.writeText "owned" (lines (ownedEntries resolved))} $out/owned.txt
       cp ${pkgs.writeText "ejected" (lines (ejectedEntries resolved))} $out/ejected.txt
     '';

@@ -25,10 +25,11 @@ read three other components to change one, the boundary is wrong.
 ## Retrieve focused repository context
 
 Use local Repowise to find relevant modules, inspect dependencies, and assess change impact before broad source reads.
-Copy the [setup and usage guide](../templates/repowise.md) to `docs/stack/repowise.md` in a new project. Use the
-open-source engine with model calls and external embeddings disabled. Read maintained ADRs and contracts directly, check
-index freshness, and verify consequential claims against the source and tests. Use targeted search if the index is
-unavailable.
+Sync seeds the [setup and usage guide](../templates/repowise.md) to `docs/stack/repowise.md` in a new project. A project
+that is not ready for Repowise sets `repository_context = "off"` under `[rules]` in `.agents/threnos.toml`. Sync then
+leaves this rule and the guide out, and setting it back to `on` restores both. Use the open-source engine with model
+calls and external embeddings disabled. Read maintained ADRs and contracts directly, check index freshness, and verify
+consequential claims against the source and tests. Use targeted search if the index is unavailable.
 
 The full index is for coordinators and ordinary development or review. An independent regeneration builder must not
 retrieve an old or reference implementation, including summaries, call flows, and history. Its brief contains only the

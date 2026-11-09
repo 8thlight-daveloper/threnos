@@ -12,18 +12,18 @@ project's settings and its own rules. It may add to those rules and may not rela
 
 The shared rules refer to these by name.
 
-| Setting                  | Value                                              |
-| ------------------------ | -------------------------------------------------- |
-| Components folder        | `<components>`, such as `internal/` or `src/`      |
-| Model folder             | `<model>`, the folder that holds the domain model  |
-| Product principles       | `docs/decisions/<product principles record>`       |
-| Further behavior rules   | `<records the behavior judge also reads>`, or none |
-| Testing stack doc        | `docs/stack/testing.md`                            |
-| Issue sizing examples    | `docs/reference/issue-sizing.md`                   |
-| Repository context guide | `docs/stack/repowise.md`                           |
-| Check command            | `just check`                                       |
-| Mutation command         | `just mutate <component>`                          |
-| Mutation cadence         | `nightly` or `local`                               |
+| Setting                  | Value                                                              |
+| ------------------------ | ------------------------------------------------------------------ |
+| Components folder        | `<components>`, such as `internal/` or `src/`                      |
+| Model folder             | `<model>`, the folder that holds the domain model                  |
+| Product principles       | `docs/decisions/<product principles record>`                       |
+| Further behavior rules   | `<records the behavior judge also reads>`, or none                 |
+| Testing stack doc        | `docs/stack/testing.md`                                            |
+| Issue sizing examples    | `docs/reference/issue-sizing.md`                                   |
+| Repository context guide | `docs/stack/repowise.md`, or none when `repository_context` is off |
+| Check command            | `just check`                                                       |
+| Mutation command         | `just mutate <component>`                                          |
+| Mutation cadence         | `nightly` or `local`                                               |
 
 ## Project rules
 

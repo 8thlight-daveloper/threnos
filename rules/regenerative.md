@@ -18,6 +18,8 @@ Use the behavior judge for open product behavior choices in the assigned task. I
 and its principles are in the project's product principles record. It does not waive the human approval or independent
 authorship rules below.
 
+<!-- repository-context:start -->
+
 ## Repository context
 
 Use local Repowise for repository orientation, dependency questions, and change impact before broad source reads. Follow
@@ -30,6 +32,8 @@ including generated summaries and history. A coordinator prepares its permitted 
 decisions, shared types, and dependency interfaces. If retrieval cannot be restricted to those sources, leave the
 full-repository index disconnected from that builder. The index is evidence about code, not authority to change a
 contract or skip checks.
+
+<!-- repository-context:end -->
 
 ## Where docs go
 

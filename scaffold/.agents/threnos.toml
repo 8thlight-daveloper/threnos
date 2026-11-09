@@ -8,6 +8,8 @@
 
 [rules]
 regenerative = "on"
+# Repository context rules and the Repowise guide. Set to "off" to leave them out. Run sync after a change.
+# repository_context = "off"
 
 [skills]
 # behavior-judge = "off"

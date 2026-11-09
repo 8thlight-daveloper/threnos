@@ -76,8 +76,9 @@ since the rules and the project's own ADRs hold what an agent needs.
    architecture choices that are the project's own. Copy the [record schema](templates/decision-record-front-matter.md)
    to `docs/reference/`. The method ADRs in [docs/decisions/](docs/decisions/) are Threnos's own and are not copied. A
    project's rules file carries what an agent needs from them.
-1. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs. Copy the
-   [Repowise guide](templates/repowise.md) to `docs/stack/repowise.md` and follow its local, no-model-spend setup.
+1. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs. Follow the
+   seeded [Repowise guide](templates/repowise.md) at `docs/stack/repowise.md` for its local, no-model-spend setup, or
+   set `repository_context = "off"` under `[rules]` in `.agents/threnos.toml` until the project is ready.
 1. Write the domain model, then the first contract, then build against it. [The lifecycle](process/README.md) gives the
    order.
 
