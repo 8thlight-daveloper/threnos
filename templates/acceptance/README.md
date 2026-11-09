@@ -6,7 +6,8 @@ data.
 
 ## Where they live
 
-- A scenario is one file, `acceptance/scenarios/<name>.yaml`.
+- A scenario is one file, `acceptance/scenarios/<name>.yaml`. A file ending in `.example` is a sample the runner
+  ignores. Rename it to `.yaml` to use it.
 - Files a scenario starts with, and golden outputs, live under `acceptance/testdata/`. A scenario may also point at an
   example under `docs/`.
 - The runner lives in `acceptance/runner/`. It is the only language-specific part.

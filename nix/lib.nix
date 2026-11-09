@@ -73,6 +73,16 @@ let
       { dest = "docs/reference/issue-sizing.md"; src = ../templates/issue-sizing.md; }
       { dest = "docs/stack/repowise.md"; src = ../templates/repowise.md; }
       { dest = "docs/stack/osv-scanner.md"; src = ../templates/osv-scanner.md; }
+      { dest = "docs/reference/acceptance-scenarios.md"; src = ../templates/acceptance/README.md; }
+      { dest = "acceptance/scenarios/example-command.yaml.example"; src = ../templates/acceptance/example-command.yaml.example; }
+      { dest = "acceptance/scenarios/example-protocol.yaml.example"; src = ../templates/acceptance/example-protocol.yaml.example; }
+      # Skeletons a project copies once per record, component, or stack topic.
+      { dest = "docs/reference/templates/adr.md"; src = ../templates/decisions/adr.md; }
+      { dest = "docs/reference/templates/product-principles.md"; src = ../templates/product-principles.md; }
+      { dest = "docs/reference/templates/contract/contract.md"; src = ../templates/contract/contract.md; }
+      { dest = "docs/reference/templates/contract/cases.json"; src = ../templates/contract/cases.json; }
+      { dest = "docs/reference/templates/stack-topic.md"; src = ../templates/stack-topic.md; }
+      { dest = "docs/reference/templates/accepted-survivors.txt"; src = ../templates/accepted-survivors.txt; }
     ]
     ++ map (each: { dest = ".github/workflows/${each.name}"; inherit (each) src; }) (folderOf ../templates/workflows)
     ++ map (each: { dest = ".github/ISSUE_TEMPLATE/${each.name}"; inherit (each) src; }) (folderOf ../templates/issues);
@@ -163,7 +173,9 @@ let
 
         while IFS= read -r seed; do
           seed=''${seed#./}
-          if [ ! -e "$seed" ]; then
+          if [ "$seed" = docs/decisions/0010-product-principles.md ] && ls docs/decisions/[0-9][0-9][0-9][0-9]-*.md > /dev/null 2>&1; then
+            echo "skipped  $seed because docs/decisions already has records. Copy docs/reference/templates/product-principles.md by hand."
+          elif [ ! -e "$seed" ]; then
             mkdir -p "$(dirname "$seed")"
             cp --no-preserve=mode,ownership "$tree/seed/$seed" "$seed"
             echo "seeded   $seed"

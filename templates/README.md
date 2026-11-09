@@ -1,11 +1,14 @@
 # Templates
 
 Starting files for a new project. Copy them, replace each `<placeholder>`, and change what does not fit. Once copied
-they belong to the project, so they do not link back here. `nix run .#sync` seeds most of them where the project has
-nothing at that path: `AGENTS.md`, `CLAUDE.md`, `workflows/`, `issues/`, the decision record schema, `issue-sizing.md`,
-`repowise.md`, `osv-scanner.md`, and `product-principles.md` as record `0010`. It never overwrites a seeded file. The
-rest are copied by hand when needed: `decisions/adr.md`, `contract/`, `acceptance/`, `accepted-survivors.txt`, and
-`stack-topic.md`.
+they belong to the project, so they do not link back here. `nix run .#sync` seeds every file here where the project has
+nothing at that path, and never overwrites one. Live files go to their paths: `AGENTS.md`, `CLAUDE.md`, `workflows/`,
+`issues/`, the decision record schema, the acceptance scenario format, `issue-sizing.md`, `repowise.md`,
+`osv-scanner.md`, and `product-principles.md` as record `0010`. Sync skips that record when `docs/decisions/` already
+has records. The two acceptance examples go to `acceptance/scenarios/` with a `.example` suffix, so a runner ignores
+them until renamed. Skeletons that a project copies once per record, component, or stack topic go to
+`docs/reference/templates/`: `adr.md`, `product-principles.md`, `contract/`, `stack-topic.md`, and
+`accepted-survivors.txt`. Agents in a project read them there.
 
 | File                                                               | Goes to                                       | Is                                                                                                                                                |
 | ------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
