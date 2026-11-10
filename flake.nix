@@ -56,6 +56,12 @@
             ${threnos.recordsPython pkgs}/bin/python -B -m unittest
             touch $out
           '';
+          dependency-check-tests = pkgs.runCommand "dependency-check-tests" { nativeBuildInputs = [ pkgs.go ]; } ''
+            export HOME=$TMPDIR GOCACHE=$TMPDIR/gocache GOFLAGS=-mod=mod GOTOOLCHAIN=local
+            cd ${./languages/go/dependency-check}
+            ${threnos.recordsPython pkgs}/bin/python -B -m unittest
+            touch $out
+          '';
           # The seeds a project gets must stand alone: no broken links, and the live ones formatted.
           # lychee builds an HTTP client even offline, and the build sandbox on Linux has no certificates.
           seeds-links = pkgs.runCommand "seeds-links" { nativeBuildInputs = [ pkgs.lychee ]; SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"; } ''

@@ -9,6 +9,9 @@ entry_point: <entry point folder>
 naming:
   component_path: "<noun>/<role>"
   segment_pattern: "^[a-z][a-z0-9]*$"
+  # A component that is still a flat name and has not been decomposed yet. A name listed here is an accepted
+  # exception. The check fails on a flat name that is not listed.
+  exceptions: []
 
 # Categories core components may not use. The stack docs map each to the
 # current language's libraries.
@@ -20,6 +23,11 @@ banned_in_core:
   - clock
   - randomness
   - environment
+
+# Third-party libraries in each category. The language's own libraries are built into its checker.
+# An entry also covers the packages below it.
+libraries:
+  terminal: []
 
 # Drivers do input and output, so the banned list does not apply to them.
 drivers:
