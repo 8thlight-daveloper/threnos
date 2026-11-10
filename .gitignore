@@ -3,3 +3,5 @@
 output/
 .DS_Store
 __pycache__/
+.claude/worktrees/
+.claude/settings.local.json
