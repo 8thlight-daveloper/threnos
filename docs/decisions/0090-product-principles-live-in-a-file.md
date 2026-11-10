@@ -1,7 +1,7 @@
 ---
 category: regenerative-process
-status: proposed
-approval: unrecorded
+status: accepted
+approval: person
 builds-on: ['0040', '0050', '0070', '0080']
 partly-supersedes: ['0040']
 note: Replaces the part of 0040 that has each project write its principles as a record. The method in 0040 stays.

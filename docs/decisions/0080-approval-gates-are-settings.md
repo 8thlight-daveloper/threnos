@@ -1,7 +1,7 @@
 ---
 category: regenerative-process
-status: proposed
-approval: unrecorded
+status: accepted
+approval: person
 builds-on: ['0040', '0050', '0070']
 note: Starts with the principles gate. The gates on contracts, acceptance scenarios, and architecture.yaml stay fixed.
 ---
