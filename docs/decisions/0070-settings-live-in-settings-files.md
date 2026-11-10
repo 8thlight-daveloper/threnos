@@ -27,7 +27,7 @@ with a schema that a check can validate. Prose holds what a person chooses and e
   dependency rules, and how acceptance scenarios are written.
 - `.threnos/config.toml` holds how a project takes Threnos: which rules and skills are on, and the settings the rules
   and skills read, such as `repository_context` and `mutation_cadence`. Sync validates each value.
-- `AGENTS.md` holds pointers to documents that a person picks, such as the product principles record and the testing
+- `AGENTS.md` holds pointers to documents that a person picks, such as the product principles file and the testing
   stack doc. A pointer names a file. It carries no value that a tool needs.
 
 **A value has one home.** A setting that a settings file already holds is not repeated in `AGENTS.md`. A setting that

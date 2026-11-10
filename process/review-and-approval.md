@@ -5,17 +5,17 @@ scenarios, and decisions. Reading regenerated code stays optional.
 
 ## Who changes what
 
-| Artifact                              | Who writes it                      | Who approves it                       |
-| ------------------------------------- | ---------------------------------- | ------------------------------------- |
-| ADRs                                  | Anyone, often an agent drafting    | A person                              |
-| Domain model                          | Anyone, by ADR                     | A person                              |
-| `architecture.yaml`                   | Anyone                             | A person                              |
-| Contracts and fixtures                | A contract author, not the builder | A person                              |
-| Acceptance scenarios and their format | Not the builder of what they judge | A person                              |
-| The accepted survivor list            | A person only                      | A person                              |
-| Principles documents                  | A person, or an agent proposing    | A person                              |
-| Component code                        | A builder agent                    | Passes its contract and the scenarios |
-| Unit tests inside a component         | The builder                        | Disposable with the component         |
+| Artifact                              | Who writes it                      | Who approves it                                |
+| ------------------------------------- | ---------------------------------- | ---------------------------------------------- |
+| ADRs                                  | Anyone, often an agent drafting    | A person                                       |
+| Domain model                          | Anyone, by ADR                     | A person                                       |
+| `architecture.yaml`                   | Anyone                             | A person                                       |
+| Contracts and fixtures                | A contract author, not the builder | A person                                       |
+| Acceptance scenarios and their format | Not the builder of what they judge | A person                                       |
+| The accepted survivor list            | A person only                      | A person                                       |
+| Principles documents                  | A person, or an agent proposing    | A person, or an agent if the project allows it |
+| Component code                        | A builder agent                    | Passes its contract and the scenarios          |
+| Unit tests inside a component         | The builder                        | Disposable with the component                  |
 
 An agent may draft any protected artifact when asked to. It may not approve it, and it may not change one as a side
 effect of other work. When a build or rebuild finds that a protected artifact is wrong, it stops and reports.

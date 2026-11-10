@@ -8,15 +8,15 @@ nothing at that path, and never overwrites one. Live files go to their paths: `A
 so a runner ignores them until renamed. Skeletons with placeholders go to `docs/reference/templates/`: `adr.md`,
 `product-principles.md`, `issue-sizing.md`, `contract/`, `stack-topic.md`, and `accepted-survivors.txt`. A project
 copies each once per record, component, or stack topic, and agents read them there. Sync does not write the product
-principles record or the issue sizing doc, because a person has to fill them in and a placeholder file could pass for a
+principles file or the issue sizing doc, because a person has to fill them in and a placeholder file could pass for a
 real one.
 
 ## Seeds are written once
 
-Sync records every path it seeds, or finds already in place, in `.threnos/seeded`, and does not seed that path
-again. A project can delete a seed for good. To get one back, remove its line from `.threnos/seeded` and run
-sync. The file is back if it is missing. To keep a seed out from the first sync, list its path under `skip` in a
-`[seeds]` table in `.threnos/config.toml`.
+Sync records every path it seeds, or finds already in place, in `.threnos/seeded`, and does not seed that path again. A
+project can delete a seed for good. To get one back, remove its line from `.threnos/seeded` and run sync. The file is
+back if it is missing. To keep a seed out from the first sync, list its path under `skip` in a `[seeds]` table in
+`.threnos/config.toml`.
 
 ## Linting the seeds
 
@@ -33,7 +33,7 @@ words to the project's vocabulary.
 | [architecture.yaml](architecture.yaml)                             | Repo root                                     | The dependency rules, as data. Required. `nix flake init` seeds an empty one                                                                               |
 | [decisions/](decisions/)                                           | `docs/decisions/`                             | The ADR skeleton, with front matter. The method ADRs are Threnos's own in [docs/decisions/](../docs/decisions/) and are not copied                         |
 | [decision-record-front-matter.md](decision-record-front-matter.md) | `docs/reference/`                             | The front matter every decision record starts with, and the checks over it                                                                                 |
-| [product-principles.md](product-principles.md)                     | `docs/decisions/<NNNN>-product-principles.md` | The project's product principles, which the behavior judge reads                                                                                           |
+| [product-principles.md](product-principles.md)                     | `docs/reference/product-principles.md`        | The project's product principles, edited in place, which the behavior judge reads                                                                          |
 | [contract/](contract/)                                             | `contracts/<noun>/<role>/`                    | A contract description and a fixture manifest                                                                                                              |
 | [acceptance/](acceptance/README.md)                                | `docs/reference/` and `acceptance/scenarios/` | The scenario format and two example scenarios                                                                                                              |
 | [workflows/](workflows/)                                           | `.github/workflows/`                          | The `check` and `mutate` GitHub Actions workflows. They call only the [task recipes](../process/task-recipes.md)                                           |
@@ -47,8 +47,8 @@ words to the project's vocabulary.
 ## Order
 
 1. `.agents/rules/regenerative.md`, `AGENTS.md`, `CLAUDE.md`, and the skills.
-1. The product principles record, from [product-principles.md](product-principles.md). Write it before the first
-   survivor review, not after. Link the Threnos method ADRs from `AGENTS.md`.
+1. The product principles file, from [product-principles.md](product-principles.md). Write it before the first survivor
+   review, not after. Link the Threnos method ADRs from `AGENTS.md`.
 1. `docs/stack/code-layout.md` from a [language mapping](../languages/README.md), then `docs/stack/repowise.md` from the
    setup guide. Initialize the local index and connect the project's agent as that guide describes.
 1. `architecture.yaml` with the first components.

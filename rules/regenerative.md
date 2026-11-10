@@ -7,8 +7,9 @@ A project may add rules. It may not relax these. When a project rule conflicts w
 
 Settings live in files, not in prose. `architecture.yaml` holds the components folder (`components_root`), the model
 folder (`model`), and the dependency and acceptance rules. `.threnos/config.toml` holds how the project takes these
-rules, including `mutation_cadence`. `AGENTS.md` points to the documents a person chooses, such as the product
-principles record. When a rule names a setting, read it from that file.
+rules, including `mutation_cadence` and who may approve each gate under `[approvals]`. `.threnos/local.toml`, when it
+exists, replaces a person's `[approvals]` lists for their own work and nothing else. `AGENTS.md` points to the documents
+a person chooses. When a rule names a setting, read it from that file.
 
 ## Shared skills
 
@@ -17,7 +18,7 @@ folder, such as `.claude/skills/<name>`, links to the matching shared skill. Edi
 `CLAUDE.md` imports `AGENTS.md` and this file.
 
 Use the behavior judge for open product behavior choices in the assigned task. Its bounded authority is in the skill,
-and its principles are in the project's product principles record. It does not waive the human approval or independent
+and its principles are in the project's product principles file. It does not waive the human approval or independent
 authorship rules below.
 
 <!-- repository-context:start -->

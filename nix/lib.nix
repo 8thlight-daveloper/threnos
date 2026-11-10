@@ -1,6 +1,8 @@
 { lib, self }:
 let
   states = [ "on" "off" "ejected" ];
+  gates = [ "principles" ];
+  approvers = [ "person" "agent" ];
   registry = builtins.fromTOML (builtins.readFile ../skills/manifest.toml);
   skillDirs = builtins.attrNames (lib.filterAttrs (_: kind: kind == "directory") (builtins.readDir ../skills));
 
@@ -34,6 +36,11 @@ let
       repositoryContext = (manifest.rules or { }).repository_context or "on";
       mutationCadence = (manifest.rules or { }).mutation_cadence or "nightly";
       seedSkip = (manifest.seeds or { }).skip or [ ];
+      approvals = manifest.approvals or { };
+      badGates = builtins.filter (gate: !(builtins.elem gate gates)) (builtins.attrNames approvals);
+      badApprovers = builtins.filter
+        (gate: let who = approvals.${gate}; in !(builtins.isList who && who != [ ] && builtins.all (each: builtins.elem each approvers) who))
+        (builtins.attrNames approvals);
 
       missing = lib.concatMap
         (name: map (needed: { inherit name needed; }) (builtins.filter (needed: !(present needed)) (requiresOf name)))
@@ -47,6 +54,8 @@ let
     assert lib.assertMsg (builtins.elem rules [ "on" "ejected" ]) "rules.regenerative must be on or ejected";
     assert lib.assertMsg (builtins.elem repositoryContext [ "on" "off" ]) "rules.repository_context must be on or off";
     assert lib.assertMsg (builtins.elem mutationCadence [ "nightly" "local" ]) "rules.mutation_cadence must be nightly or local";
+    assert lib.assertMsg (badGates == [ ]) "approvals names gates that do not exist: ${toString badGates}. Gates: ${toString gates}";
+    assert lib.assertMsg (badApprovers == [ ]) "approvals.${toString badApprovers} must be a non-empty list of person or agent";
     assert lib.assertMsg (builtins.isList seedSkip && builtins.all builtins.isString seedSkip) "seeds.skip must be a list of paths";
     assert lib.assertMsg (missing == [ ])
       (lib.concatMapStringsSep "; " (each: "${each.name} requires ${each.needed}, which is off") missing);
@@ -55,7 +64,7 @@ let
         on = inState "on";
         off = inState "off";
         ejected = inState "ejected";
-        inherit rules repositoryContext mutationCadence seedSkip;
+        inherit rules repositoryContext mutationCadence seedSkip approvals;
       }
       (if rules == "on" then mentionRules else [ ]);
 
@@ -138,6 +147,7 @@ let
       text = ''
         tree=${tree}
         owned_file=.threnos/owned
+        ${recordsPython pkgs}/bin/python ${../tools/records/check.py} --settings .
         ${same}
         release() { chmod -R u+w "$1" 2> /dev/null || true; }
 
@@ -214,6 +224,7 @@ let
         } > "$seeded_file"
 
         mkdir -p .threnos
+        printf 'local.toml\n' > .threnos/.gitignore
         [ -f "$owned_file" ] && release "$owned_file"
         printf '%s\n' "''${owned[@]}" | sort > "$owned_file"
       '';

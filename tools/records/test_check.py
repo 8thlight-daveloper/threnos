@@ -150,5 +150,157 @@ class RecordChecks(unittest.TestCase):
         self.assertEqual(problems, [])
 
 
+BEHAVIOR = "category: behavior\nstatus: accepted\napproval: person\naffects: [tui]\n"
+
+
+def principles(records="0010", approval="person", reviewed="2026-11-10"):
+    return (
+        f"---\napproval: {approval}\nreviewed: {reviewed}\n---\n\n# Product principles\n\n## Principles\n\n"
+        f"### P1. Ground claims\n\nPrefer cited facts.\n\nRecords: {records}\n"
+    )
+
+
+PRINCIPLES_PATH = "docs/reference/product-principles.md"
+
+
+class ApprovalSettings(unittest.TestCase):
+    def assertProblem(self, problems, fragment):
+        self.assertTrue(any(fragment in each for each in problems), f"{fragment!r} not in {problems}")
+
+    def project(self, config="", local=None):
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root) / ".threnos"
+            base.mkdir()
+            (Path(root) / "architecture.yaml").write_text(ARCHITECTURE)
+            (base / "config.toml").write_text(config)
+            if local is not None:
+                (base / "local.toml").write_text(local)
+            return check.settings_problems(Path(root)), check.check(Path(root))[0]
+
+    def test_a_valid_list_passes(self):
+        (problems, warnings), record_problems = self.project('[approvals]\nprinciples = ["person", "agent"]\n')
+        self.assertEqual((problems, warnings, record_problems), ([], [], []))
+
+    def test_a_file_that_does_not_parse_is_reported_not_raised(self):
+        (problems, _), record_problems = self.project("[approvals\n")
+        self.assertProblem(problems, "config.toml:")
+        self.assertProblem(record_problems, "config.toml:")
+
+    def test_an_unknown_gate_is_reported(self):
+        (problems, _), _ = self.project('[approvals]\ncontracts = ["agent"]\n')
+        self.assertProblem(problems, "approvals.contracts is not a gate")
+
+    def test_an_empty_list_is_reported(self):
+        (problems, _), _ = self.project("[approvals]\nprinciples = []\n")
+        self.assertProblem(problems, "non-empty list")
+
+    def test_an_unknown_approver_is_reported(self):
+        (problems, _), _ = self.project('[approvals]\nprinciples = ["robot"]\n')
+        self.assertProblem(problems, "non-empty list")
+
+    def test_agent_alone_warns(self):
+        (problems, warnings), _ = self.project('[approvals]\nprinciples = ["agent"]\n')
+        self.assertEqual(problems, [])
+        self.assertProblem(warnings, "lists only agent")
+
+    def test_the_user_file_may_set_approvals_only(self):
+        (problems, _), _ = self.project("", local='[rules]\nregenerative = "ejected"\n')
+        self.assertProblem(problems, "rules is project-only")
+
+    def test_a_bad_value_in_the_user_file_is_reported(self):
+        (problems, _), _ = self.project("", local='[approvals]\nprinciples = []\n')
+        self.assertProblem(problems, "local.toml: approvals.principles")
+
+    def test_the_record_check_ignores_the_user_file(self):
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root) / ".threnos"
+            base.mkdir()
+            (base / "local.toml").write_text('[approvals]\nprinciples = ["agent"]\n')
+            for name, text in {
+                "architecture.yaml": ARCHITECTURE,
+                "docs/decisions/0010-first.md": record("0010", BEHAVIOR),
+                PRINCIPLES_PATH: principles(approval="agent"),
+            }.items():
+                path = Path(root) / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(text)
+            problems, _ = check.check(Path(root))
+        self.assertProblem(problems, "approval agent is not in approvals.principles ['person']")
+
+
+class PrincipleFile(unittest.TestCase):
+    def assertProblem(self, problems, fragment):
+        self.assertTrue(any(fragment in each for each in problems), f"{fragment!r} not in {problems}")
+
+    def run_files(self, files, config=None):
+        files = dict(files)
+        if config is not None:
+            files[".threnos/config.toml"] = config
+        problems, _ = run(files)
+        return problems
+
+    def decisions(self, extra=None):
+        files = {"docs/decisions/0010-first.md": record("0010", BEHAVIOR)}
+        files.update(extra or {})
+        return files
+
+    def test_a_consistent_file_passes(self):
+        self.assertEqual(self.run_files(self.decisions({PRINCIPLES_PATH: principles()})), [])
+
+    def test_no_file_means_no_principle_checks(self):
+        self.assertEqual(self.run_files(self.decisions()), [])
+
+    def test_a_cited_record_must_exist(self):
+        problems = self.run_files(self.decisions({PRINCIPLES_PATH: principles(records="0010, 0099")}))
+        self.assertProblem(problems, "P1 cites 0099, which is not a record")
+
+    def test_a_superseded_record_cannot_be_cited(self):
+        files = self.decisions({
+            "docs/decisions/0020-second.md": record(
+                "0020", "category: behavior\nstatus: superseded\napproval: person\naffects: [tui]\nsuperseded-by: ['0010']\n"
+            ),
+            PRINCIPLES_PATH: principles(records="0010, 0020"),
+        })
+        files["docs/decisions/0010-first.md"] = record("0010", BEHAVIOR + "supersedes: ['0020']\n")
+        self.assertProblem(self.run_files(files), "cites 0020, which is superseded")
+
+    def test_an_accepted_behavior_record_must_be_cited_or_excused(self):
+        files = self.decisions({
+            "docs/decisions/0020-second.md": record("0020", BEHAVIOR),
+            PRINCIPLES_PATH: principles(),
+        })
+        self.assertProblem(self.run_files(files), "0020-second.md: no principle cites this record")
+        files["docs/decisions/0020-second.md"] = record("0020", BEHAVIOR + "principle: none\n")
+        self.assertEqual(self.run_files(files), [])
+
+    def test_a_proposed_behavior_record_needs_no_citation(self):
+        files = self.decisions({
+            "docs/decisions/0020-second.md": record("0020", "category: behavior\nstatus: proposed\naffects: []\n"),
+            PRINCIPLES_PATH: principles(),
+        })
+        self.assertEqual(self.run_files(files), [])
+
+    def test_principle_none_belongs_on_behavior_records_only(self):
+        files = self.decisions({
+            "docs/decisions/0020-second.md": record("0020", "category: operations\nstatus: proposed\nprinciple: none\n"),
+        })
+        self.assertProblem(self.run_files(files), "principle may only be none")
+
+    def test_a_principle_needs_a_records_line(self):
+        text = principles().replace("Records: 0010\n", "")
+        self.assertProblem(self.run_files(self.decisions({PRINCIPLES_PATH: text})), "P1 has no Records line")
+
+    def test_front_matter_is_required_and_the_date_must_parse(self):
+        no_front = self.run_files(self.decisions({PRINCIPLES_PATH: "# Product principles\n"}))
+        self.assertProblem(no_front, "no front matter")
+        bad_date = self.run_files(self.decisions({PRINCIPLES_PATH: principles(reviewed="soon")}))
+        self.assertProblem(bad_date, "reviewed must be a date")
+
+    def test_an_agent_approval_passes_only_when_the_project_allows_it(self):
+        files = self.decisions({PRINCIPLES_PATH: principles(approval="agent")})
+        self.assertProblem(self.run_files(files), "A person ratifies it")
+        self.assertEqual(self.run_files(files, config='[approvals]\nprinciples = ["person", "agent"]\n'), [])
+
+
 if __name__ == "__main__":
     unittest.main()

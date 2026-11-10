@@ -8,8 +8,11 @@ Write the principles down and give a skill bounded authority to apply them.
 
 ## A principles document
 
-One document holds the project's principles for a kind of judgment. It is an ADR, so it changes slowly and deliberately.
-Each principle has a short label, such as P4, so a decision can cite it.
+One file holds the project's principles for a kind of judgment. It is edited in place, so the judge reads one file and
+does not gather every record that sharpened a principle. The records stay the source of truth for what was decided and
+why. Each principle has a short label, such as P4, so a decision can cite it, and lists the records it comes from. The
+records check fails when a listed record is missing or superseded, and when an accepted behavior record is neither cited
+nor marked `principle: none`.
 
 A good principle:
 
@@ -21,9 +24,10 @@ A good principle:
 Principles are not points in a score. Privacy, correctness, ownership, and explicit commitments constrain convenience. A
 general principle never silently overrides a specific accepted decision.
 
-[ADR 0040](../docs/decisions/0040-behavior-judgment.md) holds the authority rules.
-[templates/product-principles.md](../templates/product-principles.md) is a starting record for the principles, which
-each project writes itself.
+[ADR 0040](../docs/decisions/0040-behavior-judgment.md) holds the authority rules, and
+[ADR 0090](../docs/decisions/0090-product-principles-live-in-a-file.md) says why the principles are a file.
+[templates/product-principles.md](../templates/product-principles.md) is a starting file for the principles, which each
+project writes itself.
 
 ## A judge applies them
 
@@ -46,9 +50,12 @@ implemented.
 
 ## A judge never edits its own standard
 
-The judge reads the principles. It does not change them, expand its own authority, or mark its own judgment as a
-person's approval. A person changes the principles document. The same holds for any skill that judges against a
-document.
+The judge reads the principles. It does not expand its own authority or mark its own judgment as a person's approval. A
+person changes the principles file, unless the project lists `agent` under `principles` in `[approvals]`
+([ADR 0080](../docs/decisions/0080-approval-gates-are-settings.md)). Then the judge may edit it, and records
+`approval: agent` in the file. The project's own list decides what merges, so a person who works hands-off with their
+own `.threnos/local.toml` still has the agent's edits ratified in review. The same holds for any skill that judges
+against a document.
 
 ## More than one kind of principle
 

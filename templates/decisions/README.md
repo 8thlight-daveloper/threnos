@@ -11,12 +11,14 @@ are not rewritten.
    checks. `nix flake check` runs those checks.
 1. Link the records and contracts that depend on it. Put language and tooling details in `docs/stack/`, not here.
 
-## First record
+## First file
 
-Write the product principles first, from `docs/reference/templates/product-principles.md`. The behavior judge skill
-reads them to decide open product questions, and it stops when the project has none. Name the file in the "Product
-principles" row of the document pointers in `AGENTS.md`. A person writes and approves it before the first mutation
-survivor review.
+Write the product principles first. They are a file, not a record: copy `docs/reference/templates/product-principles.md`
+to `docs/reference/product-principles.md`. The behavior judge skill reads it to decide open product questions, and it
+stops when the project has none. Each principle lists the records it comes from. When a new behavior record adds or
+sharpens a principle, edit the file and cite the record. A behavior record that adds no principle says `principle: none`
+in its front matter. A person writes the first version before the first mutation survivor review. Who may approve later
+edits is the `principles` setting under `[approvals]` in `.threnos/config.toml`.
 
 ## Not here
 

@@ -15,7 +15,7 @@ The documents a person chooses. The shared rules and skills read them from here.
 
 | Document               | Path                                               |
 | ---------------------- | -------------------------------------------------- |
-| Product principles     | `docs/decisions/<product principles record>`       |
+| Product principles     | `docs/reference/product-principles.md`             |
 | Further behavior rules | `<records the behavior judge also reads>`, or none |
 | Testing stack doc      | `docs/stack/testing.md`                            |
 | Issue sizing examples  | `docs/reference/issue-sizing.md`, or none          |

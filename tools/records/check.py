@@ -1,13 +1,17 @@
 """Check a project's decision records against the front matter schema.
 
-Usage: check.py [-v] [--framework] [project root]
+Usage: check.py [-v] [--framework] [--settings] [project root]
 
 The schema is templates/decision-record-front-matter.md. Exits 1 when a check
 fails. Notes are printed only with -v. A project must have an architecture.yaml.
+--settings checks only .threnos/config.toml and the user layer .threnos/local.toml, which sync runs.
+The record check reads the project file and never the user file, so it judges every record the way CI does.
 --framework is for Threnos itself, which holds records but is not a project, and skips that requirement.
 """
+import datetime
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 import yaml
@@ -19,7 +23,7 @@ APPROVALS = ["person", "agent", "unrecorded"]
 PRODUCT_REQUIRED = ["behavior", "ux"]
 PRODUCT_ALLOWED = ["architecture", "behavior", "ux"]
 FIELDS = {
-    "category", "status", "approval", "note", "affects", "builds-on",
+    "category", "status", "approval", "note", "affects", "builds-on", "principle",
     "supersedes", "superseded-by", "partly-supersedes", "partly-superseded-by",
 }
 LINK_FIELDS = ["builds-on", "supersedes", "superseded-by", "partly-supersedes", "partly-superseded-by"]
@@ -29,6 +33,12 @@ REVERSE = {
     "partly-supersedes": "partly-superseded-by",
     "partly-superseded-by": "partly-supersedes",
 }
+PRINCIPLES = "docs/reference/product-principles.md"
+PRINCIPLES_FIELDS = {"approval", "reviewed"}
+APPROVERS = ["person", "agent"]
+GATES = ["principles"]
+DEFAULT_APPROVERS = ["person"]
+USER_SETTINGS = {"approvals"}
 RECORD_FILE = re.compile(r"^(\d{4})-.+\.md$")
 CITATION = re.compile(r"\[(\d{4})\]|decisions/(\d{4})-|\bADRs? (\d{4})\b")
 
@@ -120,6 +130,8 @@ def field_problems(one):
     approval = one.front.get("approval")
     if status != "proposed" and approval not in APPROVALS:
         problems.append(f"{one.file}: approval {approval!r} is not one of {', '.join(APPROVALS)}")
+    if "principle" in one.front and (category != "behavior" or one.front["principle"] != "none"):
+        problems.append(f"{one.file}: principle may only be none, and only on a behavior record")
     return problems
 
 
@@ -169,6 +181,125 @@ def uncited_note(one, contracts):
     return f"{one.file}: contracts of {', '.join(missing)} do not cite it" if missing else None
 
 
+def load_toml(path):
+    """Return (settings, problem). A file that does not parse is a problem and no settings."""
+    if not path.is_file():
+        return {}, None
+    try:
+        return tomllib.loads(path.read_text()), None
+    except tomllib.TOMLDecodeError as error:
+        return {}, f".threnos/{path.name}: {error}"
+
+
+def approvals_problems(settings, label):
+    problems = []
+    table = settings.get("approvals") or {}
+    if not isinstance(table, dict):
+        return [f"{label}: approvals must be a table of gates"]
+    for gate, who in table.items():
+        if gate not in GATES:
+            problems.append(f"{label}: approvals.{gate} is not a gate. Gates: {', '.join(GATES)}")
+        elif not isinstance(who, list) or not who or any(each not in APPROVERS for each in who):
+            problems.append(f"{label}: approvals.{gate} must be a non-empty list of {' or '.join(APPROVERS)}")
+    return problems
+
+
+def local_problems(local):
+    problems = [
+        f".threnos/local.toml: {key} is project-only. A user file may set only {', '.join(sorted(USER_SETTINGS))}"
+        for key in sorted(set(local) - USER_SETTINGS)
+    ]
+    return problems + approvals_problems(local, ".threnos/local.toml")
+
+
+def approvers(config, gate):
+    return (config.get("approvals") or {}).get(gate, DEFAULT_APPROVERS)
+
+
+def settings_problems(root):
+    """Validate the project settings and the user layer. Returns (problems, warnings)."""
+    config, config_error = load_toml(root / ".threnos" / "config.toml")
+    local, local_error = load_toml(root / ".threnos" / "local.toml")
+    problems = [each for each in (config_error, local_error) if each]
+    problems += approvals_problems(config, ".threnos/config.toml") + local_problems(local)
+    warnings = [
+        f"{label}: approvals.{gate} lists only agent, so a person may not approve"
+        for label, settings in ((".threnos/config.toml", config), (".threnos/local.toml", local))
+        for gate, who in (settings.get("approvals") or {}).items()
+        if who == ["agent"]
+    ]
+    return problems, warnings
+
+
+def principle_sections(body):
+    sections, current = [], None
+    for line in body.split("\n"):
+        if line.startswith("### P"):
+            current = (line, [])
+            sections.append(current)
+        elif line.startswith("## ") or line.startswith("# "):
+            current = None
+        elif current is not None:
+            current[1].append(line)
+    return sections
+
+
+def principles_problems(root, records, config):
+    path = root / PRINCIPLES
+    if not path.is_file():
+        return []
+    name = PRINCIPLES
+    text = path.read_text()
+    if not text.startswith("---\n"):
+        return [f"{name}: no front matter. It needs approval and reviewed"]
+    block, closed, body = text[4:].partition("\n---\n")
+    if not closed:
+        return [f"{name}: front matter is not closed"]
+    try:
+        front = yaml.safe_load(block) or {}
+    except yaml.YAMLError as error:
+        return [f"{name}: front matter: {error}"]
+    problems = []
+    unknown = sorted(set(front) - PRINCIPLES_FIELDS)
+    if unknown:
+        problems.append(f"{name}: front matter has unknown fields: {', '.join(unknown)}")
+    approval = front.get("approval")
+    allowed = approvers(config, "principles")
+    if approval not in APPROVERS:
+        problems.append(f"{name}: approval {approval!r} is not one of {', '.join(APPROVERS)}")
+    elif approval not in allowed:
+        problems.append(
+            f"{name}: approval {approval} is not in approvals.principles {allowed}. "
+            "A person ratifies it by reading the changes and setting approval: person"
+        )
+    if not isinstance(front.get("reviewed"), datetime.date):
+        problems.append(f"{name}: reviewed must be a date, such as 2026-01-31")
+    by_number = {one.number: one for one in records}
+    cited = set()
+    for heading, lines in principle_sections(body):
+        label = heading[4:].split(".")[0]
+        found = next((line for line in lines if line.startswith("Records:")), None)
+        if found is None:
+            problems.append(f"{name}: {label} has no Records line. List the records it comes from, or none")
+            continue
+        for number in re.findall(r"\b\d{4}\b", found):
+            target = by_number.get(number)
+            if target is None:
+                problems.append(f"{name}: {label} cites {number}, which is not a record")
+            elif target.front.get("status") in ("superseded", "withdrawn"):
+                problems.append(f"{name}: {label} cites {number}, which is {target.front['status']}. Update the principle")
+            cited.add(number)
+    for one in records:
+        if (
+            one.front.get("category") == "behavior"
+            and one.front.get("status") == "accepted"
+            and one.number not in cited
+            and one.front.get("principle") != "none"
+        ):
+            problems.append(f"{one.file}: no principle cites this record. Cite it in {name}, or set principle: none")
+    return problems
+
+
 def check(root, require_architecture=True):
     """Return (problems, notes) for the project at root."""
     records, problems = load_records(root)
@@ -186,12 +317,28 @@ def check(root, require_architecture=True):
         note = uncited_note(one, contracts)
         if note:
             notes.append(note)
+    config, config_error = load_toml(root / ".threnos" / "config.toml")
+    if config_error:
+        problems.append(config_error)
+    problems += approvals_problems(config, ".threnos/config.toml") + principles_problems(root, records, config)
     return sorted(problems), notes
+
+
+def main_settings(root):
+    problems, warnings = settings_problems(root)
+    for warning in warnings:
+        print("warning:", warning, file=sys.stderr)
+    if problems:
+        print("found problems:\n  " + "\n  ".join(problems), file=sys.stderr)
+        return 1
+    return 0
 
 
 def main(args):
     verbose = "-v" in args
-    paths = [each for each in args if each not in ("-v", "--framework")]
+    paths = [each for each in args if each not in ("-v", "--framework", "--settings")]
+    if "--settings" in args:
+        return main_settings(Path(paths[0]) if paths else Path("."))
     problems, notes = check(Path(paths[0]) if paths else Path("."), require_architecture="--framework" not in args)
     if verbose:
         for note in notes:

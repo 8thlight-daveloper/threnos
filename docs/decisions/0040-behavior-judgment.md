@@ -4,7 +4,7 @@ status: accepted
 approval: unrecorded
 builds-on: ['0030']
 partly-superseded-by: ['0090']
-note: Accepted for experimental use, as in onboard-kit 0100. The product principles are not part of this record. Each project writes its own.
+note: Accepted for experimental use, as in onboard-kit 0100. The product principles are not part of this record. Each project writes its own, as a file under 0090.
 ---
 
 # 0040. Behavior judgment
@@ -17,14 +17,14 @@ Mutation survivors and contract reviews expose choices about product behavior. A
 work, but letting an agent follow the current code makes an implementation accident into a requirement. We need explicit
 product principles and a bounded way for an agent to apply them. The method is the same for every project. The
 principles describe one product's people, so each project writes its own, starting from the Threnos template
-`templates/product-principles.md`.
+`templates/product-principles.md`. [0090](0090-product-principles-live-in-a-file.md) makes that a file.
 
 The behavior judge is a development workflow. It adds no model call or runtime dependency to the shipped program. Its
 decisions become deterministic tests.
 
 ## Decision
 
-Use the behavior judge skill for open product-behavior questions. The principles live in the project's own record. The
+Use the behavior judge skill for open product-behavior questions. The principles live in the project's own file. The
 skill carries the procedure and the delegated authority below, which stay in step with this record. Neither an
 implementation nor a mutation score is product authority.
 

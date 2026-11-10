@@ -10,8 +10,8 @@ note: Replaces the part of 0040 that has each project write its principles as a 
 # 0090. Product principles live in a file
 
 Builds on [0040](0040-behavior-judgment.md), [0050](0050-records-and-checked-files.md),
-[0070](0070-settings-live-in-settings-files.md), and [0080](0080-approval-gates-are-settings.md). It replaces the part of
-0040 that has each project write its principles as a decision record.
+[0070](0070-settings-live-in-settings-files.md), and [0080](0080-approval-gates-are-settings.md). It replaces the part
+of 0040 that has each project write its principles as a decision record.
 
 ## Context
 
@@ -40,8 +40,8 @@ make the edit only when the setting lists `agent`, and it marks the change as an
 
 - Every record a principle cites exists.
 - A cited record that is superseded fails the check until the principle is updated.
-- A `behavior` record is cited by a principle, or its front matter says `principle: none`. The field forces a decision on
-  whether a new behavior adds a principle.
+- A `behavior` record is cited by a principle, or its front matter says `principle: none`. The field forces a decision
+  on whether a new behavior adds a principle.
 
 **Threnos ships a skeleton and no principles.** The skeleton moves from a record template to a file template. A person
 writes the first version, because a placeholder could pass for real principles.
