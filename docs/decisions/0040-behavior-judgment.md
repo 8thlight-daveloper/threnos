@@ -3,6 +3,7 @@ category: regenerative-process
 status: accepted
 approval: unrecorded
 builds-on: ['0030']
+partly-superseded-by: ['0090']
 note: Accepted for experimental use, as in onboard-kit 0100. The product principles are not part of this record. Each project writes its own.
 ---
 

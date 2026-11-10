@@ -6,7 +6,7 @@ by taking a new version from its source. `AGENTS.md` holds the project's documen
 A project may add rules. It may not relax these. When a project rule conflicts with a rule here, stop and ask a person.
 
 Settings live in files, not in prose. `architecture.yaml` holds the components folder (`components_root`), the model
-folder (`model`), and the dependency and acceptance rules. `.agents/threnos.toml` holds how the project takes these
+folder (`model`), and the dependency and acceptance rules. `.threnos/config.toml` holds how the project takes these
 rules, including `mutation_cadence`. `AGENTS.md` points to the documents a person chooses, such as the product
 principles record. When a rule names a setting, read it from that file.
 
@@ -81,7 +81,7 @@ exceptions. Spell words out or use a common short form such as `config`. Do not 
   not edit the contract unless a person authorizes that specific change.
 - When building a component, first run its contract tests against a stub and confirm that every test that exercises the
   output fails. Tests of properties, such as determinism, may pass against a stub that returns nothing.
-- Read `rules.mutation_cadence` in `.agents/threnos.toml`. When it is `nightly`, mutation runs in CI. Read the latest
+- Read `rules.mutation_cadence` in `.threnos/config.toml`. When it is `nightly`, mutation runs in CI. Read the latest
   result for the component and report surviving mutants as contract gaps. Run `just mutate <component>` only when a
   person asks. When it is `local`, run `just mutate <component>` after the contract tests pass and report surviving
   mutants as contract gaps. Under either cadence, do not edit the contract.

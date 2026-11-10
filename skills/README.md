@@ -35,7 +35,7 @@ the project turned off. `nix flake check` fails when an installed file differs f
 a recipe the project lists. A flake in a Git repository sees only tracked files, so run `git add .agents .claude` after
 sync and before the check. Until then the drift check fails on the new files.
 
-The project's `.agents/threnos.toml` sets each skill to one of three states:
+The project's `.threnos/config.toml` sets each skill to one of three states:
 
 | State     | Sync does                                         | Use it when                                                                       |
 | --------- | ------------------------------------------------- | --------------------------------------------------------------------------------- |
@@ -71,5 +71,5 @@ Edit a skill here, never in a project's `.agents/skills/`. To change one for a s
 
 The process skills use the fixed recipe names from [task recipes](../process/task-recipes.md): `just check`, which runs
 every check, and `just mutate <component>`, which runs the mutation tool on one component and prints survivors in the
-accepted list's format. They read `rules.mutation_cadence` in `.agents/threnos.toml`. The cadence is `nightly`, where CI
+accepted list's format. They read `rules.mutation_cadence` in `.threnos/config.toml`. The cadence is `nightly`, where CI
 runs mutation and agents read the result, or `local`, where agents run it. Sync validates the value.

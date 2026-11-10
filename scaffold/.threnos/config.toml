@@ -13,7 +13,7 @@ regenerative = "on"
 # Who runs mutation testing. "nightly": CI runs it and agents read the latest result. "local": agents run it.
 mutation_cadence = "nightly"
 
-# Seeds are written once and recorded in .agents/.threnos-seeded. To keep one out from the first sync, list its path.
+# Seeds are written once and recorded in .threnos/seeded. To keep one out from the first sync, list its path.
 # [seeds]
 # skip = ["docs/stack/osv-scanner.md"]
 

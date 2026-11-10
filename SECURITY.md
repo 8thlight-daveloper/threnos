@@ -21,7 +21,7 @@ Threnos is mostly documents, but three parts act on a project's files or tell an
 
 - `nix run .#sync` writes the shared rules and skills into a project, removes skills the project turned off, and seeds
   starting files such as CI workflows where the project has nothing at that path. It never overwrites an existing seed,
-  and records each seeded path in `.agents/.threnos-seeded`.
+  and records each seeded path in `.threnos/seeded`.
 - The shared rules and the skills are instructions that agents follow with the permissions the project gave them.
 - `gomurun` and the mutation scripts run a project's tests and write a cache and reports under that project.
 

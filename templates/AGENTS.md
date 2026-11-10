@@ -11,7 +11,7 @@ project's document pointers and its own rules. It may add to those rules and may
 ## Document pointers
 
 The documents a person chooses. The shared rules and skills read them from here. Values that a tool reads live in
-`architecture.yaml` and `.agents/threnos.toml`, not in this table.
+`architecture.yaml` and `.threnos/config.toml`, not in this table.
 
 | Document               | Path                                               |
 | ---------------------- | -------------------------------------------------- |

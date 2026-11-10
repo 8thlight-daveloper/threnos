@@ -31,7 +31,7 @@ Brand's pace layers.
 | [process/](process/README.md)     | The process, one topic per file, in the order you meet it                                                                                         |
 | [rules/](rules/regenerative.md)   | The shared rules every agent follows on a project built this way                                                                                  |
 | [skills/](skills/README.md)       | Agent skills that carry out parts of the process, vendor-neutral                                                                                  |
-| [scaffold/](scaffold/)            | A flake template: `nix flake init -t <threnos>` gives a project its flake, justfile, and `.agents/threnos.toml`                                   |
+| [scaffold/](scaffold/)            | A flake template: `nix flake init -t <threnos>` gives a project its flake, justfile, and `.threnos/config.toml`                                   |
 | [docs/](docs/decisions/)          | Threnos's own decisions: the method ADRs. They explain the process and are not copied into projects                                               |
 | [templates/](templates/README.md) | Starting files for a new project: `AGENTS.md`, a contract, a scenario, an ADR skeleton, product principles, issue templates, the dependency rules |
 | [languages/](languages/README.md) | How the neutral structure maps to a language. Go is worked out; others are candidates                                                             |
@@ -45,6 +45,9 @@ your-project/
   AGENTS.md                          Your settings and rules. You edit it
   CLAUDE.md                          Imports AGENTS.md and the shared rules
   architecture.yaml                  The dependency rules, as data. Required. You edit it
+  .threnos/
+    config.toml                      How the project takes Threnos. You edit it
+    seeded, owned                    Sync's records of what it wrote
   .agents/
     rules/regenerative.md            The shared rules, copied from here. Read-only
     skills/                          The skills you copied from here
@@ -67,11 +70,11 @@ since the rules and the project's own ADRs hold what an agent needs.
    for Claude Code, and seeds the project's starting files where nothing exists yet: `AGENTS.md`, `CLAUDE.md`, the CI
    workflows, the issue templates, the decision record schema, the stack and reference docs, and skeletons for new
    records, contracts, and stack topics. Sync writes each seeded file once, never overwrites it, and records it in
-   `.agents/.threnos-seeded`, so a deleted seed stays deleted. Remove a line there to restore that file. The project
-   owns every seeded file. Fill in the document pointers in `AGENTS.md`, the settings in `.agents/threnos.toml`, and the
+   `.threnos/seeded`, so a deleted seed stays deleted. Remove a line there to restore that file. The project
+   owns every seeded file. Fill in the document pointers in `AGENTS.md`, the settings in `.threnos/config.toml`, and the
    components in `architecture.yaml`, which `nix flake init` seeds empty. A project needs one, and the flake check fails
    without it.
-1. Choose skills in `.agents/threnos.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without
+1. Choose skills in `.threnos/config.toml`: `on`, `off`, or `ejected`. See [skills/README.md](skills/README.md). Without
    Nix, copy the files by hand as that file describes.
 1. Write the project's first records: product principles, from the seeded skeleton
    `docs/reference/templates/product-principles.md` ([source](templates/product-principles.md)), and the stack and
@@ -80,7 +83,7 @@ since the rules and the project's own ADRs hold what an agent needs.
    project's rules file carries what an agent needs from them.
 1. Pick a language mapping from [languages/](languages/README.md), and record it in the project's stack docs. Follow the
    seeded [Repowise guide](templates/repowise.md) at `docs/stack/repowise.md` for its local, no-model-spend setup, or
-   set `repository_context = "off"` under `[rules]` in `.agents/threnos.toml` until the project is ready.
+   set `repository_context = "off"` under `[rules]` in `.threnos/config.toml` until the project is ready.
 1. Write the domain model, then the first contract, then build against it. [The lifecycle](process/README.md) gives the
    order.
 

@@ -137,7 +137,7 @@ let
       runtimeInputs = [ pkgs.coreutils pkgs.diffutils pkgs.findutils pkgs.gnugrep ];
       text = ''
         tree=${tree}
-        owned_file=.agents/.threnos-owned
+        owned_file=.threnos/owned
         ${same}
         release() { chmod -R u+w "$1" 2> /dev/null || true; }
 
@@ -167,7 +167,7 @@ let
         for entry in "''${owned[@]}"; do
           [ -n "$entry" ] || continue
           if { [ -e "$entry" ] || [ -L "$entry" ]; } && ! contains "$entry" "''${previous[@]}" && ! same "$entry" "$tree/$entry"; then
-            echo "refused  $entry exists and differs. Set it to ejected in .agents/threnos.toml, or remove it." >&2
+            echo "refused  $entry exists and differs. Set it to ejected in .threnos/config.toml, or remove it." >&2
             refused=1
           fi
         done
@@ -184,7 +184,7 @@ let
           echo "wrote    $entry"
         done
 
-        seeded_file=.agents/.threnos-seeded
+        seeded_file=.threnos/seeded
         seeded_before=()
         if [ -f "$seeded_file" ]; then mapfile -t seeded_before < <(grep -v '^#' "$seeded_file" | grep . || true); fi
         mapfile -t skip < <(grep . "$tree/seedskip.txt" || true)
@@ -206,14 +206,14 @@ let
             seeded_now+=("$seed")
           fi
         done < <(cd "$tree/seed" && find . -type f | sort)
-        mkdir -p .agents
+        mkdir -p .threnos
         {
           echo "# Paths that sync has seeded or found in place. Sync does not seed them again."
           echo "# Remove a line and run sync to restore that file if it is missing."
           printf '%s\n' "''${seeded_now[@]}" | grep . | sort -u || true
         } > "$seeded_file"
 
-        mkdir -p .agents
+        mkdir -p .threnos
         [ -f "$owned_file" ] && release "$owned_file"
         printf '%s\n' "''${owned[@]}" | sort > "$owned_file"
       '';
@@ -284,7 +284,7 @@ let
   # packages holds the project's own outputs and may not use the name threnos-tree.
   mkProject = { pkgs, src, recipes ? [ "check" "mutate" "mutate-plan" "mutate-summary" "mutate-report" ], devShell ? { }, packages ? { } }:
     let
-      resolved = resolve (src + "/.agents/threnos.toml");
+      resolved = resolve (src + "/.threnos/config.toml");
       tree = mkTree pkgs resolved;
     in
     {

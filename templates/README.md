@@ -13,10 +13,10 @@ real one.
 
 ## Seeds are written once
 
-Sync records every path it seeds, or finds already in place, in `.agents/.threnos-seeded`, and does not seed that path
-again. A project can delete a seed for good. To get one back, remove its line from `.agents/.threnos-seeded` and run
+Sync records every path it seeds, or finds already in place, in `.threnos/seeded`, and does not seed that path
+again. A project can delete a seed for good. To get one back, remove its line from `.threnos/seeded` and run
 sync. The file is back if it is missing. To keep a seed out from the first sync, list its path under `skip` in a
-`[seeds]` table in `.agents/threnos.toml`.
+`[seeds]` table in `.threnos/config.toml`.
 
 ## Linting the seeds
 

@@ -36,12 +36,12 @@
 
       # Everything with each skill at its default. Projects build their own through lib.projectOutputs.
       packages = forAllSystems (pkgs: {
-        threnos-tree = threnos.mkTree pkgs (threnos.resolve ./scaffold/.agents/threnos.toml);
+        threnos-tree = threnos.mkTree pkgs (threnos.resolve ./scaffold/.threnos/config.toml);
       });
 
       checks = forAllSystems (pkgs:
         let
-          resolved = threnos.resolve ./scaffold/.agents/threnos.toml;
+          resolved = threnos.resolve ./scaffold/.threnos/config.toml;
           seedTree = threnos.mkTree pkgs resolved;
         in
         {

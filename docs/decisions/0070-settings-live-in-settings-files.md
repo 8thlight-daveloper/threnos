@@ -25,7 +25,7 @@ with a schema that a check can validate. Prose holds what a person chooses and e
 
 - `architecture.yaml` holds the shape of the program: the components folder, the model, the contracts folder, the
   dependency rules, and how acceptance scenarios are written.
-- `.agents/threnos.toml` holds how a project takes Threnos: which rules and skills are on, and the settings the rules
+- `.threnos/config.toml` holds how a project takes Threnos: which rules and skills are on, and the settings the rules
   and skills read, such as `repository_context` and `mutation_cadence`. Sync validates each value.
 - `AGENTS.md` holds pointers to documents that a person picks, such as the product principles record and the testing
   stack doc. A pointer names a file. It carries no value that a tool needs.
@@ -47,5 +47,5 @@ names them.
 
 - **Keep a settings table in `AGENTS.md`.** One place for a person to read. A tool cannot validate it and it drifts from
   the files that hold the same values.
-- **Put everything in `threnos.toml`.** One file, but program shape such as components belongs next to the dependency
+- **Put everything in `config.toml`.** One file, but program shape such as components belongs next to the dependency
   rules and the checks that read them.

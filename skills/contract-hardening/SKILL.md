@@ -15,7 +15,7 @@ agent runs and some hours, so use it for a component whose input is large and fi
 component needs only the first two steps.
 
 Commands below are `just check` and `just mutate <component>`. The `rules.mutation_cadence` setting in
-`.agents/threnos.toml` decides who runs the mutation tool, as step 2 describes.
+`.threnos/config.toml` decides who runs the mutation tool, as step 2 describes.
 
 ## Rules
 
