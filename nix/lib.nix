@@ -1,7 +1,7 @@
 { lib, self }:
 let
   states = [ "on" "off" "ejected" ];
-  gates = [ "principles" ];
+  gates = [ "principles" "contracts" "acceptance" "architecture" "model" "build" ];
   approvers = [ "person" "agent" ];
   registry = builtins.fromTOML (builtins.readFile ../skills/manifest.toml);
   skillDirs = builtins.attrNames (lib.filterAttrs (_: kind: kind == "directory") (builtins.readDir ../skills));
@@ -37,10 +37,11 @@ let
       mutationCadence = (manifest.rules or { }).mutation_cadence or "nightly";
       seedSkip = (manifest.seeds or { }).skip or [ ];
       approvals = manifest.approvals or { };
-      badGates = builtins.filter (gate: !(builtins.elem gate gates)) (builtins.attrNames approvals);
+      badGates = builtins.filter (gate: gate != "independence" && !(builtins.elem gate gates)) (builtins.attrNames approvals);
       badApprovers = builtins.filter
         (gate: let who = approvals.${gate}; in !(builtins.isList who && who != [ ] && builtins.all (each: builtins.elem each approvers) who))
-        (builtins.attrNames approvals);
+        (builtins.filter (gate: gate != "independence") (builtins.attrNames approvals));
+      independence = approvals.independence or "session";
 
       missing = lib.concatMap
         (name: map (needed: { inherit name needed; }) (builtins.filter (needed: !(present needed)) (requiresOf name)))
@@ -56,6 +57,7 @@ let
     assert lib.assertMsg (builtins.elem mutationCadence [ "nightly" "local" ]) "rules.mutation_cadence must be nightly or local";
     assert lib.assertMsg (badGates == [ ]) "approvals names gates that do not exist: ${toString badGates}. Gates: ${toString gates}";
     assert lib.assertMsg (badApprovers == [ ]) "approvals.${toString badApprovers} must be a non-empty list of person or agent";
+    assert lib.assertMsg (builtins.elem independence [ "session" "harness" ]) "approvals.independence must be session or harness";
     assert lib.assertMsg (builtins.isList seedSkip && builtins.all builtins.isString seedSkip) "seeds.skip must be a list of paths";
     assert lib.assertMsg (missing == [ ])
       (lib.concatMapStringsSep "; " (each: "${each.name} requires ${each.needed}, which is off") missing);
@@ -147,7 +149,7 @@ let
       text = ''
         tree=${tree}
         owned_file=.threnos/owned
-        ${recordsPython pkgs}/bin/python ${../tools/records/check.py} --settings .
+        ${recordsPython pkgs}/bin/python ${../tools/records}/check.py --settings .
         ${same}
         release() { chmod -R u+w "$1" 2> /dev/null || true; }
 
@@ -247,9 +249,18 @@ let
 
   recordsPython = pkgs: pkgs.python3.withPackages (ps: [ ps.pyyaml ]);
 
+  # Records one approval in .threnos/approvals.yaml. Run it from the project root.
+  mkApprove = pkgs: pkgs.writeShellApplication {
+    name = "threnos-approve";
+    runtimeInputs = [ pkgs.git ];
+    text = ''
+      exec ${recordsPython pkgs}/bin/python ${../tools/records}/approve.py "$@"
+    '';
+  };
+
   mkChecks = { pkgs, src, resolved, tree, recipes }: {
     threnos-records = pkgs.runCommand "threnos-records" { } ''
-      ${recordsPython pkgs}/bin/python ${../tools/records/check.py} ${src}
+      ${recordsPython pkgs}/bin/python ${../tools/records}/check.py ${src}
       touch $out
     '';
 
@@ -307,11 +318,15 @@ let
         type = "app";
         program = lib.getExe (mkSync pkgs tree);
       };
+      apps.approve = {
+        type = "app";
+        program = lib.getExe (mkApprove pkgs);
+      };
       packages = assert lib.assertMsg (!(packages ? threnos-tree)) "packages.threnos-tree is reserved for the Threnos sync tree";
         packages // { threnos-tree = tree; };
       checks = mkChecks { inherit pkgs src resolved tree recipes; };
     };
 in
 {
-  inherit resolve mkTree mkSync mkChecks mkProject devPackages recordsPython markdownPython registry;
+  inherit resolve mkTree mkSync mkApprove mkChecks mkProject devPackages recordsPython markdownPython registry;
 }

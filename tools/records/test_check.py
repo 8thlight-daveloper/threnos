@@ -187,8 +187,8 @@ class ApprovalSettings(unittest.TestCase):
         self.assertProblem(record_problems, "config.toml:")
 
     def test_an_unknown_gate_is_reported(self):
-        (problems, _), _ = self.project('[approvals]\ncontracts = ["agent"]\n')
-        self.assertProblem(problems, "approvals.contracts is not a gate")
+        (problems, _), _ = self.project('[approvals]\nghost = ["agent"]\n')
+        self.assertProblem(problems, "approvals.ghost is not a gate")
 
     def test_an_empty_list_is_reported(self):
         (problems, _), _ = self.project("[approvals]\nprinciples = []\n")

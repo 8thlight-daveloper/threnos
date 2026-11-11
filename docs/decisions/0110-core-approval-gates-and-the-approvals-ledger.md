@@ -86,7 +86,8 @@ who approves a routine change, not what an agent may decide alone.
   cannot verify that the session is real or that it did not resume the author's context. The fields are an audit trail
   and a speed bump. They make a careless self-approval fail the check and leave evidence. The mutation tool and the
   second independent build of [0030](0030-contracts-and-tests.md) still test a contract on its merits.
-- Sync gains an `approve` command that computes the hash and writes the entry, so no one hashes by hand.
+- The flake gains `nix run .#approve`, which computes the hash and writes the entry, so no one hashes by hand. It checks
+  the entry against the settings before it writes, and warns when the project's own list would reject it.
 - The ledger needs an entry per component for contracts, so a project with many components has many entries.
 
 ## Alternatives considered

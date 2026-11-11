@@ -76,7 +76,7 @@
           '';
           # Threnos's own records are method decisions, so the check runs on them here.
           records-self = pkgs.runCommand "records-self" { } ''
-            ${threnos.recordsPython pkgs}/bin/python ${./tools/records/check.py} --framework ${./.}
+            ${threnos.recordsPython pkgs}/bin/python ${./tools/records}/check.py --framework ${./.}
             touch $out
           '';
         });

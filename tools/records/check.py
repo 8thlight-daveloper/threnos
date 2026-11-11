@@ -16,6 +16,8 @@ from pathlib import Path
 
 import yaml
 
+import ledger
+
 DECISIONS = "docs/decisions"
 CATEGORIES = ["architecture", "behavior", "ux", "regenerative-process", "operations"]
 STATUSES = ["proposed", "accepted", "superseded", "withdrawn"]
@@ -36,7 +38,7 @@ REVERSE = {
 PRINCIPLES = "docs/reference/product-principles.md"
 PRINCIPLES_FIELDS = {"approval", "reviewed"}
 APPROVERS = ["person", "agent"]
-GATES = ["principles"]
+GATES = ["principles"] + ledger.LEDGER_GATES
 DEFAULT_APPROVERS = ["person"]
 USER_SETTINGS = {"approvals"}
 RECORD_FILE = re.compile(r"^(\d{4})-.+\.md$")
@@ -197,7 +199,10 @@ def approvals_problems(settings, label):
     if not isinstance(table, dict):
         return [f"{label}: approvals must be a table of gates"]
     for gate, who in table.items():
-        if gate not in GATES:
+        if gate == "independence":
+            if who not in ledger.INDEPENDENCE:
+                problems.append(f"{label}: approvals.independence must be {' or '.join(ledger.INDEPENDENCE)}")
+        elif gate not in GATES:
             problems.append(f"{label}: approvals.{gate} is not a gate. Gates: {', '.join(GATES)}")
         elif not isinstance(who, list) or not who or any(each not in APPROVERS for each in who):
             problems.append(f"{label}: approvals.{gate} must be a non-empty list of {' or '.join(APPROVERS)}")
@@ -226,7 +231,12 @@ def settings_problems(root):
         f"{label}: approvals.{gate} lists only agent, so a person may not approve"
         for label, settings in ((".threnos/config.toml", config), (".threnos/local.toml", local))
         for gate, who in (settings.get("approvals") or {}).items()
-        if who == ["agent"]
+        if gate != "independence" and who == ["agent"]
+    ]
+    warnings += [
+        f"{label}: approvals.build lists agent, so no person reviews a running build"
+        for label, settings in ((".threnos/config.toml", config), (".threnos/local.toml", local))
+        if "agent" in (settings.get("approvals") or {}).get("build", [])
     ]
     return problems, warnings
 
@@ -321,6 +331,8 @@ def check(root, require_architecture=True):
     if config_error:
         problems.append(config_error)
     problems += approvals_problems(config, ".threnos/config.toml") + principles_problems(root, records, config)
+    architecture = yaml.safe_load((root / "architecture.yaml").read_text()) or {} if (root / "architecture.yaml").is_file() else {}
+    problems += ledger.ledger_problems(root, config, architecture)
     return sorted(problems), notes
 
 

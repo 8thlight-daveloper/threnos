@@ -48,6 +48,7 @@ your-project/
   .threnos/
     config.toml                      How the project takes Threnos. You edit it
     seeded, owned                    Sync's records of what it wrote
+    approvals.yaml                   Approvals of protected units, once the project adopts it. Written by `nix run .#approve`
   .agents/
     rules/regenerative.md            The shared rules, copied from here. Read-only
     skills/                          The skills you copied from here
