@@ -1,7 +1,7 @@
 { lib, self }:
 let
   states = [ "on" "off" "ejected" ];
-  gates = [ "principles" "contracts" "acceptance" "architecture" "model" "build" ];
+  gates = [ "principles" "decisions" "contracts" "acceptance" "architecture" "model" "build" ];
   approvers = [ "person" "agent" ];
   registry = builtins.fromTOML (builtins.readFile ../skills/manifest.toml);
   skillDirs = builtins.attrNames (lib.filterAttrs (_: kind: kind == "directory") (builtins.readDir ../skills));

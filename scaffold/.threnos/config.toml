@@ -16,7 +16,7 @@ mutation_cadence = "nightly"
 # Who may approve a gate: "person", "agent", or both. The default is ["person"]. A person may replace a list for their
 # own work in .threnos/local.toml, which is gitignored. The records check always uses this file, so what merges is
 # the project's choice.
-# The gates are principles, contracts, acceptance, architecture, model, and build. A project that adopts
+# The gates are principles, decisions, contracts, acceptance, architecture, model, and build. A project that adopts
 # .threnos/approvals.yaml has each protected unit approved there. independence says what must differ between an agent
 # approver and the author: "session" (the default) or "harness".
 # [approvals]

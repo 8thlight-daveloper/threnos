@@ -17,17 +17,18 @@ partly-supersedes: ['0340', '0350']
 
 ## Fields
 
-| Field                                       | Required                | Holds                                                                                                                                                  |
-| ------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `category`                                  | Yes                     | One of the categories below                                                                                                                            |
-| `status`                                    | Yes                     | `proposed`, `accepted`, `superseded`, or `withdrawn`                                                                                                   |
-| `approval`                                  | Yes once accepted       | `person`, `agent`, or `unrecorded` for a record that never said. A person who delegated the call to an agent gives `agent`, and the `note` says so     |
-| `note`                                      | No                      | One sentence that limits the status, such as "Accepted for experimental use."                                                                          |
-| `affects`                                   | Behavior and ux records | Component ids from `architecture.yaml`. Optional on `architecture`. Not allowed on process records, and never `all`                                    |
-| `principle`                                 | No                      | `none` only, on a `behavior` record, when no principle in `docs/reference/product-principles.md` should cite it. Without the file, the field is unused |
-| `builds-on`                                 | No                      | Record numbers this one depends on, as quoted four-digit strings                                                                                       |
-| `supersedes`, `superseded-by`               | No                      | Whole replacement, in both directions                                                                                                                  |
-| `partly-supersedes`, `partly-superseded-by` | No                      | Replacement of one part, in both directions                                                                                                            |
+| Field                                       | Required                | Holds                                                                                                                                                                 |
+| ------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `category`                                  | Yes                     | One of the categories below                                                                                                                                           |
+| `status`                                    | Yes                     | `proposed`, `accepted`, `superseded`, or `withdrawn`                                                                                                                  |
+| `approval`                                  | Yes once accepted       | `person`, `agent`, or `unrecorded` for a record that never said. `agent` means an agent approved it, as the `decisions` gate allows. It needs `approver` and `author` |
+| `approver`, `author`                        | With `approval: agent`  | `{kind: person, name}` or `{kind: agent, harness, session}`. The approver's kind matches `approval`. An agent approver's session must differ from the author's        |
+| `note`                                      | No                      | One sentence that limits the status, such as "Accepted for experimental use."                                                                                         |
+| `affects`                                   | Behavior and ux records | Component ids from `architecture.yaml`. Optional on `architecture`. Not allowed on process records, and never `all`                                                   |
+| `principle`                                 | No                      | `none` only, on a `behavior` record, when no principle in `docs/reference/product-principles.md` should cite it. Without the file, the field is unused                |
+| `builds-on`                                 | No                      | Record numbers this one depends on, as quoted four-digit strings                                                                                                      |
+| `supersedes`, `superseded-by`               | No                      | Whole replacement, in both directions                                                                                                                                 |
+| `partly-supersedes`, `partly-superseded-by` | No                      | Replacement of one part, in both directions                                                                                                                           |
 
 Record numbers are quoted so that `0340` stays a string.
 
@@ -72,6 +73,18 @@ use Nix can run it with Python and PyYAML. It reports:
 - `affects` on a process record, or a missing `affects` on a `behavior` or `ux` record;
 - a contract that cites a product record missing from its `affects`. A citation is `[0360]`, a path such as
   `decisions/0360-`, or `ADR 0360`. A bare four-digit number is not one, because file modes such as 0640 look the same.
+
+A record whose status is `accepted` or `superseded` is also held to the `decisions` gate in `.threnos/config.toml`. The
+default list is `["person"]`:
+
+- an `approval` of `person` or `agent` that is not in `approvals.decisions`, which a person fixes by reading the record
+  and setting `approval: person`;
+- an `approval: agent` without `approver` and `author`, or whose approver is the author's session or, under
+  `independence = "harness"`, the author's harness;
+- an `approver` whose kind differs from `approval`, or a party missing its fields.
+
+`unrecorded` passes and counts as no approval. The check prints how many accepted records are `unrecorded`. It reads the
+project file and never `.threnos/local.toml`.
 
 When the project has `docs/reference/product-principles.md`, the check also reads it. The file starts with `approval`
 (`person` or `agent`) and `reviewed` (a date). Each `### P` heading ends with a `Records:` line of four-digit numbers,

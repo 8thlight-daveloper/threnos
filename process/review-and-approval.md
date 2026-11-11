@@ -23,9 +23,14 @@ effect of other work. When a build or rebuild finds that a protected artifact is
 ## Who may approve, and where it is recorded
 
 Each gate is a setting. `[approvals]` in `.threnos/config.toml` lists who may approve it: `person`, `agent`, or both.
-The default is `person`. The gates are `principles`, `contracts`, `acceptance`, `architecture`, `model`, and `build`.
-[ADR 0080](../docs/decisions/0080-approval-gates-are-settings.md) and
+The default is `person`. The gates are `principles`, `decisions`, `contracts`, `acceptance`, `architecture`, `model`,
+and `build`. [ADR 0080](../docs/decisions/0080-approval-gates-are-settings.md) and
 [ADR 0110](../docs/decisions/0110-core-approval-gates-and-the-approvals-ledger.md) give the reasons.
+
+Decision records are the `decisions` gate. A record carries its own `approval`, and an agent approval adds `approver`
+and `author` with a harness and session each. They stay out of the ledger, because they change after approval for links
+and supersession, so an edit to an accepted record is seen in review. See
+[ADR 0120](../docs/decisions/0120-decision-records-are-an-approval-gate.md).
 
 A project that adopts the ledger, `.threnos/approvals.yaml`, records one approval for each protected unit. An entry
 holds the gate, the unit, a hash of its content, who approved, who wrote it, and a date. `nix run .#approve` writes it.

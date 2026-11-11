@@ -25,7 +25,7 @@ APPROVALS = ["person", "agent", "unrecorded"]
 PRODUCT_REQUIRED = ["behavior", "ux"]
 PRODUCT_ALLOWED = ["architecture", "behavior", "ux"]
 FIELDS = {
-    "category", "status", "approval", "note", "affects", "builds-on", "principle",
+    "category", "status", "approval", "approver", "author", "note", "affects", "builds-on", "principle",
     "supersedes", "superseded-by", "partly-supersedes", "partly-superseded-by",
 }
 LINK_FIELDS = ["builds-on", "supersedes", "superseded-by", "partly-supersedes", "partly-superseded-by"]
@@ -38,7 +38,9 @@ REVERSE = {
 PRINCIPLES = "docs/reference/product-principles.md"
 PRINCIPLES_FIELDS = {"approval", "reviewed"}
 APPROVERS = ["person", "agent"]
-GATES = ["principles"] + ledger.LEDGER_GATES
+GATES = ["principles", "decisions"] + ledger.LEDGER_GATES
+GATED_STATUSES = ["accepted", "superseded"]
+UNRECORDED = "approval is unrecorded"
 DEFAULT_APPROVERS = ["person"]
 USER_SETTINGS = {"approvals"}
 RECORD_FILE = re.compile(r"^(\d{4})-.+\.md$")
@@ -135,6 +137,40 @@ def field_problems(one):
     if "principle" in one.front and (category != "behavior" or one.front["principle"] != "none"):
         problems.append(f"{one.file}: principle may only be none, and only on a behavior record")
     return problems
+
+
+def approval_gate_problems(one, config):
+    """Check a gated record's approval against the decisions gate, and its parties."""
+    problems = []
+    table = config.get("approvals") or {}
+    approval = one.front.get("approval")
+    if one.front.get("status") in GATED_STATUSES and approval in ("person", "agent"):
+        allowed = table.get("decisions", DEFAULT_APPROVERS)
+        if approval not in allowed:
+            problems.append(
+                f"{one.file}: approval {approval} is not in approvals.decisions {allowed}. "
+                "A person ratifies it by reading it and setting approval: person"
+            )
+    parties = {field: one.front[field] for field in ("approver", "author") if field in one.front}
+    for field, who in parties.items():
+        problems += ledger.party_problems(one.file, field, who)
+    approver = parties.get("approver")
+    if isinstance(approver, dict) and approver.get("kind") in ledger.KINDS and approval in ("person", "agent"):
+        if approver["kind"] != approval:
+            problems.append(f"{one.file}: approver kind {approver['kind']} does not match approval {approval}")
+    if approval == "agent" and one.front.get("status") in GATED_STATUSES:
+        for field in ("approver", "author"):
+            if field not in parties:
+                problems.append(f"{one.file}: approval agent needs {field}, so independence can be checked")
+        if len(parties) == 2:
+            problems += ledger.independence_problems(one.file, parties, table.get("independence", "session"))
+    return problems
+
+
+def unrecorded_note(one):
+    if one.front.get("status") in GATED_STATUSES and one.front.get("approval") == "unrecorded":
+        return f"{one.file}: {UNRECORDED}"
+    return None
 
 
 def affects_problems(one, components):
@@ -319,17 +355,15 @@ def check(root, require_architecture=True):
         contracts = {}
         if require_architecture:
             problems.append(f"{root / 'architecture.yaml'} does not exist. Every project needs one, and affects ids and contract citations are checked against it")
+    config, config_error = load_toml(root / ".threnos" / "config.toml")
+    if config_error:
+        problems.append(config_error)
     by_number = {one.number: one for one in records}
     notes = []
     for one in records:
         problems += field_problems(one) + affects_problems(one, components) + link_problems(one, by_number)
-        problems += citation_problems(one, contracts)
-        note = uncited_note(one, contracts)
-        if note:
-            notes.append(note)
-    config, config_error = load_toml(root / ".threnos" / "config.toml")
-    if config_error:
-        problems.append(config_error)
+        problems += citation_problems(one, contracts) + approval_gate_problems(one, config)
+        notes += [note for note in (uncited_note(one, contracts), unrecorded_note(one)) if note]
     problems += approvals_problems(config, ".threnos/config.toml") + principles_problems(root, records, config)
     architecture = yaml.safe_load((root / "architecture.yaml").read_text()) or {} if (root / "architecture.yaml").is_file() else {}
     problems += ledger.ledger_problems(root, config, architecture)
@@ -352,11 +386,16 @@ def main(args):
     if "--settings" in args:
         return main_settings(Path(paths[0]) if paths else Path("."))
     problems, notes = check(Path(paths[0]) if paths else Path("."), require_architecture="--framework" not in args)
+    unrecorded = [note for note in notes if note.endswith(UNRECORDED)]
+    uncited = [note for note in notes if note not in unrecorded]
     if verbose:
         for note in notes:
             print("note:", note)
-    elif notes:
-        print(f"records that list a component whose contract does not cite them: {len(notes)}, see check.py -v")
+    else:
+        if uncited:
+            print(f"records that list a component whose contract does not cite them: {len(uncited)}, see check.py -v")
+        if unrecorded:
+            print(f"accepted records with approval unrecorded: {len(unrecorded)}, see check.py -v")
     if problems:
         print("found problems:\n  " + "\n  ".join(problems), file=sys.stderr)
         return 1

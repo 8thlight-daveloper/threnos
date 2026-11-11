@@ -31,7 +31,7 @@ class RecordChecks(unittest.TestCase):
         problems, _ = run({
             "docs/decisions/0010-first.md": record("0010", "category: behavior\nstatus: accepted\napproval: person\naffects: [plan/decoder]\n"),
             "docs/decisions/0020-second.md": record("0020", "category: architecture\nstatus: proposed\nbuilds-on: ['0010']\n"),
-            "docs/decisions/0030-third.md": record("0030", "category: operations\nstatus: accepted\napproval: agent\n"),
+            "docs/decisions/0030-third.md": record("0030", "category: operations\nstatus: accepted\napproval: person\n"),
         })
         self.assertEqual(problems, [])
 
@@ -300,6 +300,73 @@ class PrincipleFile(unittest.TestCase):
         files = self.decisions({PRINCIPLES_PATH: principles(approval="agent")})
         self.assertProblem(self.run_files(files), "A person ratifies it")
         self.assertEqual(self.run_files(files, config='[approvals]\nprinciples = ["person", "agent"]\n'), [])
+
+
+OPERATIONS = "category: operations\nstatus: accepted\n"
+AGENT_AUTHOR = "author: {kind: agent, harness: claude-code, session: aaa}\n"
+AGENT_APPROVER = "approver: {kind: agent, harness: claude-code, session: bbb}\n"
+
+
+class DecisionGate(unittest.TestCase):
+    def assertProblem(self, problems, fragment):
+        self.assertTrue(any(fragment in each for each in problems), f"{fragment!r} not in {problems}")
+
+    def run_records(self, front, config=None):
+        files = {"docs/decisions/0010-first.md": record("0010", front)}
+        if config is not None:
+            files[".threnos/config.toml"] = config
+        return run(files)
+
+    def test_a_person_approval_passes_by_default(self):
+        problems, _ = self.run_records(OPERATIONS + "approval: person\n")
+        self.assertEqual(problems, [])
+
+    def test_an_agent_approval_fails_unless_the_project_allows_it(self):
+        front = OPERATIONS + "approval: agent\n" + AGENT_APPROVER + AGENT_AUTHOR
+        problems, _ = self.run_records(front)
+        self.assertProblem(problems, "approval agent is not in approvals.decisions ['person']")
+        self.assertProblem(problems, "A person ratifies it")
+        problems, _ = self.run_records(front, '[approvals]\ndecisions = ["person", "agent"]\n')
+        self.assertEqual(problems, [])
+
+    def test_a_proposed_record_is_not_gated(self):
+        problems, _ = self.run_records("category: operations\nstatus: proposed\napproval: agent\n")
+        self.assertEqual(problems, [])
+
+    def test_an_agent_approval_needs_both_parties(self):
+        config = '[approvals]\ndecisions = ["agent"]\n'
+        problems, _ = self.run_records(OPERATIONS + "approval: agent\n", config)
+        self.assertProblem(problems, "approval agent needs approver")
+        self.assertProblem(problems, "approval agent needs author")
+
+    def test_the_approver_may_not_be_the_authors_session(self):
+        config = '[approvals]\ndecisions = ["agent"]\n'
+        same = "approver: {kind: agent, harness: claude-code, session: aaa}\n"
+        problems, _ = self.run_records(OPERATIONS + "approval: agent\n" + same + AGENT_AUTHOR, config)
+        self.assertProblem(problems, "the approving agent is the author's session")
+
+    def test_a_person_may_approve_what_an_agent_wrote(self):
+        front = OPERATIONS + "approval: person\napprover: {kind: person, name: Dana}\n" + AGENT_AUTHOR
+        problems, _ = self.run_records(front)
+        self.assertEqual(problems, [])
+
+    def test_the_approver_kind_must_match_the_approval(self):
+        front = OPERATIONS + "approval: person\n" + AGENT_APPROVER
+        problems, _ = self.run_records(front, '[approvals]\ndecisions = ["person"]\n')
+        self.assertProblem(problems, "approver kind agent does not match approval person")
+
+    def test_a_malformed_party_is_reported(self):
+        problems, _ = self.run_records(OPERATIONS + "approval: person\napprover: {kind: robot}\n")
+        self.assertProblem(problems, "approver kind 'robot'")
+
+    def test_unrecorded_passes_and_is_counted(self):
+        problems, notes = self.run_records(OPERATIONS + "approval: unrecorded\n")
+        self.assertEqual(problems, [])
+        self.assertIn("0010-first.md: approval is unrecorded", notes)
+
+    def test_decisions_is_a_known_gate_and_the_default_list_applies_without_config(self):
+        self.assertEqual(check.approvals_problems({"approvals": {"decisions": ["person", "agent"]}}, "c"), [])
+        self.assertTrue(check.approvals_problems({"approvals": {"decisions": []}}, "c"))
 
 
 if __name__ == "__main__":

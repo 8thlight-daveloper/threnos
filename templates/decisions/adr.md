@@ -2,6 +2,7 @@
 category: <architecture | behavior | ux | operations>
 status: proposed
 approval: <person | agent | unrecorded, once accepted>
+# With approval: agent, add approver and author: {kind: agent, harness: <harness>, session: <id>}
 affects: [<component id>]
 builds-on: ['<NNNN>']
 ---
