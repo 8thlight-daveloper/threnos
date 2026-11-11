@@ -115,7 +115,10 @@ def entry_problems(entry, known, approvers, mode):
             problems.append(f"{label}: the unit of a build entry is a commit, as 7 to 40 hex digits")
         return problems
     if unit not in known.get(gate, []):
-        problems.append(f"{label}: is not a {gate} unit in this project")
+        problems.append(
+            f"{label}: is not a {gate} unit in this project. If it was renamed or deleted, run: "
+            f"nix run .#approve -- --remove {gate} {unit}"
+        )
     return problems + independence_problems(label, entry, mode)
 
 

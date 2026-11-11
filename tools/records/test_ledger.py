@@ -227,6 +227,38 @@ class Approve(unittest.TestCase):
         write(self.root, {"contracts/plan/other/contract.md": "Other.\n"})
         self.assertEqual(self.run_approve("contracts", "--approver", "person:Dana"), 1)
 
+    def stale_entry(self):
+        self.run_approve("contracts", "contracts/plan/decoder", "--approver", "person:Dana")
+        self.run_approve("model", "--approver", "person:Dana")
+        (self.root / "contracts/plan/decoder/contract.md").rename(self.root / "contracts/plan/decoder/old.md")
+        write(self.root, {"contracts/plan/codec/contract.md": "Codec.\n"})
+        import shutil
+        shutil.rmtree(self.root / "contracts/plan/decoder")
+
+    def test_remove_drops_the_entry_of_a_unit_that_is_gone_and_keeps_the_others(self):
+        self.stale_entry()
+        problems, _ = check.check(self.root)
+        self.assertTrue(any("run: nix run .#approve -- --remove contracts contracts/plan/decoder" in each for each in problems), problems)
+        self.assertEqual(self.run_approve("--remove", "contracts", "contracts/plan/decoder"), 0)
+        self.assertEqual([(each["gate"], each["unit"]) for each in self.read()], [("model", "model")])
+
+    def test_remove_refuses_while_the_unit_exists(self):
+        self.run_approve("model", "--approver", "person:Dana")
+        self.assertEqual(self.run_approve("--remove", "model", "model"), 1)
+        self.assertEqual(len(self.read()), 1)
+
+    def test_remove_refuses_when_there_is_no_entry_and_for_build(self):
+        self.run_approve("model", "--approver", "person:Dana")
+        self.assertEqual(self.run_approve("--remove", "contracts", "contracts/ghost"), 1)
+        self.assertEqual(self.run_approve("--remove", "build", "abc1234"), 1)
+
+    def test_remove_needs_a_unit_and_no_approver(self):
+        self.assertEqual(self.run_approve("--remove", "contracts"), 1)
+
+    def test_approve_still_needs_an_approver(self):
+        with self.assertRaises(SystemExit):
+            self.run_approve("model")
+
     def test_a_malformed_party_is_refused(self):
         with self.assertRaises(SystemExit):
             self.run_approve("model", "--approver", "agent:claude-code")

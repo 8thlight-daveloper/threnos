@@ -1,10 +1,15 @@
 """Record an approval in the ledger, `.threnos/approvals.yaml`.
 
 Usage: approve.py [--root DIR] GATE [UNIT] --approver WHO [--author WHO] [--date YYYY-MM-DD] [--note TEXT]
+       approve.py [--root DIR] --remove GATE UNIT
 
 WHO is `person:<name>` or `agent:<harness>:<session>`. GATE is contracts, acceptance, architecture, model, or build.
 UNIT is the folder or file the gate protects. It may be left out when the gate has one unit. For build it is a commit,
 and defaults to HEAD. The entry holds the unit's current hash. An existing entry for the unit is replaced.
+
+--remove drops the entry for a unit that no longer exists, such as a component folder that was renamed. It refuses while
+the unit exists, and for `build`, whose entries name commits and are never stale. It grants no approval, so it needs no
+approver. A renamed folder is a new unit and needs its own approval.
 
 The entry is checked before it is written, against the lists in `.threnos/config.toml` and the user's
 `.threnos/local.toml`, which replaces a list for this person. A write that the project's own list would reject, which is
@@ -44,12 +49,44 @@ def head(root):
     return subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
 
 
+def read_entries(path):
+    return (yaml.safe_load(path.read_text()) or {}).get("approvals") or [] if path.is_file() else []
+
+
+def write_entries(path, entries):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(HEADER + yaml.safe_dump({"approvals": entries}, sort_keys=False))
+
+
+def remove(root, gate, unit, known):
+    """Drop the entry of a unit that no longer exists. Returns an exit code."""
+    path = root / ledger.LEDGER
+    if gate == "build":
+        print("build entries name commits and are never stale, so there is nothing to remove", file=sys.stderr)
+        return 1
+    if unit is None:
+        print("--remove needs the gate and the unit", file=sys.stderr)
+        return 1
+    entries = read_entries(path)
+    kept = [each for each in entries if (each.get("gate"), each.get("unit")) != (gate, unit)]
+    if len(kept) == len(entries):
+        print(f"the ledger has no {gate} entry for {unit}", file=sys.stderr)
+        return 1
+    if unit in known[gate]:
+        print(f"{unit} still exists. Approve it again instead of removing its entry", file=sys.stderr)
+        return 1
+    write_entries(path, kept)
+    print(f"removed {gate} {unit}")
+    return 0
+
+
 def main(args):
     parser = argparse.ArgumentParser(prog="approve.py", description=__doc__.split("\n")[0])
     parser.add_argument("--root", default=".")
     parser.add_argument("gate", choices=ledger.LEDGER_GATES)
     parser.add_argument("unit", nargs="?")
-    parser.add_argument("--approver", required=True, type=party)
+    parser.add_argument("--remove", action="store_true")
+    parser.add_argument("--approver", type=party)
     parser.add_argument("--author", type=party)
     parser.add_argument("--date", type=datetime.date.fromisoformat, default=datetime.date.today())
     parser.add_argument("--note")
@@ -63,6 +100,10 @@ def main(args):
         print(config_error or local_error, file=sys.stderr)
         return 1
     known = ledger.units(root, architecture)
+    if given.remove:
+        return remove(root, given.gate, given.unit, known)
+    if given.approver is None:
+        parser.error("--approver is required")
 
     unit = given.unit
     if given.gate == "build":
@@ -95,11 +136,10 @@ def main(args):
         print("warning: the project's own settings reject this entry, so CI will fail until a person ratifies it:\n  " + "\n  ".join(theirs), file=sys.stderr)
 
     path = root / ledger.LEDGER
-    existing = (yaml.safe_load(path.read_text()) or {}).get("approvals") or [] if path.is_file() else []
+    existing = read_entries(path)
     kept = [each for each in existing if (each.get("gate"), each.get("unit")) != (entry["gate"], entry["unit"])]
     entries = sorted(kept + [entry], key=lambda each: (ledger.LEDGER_GATES.index(each["gate"]), str(each["unit"])))
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(HEADER + yaml.safe_dump({"approvals": entries}, sort_keys=False))
+    write_entries(path, entries)
     print(f"recorded {given.gate} {unit}")
     return 0
 

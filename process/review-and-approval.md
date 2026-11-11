@@ -43,6 +43,10 @@ wrote. The identifiers are written by the approving agent and cannot be verified
 careless self-approval. They do not prove independence. The mutation tool and the second independent build still test a
 contract on its merits.
 
+A renamed or deleted unit leaves an entry that fails the check. `nix run .#approve -- --remove <gate> <unit>` drops it
+and refuses while the unit exists. It grants no approval, so it needs no approver. The renamed unit is a new unit and
+needs its own approval.
+
 A person can work hands-off by replacing a list in `.threnos/local.toml`. The project's list still decides what merges,
 so CI fails an agent approval that the project does not allow until a person approves the unit again.
 
