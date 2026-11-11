@@ -1,7 +1,7 @@
 ---
 category: regenerative-process
-status: proposed
-approval: unrecorded
+status: accepted
+approval: person
 builds-on: ['0030', '0040', '0060', '0080']
 partly-supersedes: ['0080']
 note: Replaces the paragraph in 0080 that keeps the core gates fixed. The settings, the user layer, and the merge rule in 0080 stay.
