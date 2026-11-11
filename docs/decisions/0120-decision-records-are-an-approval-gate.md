@@ -1,7 +1,7 @@
 ---
 category: regenerative-process
-status: proposed
-approval: unrecorded
+status: accepted
+approval: person
 builds-on: ['0050', '0080', '0110']
 note: Adds the decisions gate. Records stay out of the approvals ledger.
 ---
