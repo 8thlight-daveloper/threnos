@@ -1,7 +1,7 @@
 ---
 category: regenerative-process
-status: proposed
-approval: unrecorded
+status: accepted
+approval: person
 builds-on: ['0020', '0050']
 note: Adds the libraries and naming.exceptions keys and the checks over them. The structure in 0020 is unchanged.
 ---
