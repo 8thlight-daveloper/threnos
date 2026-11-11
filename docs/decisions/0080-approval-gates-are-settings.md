@@ -3,7 +3,8 @@ category: regenerative-process
 status: accepted
 approval: person
 builds-on: ['0040', '0050', '0070']
-note: Starts with the principles gate. The gates on contracts, acceptance scenarios, and architecture.yaml stay fixed.
+partly-superseded-by: ['0110']
+note: Starts with the principles gate. 0110 replaces the paragraph that keeps the core gates fixed.
 ---
 
 # 0080. Approval gates are settings
