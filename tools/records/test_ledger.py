@@ -1,7 +1,9 @@
 import datetime
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import approve
 import check
@@ -11,6 +13,21 @@ ARCHITECTURE = "components:\n  - name: plan/decoder\nmodel: model\n"
 PERSON = {"kind": "person", "name": "Dana"}
 AUTHOR = {"kind": "agent", "harness": "claude-code", "session": "aaa"}
 REVIEWER = {"kind": "agent", "harness": "claude-code", "session": "bbb"}
+
+_HOME = None
+_PATCH = None
+
+
+def setUpModule():
+    global _HOME, _PATCH
+    _HOME = tempfile.TemporaryDirectory()
+    _PATCH = mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": _HOME.name})
+    _PATCH.start()
+
+
+def tearDownModule():
+    _PATCH.stop()
+    _HOME.cleanup()
 
 
 def write(root, files):
@@ -157,6 +174,35 @@ class LedgerChecks(unittest.TestCase):
         problems, _ = check.check(self.root)
         self.assertProblem(problems, "contracts contracts/plan/decoder has no approval")
 
+    def test_identity_is_validated_where_a_user_may_set_it(self):
+        self.assertEqual(check.local_problems({"identity": {"name": "Dana"}}), [])
+        self.assertProblem(check.local_problems({"identity": {"name": ""}}), "identity.name must be a one-line name")
+        self.assertProblem(check.local_problems({"identity": {"email": "x"}}), "identity.email is not a setting")
+        self.assertProblem(check.local_problems({"identity": "Dana"}), "identity must be a table")
+
+    def test_the_project_file_may_not_set_identity(self):
+        write(self.root, {".threnos/config.toml": '[identity]\nname = "Dana"\n'})
+        problems, _ = check.check(self.root)
+        self.assertProblem(problems, "identity is user-only")
+        problems, _ = check.settings_problems(self.root)
+        self.assertProblem(problems, "identity is user-only")
+
+    def test_the_global_file_may_set_identity_only(self):
+        with tempfile.TemporaryDirectory() as home:
+            path = Path(home) / "config.toml"
+            path.write_text('[identity]\nname = "Dana"\n[approvals]\nmodel = ["agent"]\n')
+            self.assertProblem(check.global_problems(path), "approvals is not a global setting")
+            path.write_text("[identity\n")
+            self.assertTrue(check.global_problems(path))
+            self.assertEqual(check.global_problems(Path(home) / "missing.toml"), [])
+
+    def test_the_global_path_follows_xdg_and_falls_back_to_home_config(self):
+        with mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": "/x/y"}):
+            self.assertEqual(check.global_config_path(), Path("/x/y/threnos/config.toml"))
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("XDG_CONFIG_HOME", None)
+            self.assertEqual(check.global_config_path(), Path.home() / ".config" / "threnos" / "config.toml")
+
     def test_independence_is_validated_in_settings(self):
         problems = check.approvals_problems({"approvals": {"independence": "never"}}, "config")
         self.assertProblem(problems, "independence must be session or harness")
@@ -167,19 +213,34 @@ class Approve(unittest.TestCase):
     def setUp(self):
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
-        self.root = Path(folder.name)
+        self.root = Path(folder.name) / "project"
+        self.root.mkdir()
+        self.home = Path(folder.name) / "home"
+        patch = mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.home)})
+        patch.start()
+        self.addCleanup(patch.stop)
         write(self.root, {
             "architecture.yaml": ARCHITECTURE,
             "contracts/plan/decoder/contract.md": "Decodes.\n",
             "model/model.go": "package model\n",
         })
 
-    def run_approve(self, *args, config=None, local=None):
+    def run_approve(self, *args, config=None, local=None, terminal=lambda: False, answers=()):
         if config is not None:
             write(self.root, {".threnos/config.toml": config})
         if local is not None:
             write(self.root, {".threnos/local.toml": local})
-        return approve.main(["--root", str(self.root), *args])
+        self.asked = []
+        replies = iter(answers)
+
+        def ask(prompt):
+            self.asked.append(prompt)
+            return next(replies)
+
+        return approve.main(["--root", str(self.root), *args], terminal=terminal, ask=ask)
+
+    def set_global(self, text):
+        write(self.home, {"threnos/config.toml": text})
 
     def read(self):
         import yaml
@@ -255,9 +316,70 @@ class Approve(unittest.TestCase):
     def test_remove_needs_a_unit_and_no_approver(self):
         self.assertEqual(self.run_approve("--remove", "contracts"), 1)
 
-    def test_approve_still_needs_an_approver(self):
-        with self.assertRaises(SystemExit):
-            self.run_approve("model")
+    def test_without_a_terminal_a_missing_approver_is_refused(self):
+        self.set_global('[identity]\nname = "Dana"\n')
+        self.assertEqual(self.run_approve("model"), 1)
+        self.assertFalse((self.root / ledger.LEDGER).exists())
+        self.assertEqual(self.asked, [])
+
+    def test_at_a_terminal_the_global_name_is_confirmed_and_recorded(self):
+        self.set_global('[identity]\nname = "Dana"\n')
+        code = self.run_approve("model", terminal=lambda: True, answers=["y"])
+        self.assertEqual(code, 0)
+        self.assertEqual(self.asked, ["Approve model model as Dana? [y/N] "])
+        self.assertEqual(self.read()[0]["approver"], {"kind": "person", "name": "Dana"})
+
+    def test_the_project_name_beats_the_global_name(self):
+        self.set_global('[identity]\nname = "Dana"\n')
+        code = self.run_approve("model", local='[identity]\nname = "dana-client"\n', terminal=lambda: True, answers=["yes"])
+        self.assertEqual(code, 0)
+        self.assertEqual(self.read()[0]["approver"]["name"], "dana-client")
+
+    def test_the_flag_beats_every_file_and_asks_nothing(self):
+        self.set_global('[identity]\nname = "Dana"\n')
+        code = self.run_approve("model", "--approver", "person:Ana", local='[identity]\nname = "x"\n', terminal=lambda: True)
+        self.assertEqual(code, 0)
+        self.assertEqual(self.asked, [])
+        self.assertEqual(self.read()[0]["approver"]["name"], "Ana")
+
+    def test_with_no_name_set_the_person_types_one(self):
+        code = self.run_approve("model", terminal=lambda: True, answers=["Ana", "y"])
+        self.assertEqual(code, 0)
+        self.assertEqual(self.asked, ["Your name: ", "Approve model model as Ana? [y/N] "])
+        self.assertEqual(self.read()[0]["approver"]["name"], "Ana")
+
+    def test_anything_but_yes_writes_nothing(self):
+        for answer in ("", "n", "maybe"):
+            self.assertEqual(self.run_approve("model", terminal=lambda: True, answers=["Ana", answer]), 1)
+        self.assertFalse((self.root / ledger.LEDGER).exists())
+
+    def test_a_closed_terminal_or_an_interrupt_refuses_cleanly(self):
+        for error in (EOFError, KeyboardInterrupt):
+            def ask(prompt, error=error):
+                raise error
+
+            code = approve.main(["--root", str(self.root), "model"], terminal=lambda: True, ask=ask)
+            self.assertEqual(code, 1)
+        self.assertFalse((self.root / ledger.LEDGER).exists())
+
+    def test_an_empty_typed_name_is_refused(self):
+        self.assertEqual(self.run_approve("model", terminal=lambda: True, answers=["  "]), 1)
+
+    def test_a_build_approval_names_the_commit_in_the_prompt(self):
+        with mock.patch.object(approve, "head", return_value="a" * 40):
+            self.run_approve("build", terminal=lambda: True, answers=["Ana", "y"])
+        self.assertEqual(self.asked[1], f"Approve build {'a' * 40} as Ana? [y/N] ")
+
+    def test_a_broken_global_file_is_reported_and_blocks_the_default(self):
+        self.set_global("[identity\n")
+        self.assertEqual(self.run_approve("model", terminal=lambda: True, answers=["y"]), 1)
+        self.assertEqual(self.asked, [])
+
+    def test_an_agent_approval_never_asks(self):
+        config = '[approvals]\nmodel = ["agent"]\n'
+        code = self.run_approve("model", "--approver", "agent:claude-code:bbb", "--author", "agent:claude-code:aaa", config=config)
+        self.assertEqual(code, 0)
+        self.assertEqual(self.asked, [])
 
     def test_a_malformed_party_is_refused(self):
         with self.assertRaises(SystemExit):

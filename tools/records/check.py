@@ -9,6 +9,7 @@ The record check reads the project file and never the user file, so it judges ev
 --framework is for Threnos itself, which holds records but is not a project, and skips that requirement.
 """
 import datetime
+import os
 import re
 import sys
 import tomllib
@@ -42,7 +43,8 @@ GATES = ["principles", "decisions"] + ledger.LEDGER_GATES
 GATED_STATUSES = ["accepted", "superseded"]
 UNRECORDED = "approval is unrecorded"
 DEFAULT_APPROVERS = ["person"]
-USER_SETTINGS = {"approvals"}
+USER_SETTINGS = {"approvals", "identity"}
+GLOBAL_SETTINGS = {"identity"}
 RECORD_FILE = re.compile(r"^(\d{4})-.+\.md$")
 CITATION = re.compile(r"\[(\d{4})\]|decisions/(\d{4})-|\bADRs? (\d{4})\b")
 
@@ -219,14 +221,42 @@ def uncited_note(one, contracts):
     return f"{one.file}: contracts of {', '.join(missing)} do not cite it" if missing else None
 
 
-def load_toml(path):
+def load_toml(path, label=None):
     """Return (settings, problem). A file that does not parse is a problem and no settings."""
     if not path.is_file():
         return {}, None
     try:
         return tomllib.loads(path.read_text()), None
     except tomllib.TOMLDecodeError as error:
-        return {}, f".threnos/{path.name}: {error}"
+        return {}, f"{label or '.threnos/' + path.name}: {error}"
+
+
+def global_config_path():
+    """The person's own settings file, outside any repository."""
+    base = os.environ.get("XDG_CONFIG_HOME")
+    return (Path(base) if base else Path.home() / ".config") / "threnos" / "config.toml"
+
+
+def identity_problems(settings, label):
+    table = settings.get("identity")
+    if table is None:
+        return []
+    if not isinstance(table, dict):
+        return [f"{label}: identity must be a table with a name"]
+    problems = [f"{label}: identity.{key} is not a setting. Set name" for key in sorted(set(table) - {"name"})]
+    name = table.get("name")
+    if "name" in table and (not isinstance(name, str) or not name.strip() or "\n" in name):
+        problems.append(f"{label}: identity.name must be a one-line name")
+    return problems
+
+
+def identity_name(*files):
+    """Return the first identity.name among the settings, or None."""
+    for settings in files:
+        name = (settings.get("identity") or {}).get("name")
+        if isinstance(name, str) and name.strip():
+            return name.strip()
+    return None
 
 
 def approvals_problems(settings, label):
@@ -250,8 +280,17 @@ def local_problems(local):
         f".threnos/local.toml: {key} is project-only. A user file may set only {', '.join(sorted(USER_SETTINGS))}"
         for key in sorted(set(local) - USER_SETTINGS)
     ]
-    return problems + approvals_problems(local, ".threnos/local.toml")
+    return problems + approvals_problems(local, ".threnos/local.toml") + identity_problems(local, ".threnos/local.toml")
 
+
+def global_problems(path):
+    settings, error = load_toml(path, str(path))
+    problems = [error] if error else []
+    problems += [
+        f"{path}: {key} is not a global setting. The global file may set only {', '.join(sorted(GLOBAL_SETTINGS))}"
+        for key in sorted(set(settings) - GLOBAL_SETTINGS)
+    ]
+    return problems + identity_problems(settings, str(path))
 
 def approvers(config, gate):
     return (config.get("approvals") or {}).get(gate, DEFAULT_APPROVERS)
@@ -263,6 +302,9 @@ def settings_problems(root):
     local, local_error = load_toml(root / ".threnos" / "local.toml")
     problems = [each for each in (config_error, local_error) if each]
     problems += approvals_problems(config, ".threnos/config.toml") + local_problems(local)
+    problems += global_problems(global_config_path())
+    if "identity" in config:
+        problems.append(".threnos/config.toml: identity is user-only. Set it in .threnos/local.toml or the global file")
     warnings = [
         f"{label}: approvals.{gate} lists only agent, so a person may not approve"
         for label, settings in ((".threnos/config.toml", config), (".threnos/local.toml", local))
@@ -365,6 +407,8 @@ def check(root, require_architecture=True):
         problems += citation_problems(one, contracts) + approval_gate_problems(one, config)
         notes += [note for note in (uncited_note(one, contracts), unrecorded_note(one)) if note]
     problems += approvals_problems(config, ".threnos/config.toml") + principles_problems(root, records, config)
+    if "identity" in config:
+        problems.append(".threnos/config.toml: identity is user-only. Set it in .threnos/local.toml or the global file")
     architecture = yaml.safe_load((root / "architecture.yaml").read_text()) or {} if (root / "architecture.yaml").is_file() else {}
     problems += ledger.ledger_problems(root, config, architecture)
     return sorted(problems), notes

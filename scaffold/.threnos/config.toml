@@ -19,6 +19,8 @@ mutation_cadence = "nightly"
 # The gates are principles, decisions, contracts, acceptance, architecture, model, and build. A project that adopts
 # .threnos/approvals.yaml has each protected unit approved there. independence says what must differ between an agent
 # approver and the author: "session" (the default) or "harness".
+# Your name for approvals is not set here. A person sets `[identity] name = "..."` in the global file
+# ~/.config/threnos/config.toml, or for one project in .threnos/local.toml. Neither file is committed.
 # [approvals]
 # principles = ["person"]
 # contracts = ["person", "agent"]

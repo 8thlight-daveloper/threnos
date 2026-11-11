@@ -1,10 +1,27 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import check
 
 ARCHITECTURE = "components:\n  - name: plan/decoder\n  - name: tui\n"
+
+_HOME = None
+_PATCH = None
+
+
+def setUpModule():
+    global _HOME, _PATCH
+    _HOME = tempfile.TemporaryDirectory()
+    _PATCH = mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": _HOME.name})
+    _PATCH.start()
+
+
+def tearDownModule():
+    _PATCH.stop()
+    _HOME.cleanup()
 
 
 def record(number, front, title="Title"):

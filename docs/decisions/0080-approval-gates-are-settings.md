@@ -3,7 +3,7 @@ category: regenerative-process
 status: accepted
 approval: person
 builds-on: ['0040', '0050', '0070']
-partly-superseded-by: ['0110']
+partly-superseded-by: ['0110', '0130']
 note: Starts with the principles gate. 0110 replaces the paragraph that keeps the core gates fixed.
 ---
 

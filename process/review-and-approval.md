@@ -43,6 +43,15 @@ wrote. The identifiers are written by the approving agent and cannot be verified
 careless self-approval. They do not prove independence. The mutation tool and the second independent build still test a
 contract on its merits.
 
+A person at a terminal records an approval without typing a name. `nix run .#approve -- <gate> [unit]` uses
+`identity.name` from `.threnos/local.toml` for that project, then from the global file,
+`$XDG_CONFIG_HOME/threnos/config.toml` or `~/.config/threnos/config.toml`. With neither it asks for a name. Then it asks
+"Approve <gate> <unit> as <name>? [y/N]". Without a terminal it refuses and says to pass `--approver`, so an agent's
+shell cannot take the default. `--approver` always wins. The name is a plain label. The tool never reads an email
+address. It stops an accident and not a deliberate false claim, because an agent can still pass `person:<name>`, so a
+person reading the ledger in review is the check. See
+[ADR 0130](../docs/decisions/0130-user-identity-lives-in-the-users-own-settings.md).
+
 A renamed or deleted unit leaves an entry that fails the check. `nix run .#approve -- --remove <gate> <unit>` drops it
 and refuses while the unit exists. It grants no approval, so it needs no approver. The renamed unit is a new unit and
 needs its own approval.

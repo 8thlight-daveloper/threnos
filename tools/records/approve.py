@@ -1,9 +1,11 @@
 """Record an approval in the ledger, `.threnos/approvals.yaml`.
 
-Usage: approve.py [--root DIR] GATE [UNIT] --approver WHO [--author WHO] [--date YYYY-MM-DD] [--note TEXT]
+Usage: approve.py [--root DIR] GATE [UNIT] [--approver WHO] [--author WHO] [--date YYYY-MM-DD] [--note TEXT]
        approve.py [--root DIR] --remove GATE UNIT
 
-WHO is `person:<name>` or `agent:<harness>:<session>`. GATE is contracts, acceptance, architecture, model, or build.
+WHO is `person:<name>` or `agent:<harness>:<session>`. Without --approver, a person at a terminal approves under the name
+in `identity.name` of `.threnos/local.toml`, then of the global file, then one they type, and confirms it. Without a
+terminal the tool refuses, so an agent must pass --approver. See ADR 0130. GATE is contracts, acceptance, architecture, model, or build.
 UNIT is the folder or file the gate protects. It may be left out when the gate has one unit. For build it is a commit,
 and defaults to HEAD. The entry holds the unit's current hash. An existing entry for the unit is replaced.
 
@@ -80,7 +82,32 @@ def remove(root, gate, unit, known):
     return 0
 
 
-def main(args):
+def is_terminal():
+    return sys.stdin.isatty()
+
+
+def resolve_approver(gate, unit, local, global_settings, terminal, ask):
+    """Return (approver, problem). A person at a terminal gets a named default after a confirmation."""
+    if not terminal():
+        return None, (
+            "no --approver. Pass person:<name> or agent:<harness>:<session>. A person at a terminal may set "
+            "identity.name in .threnos/local.toml or the global file to be asked instead"
+        )
+    name = check.identity_name(local, global_settings)
+    try:
+        if name is None:
+            name = ask("Your name: ").strip()
+            if not name or "\n" in name:
+                return None, "no name given"
+        answer = ask(f"Approve {gate} {unit} as {name}? [y/N] ").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        return None, "no answer. Nothing was written"
+    if answer not in ("y", "yes"):
+        return None, "not approved. Nothing was written"
+    return {"kind": "person", "name": name}, None
+
+
+def main(args, terminal=is_terminal, ask=input):
     parser = argparse.ArgumentParser(prog="approve.py", description=__doc__.split("\n")[0])
     parser.add_argument("--root", default=".")
     parser.add_argument("gate", choices=ledger.LEDGER_GATES)
@@ -102,9 +129,6 @@ def main(args):
     known = ledger.units(root, architecture)
     if given.remove:
         return remove(root, given.gate, given.unit, known)
-    if given.approver is None:
-        parser.error("--approver is required")
-
     unit = given.unit
     if given.gate == "build":
         unit = unit or head(root)
@@ -119,7 +143,17 @@ def main(args):
             print(f"{unit} is not a {given.gate} unit. Units: {', '.join(known[given.gate]) or 'none exist'}", file=sys.stderr)
             return 1
         entry["hash"] = ledger.digest(root / unit)
-    entry["approver"] = given.approver
+    approver = given.approver
+    if approver is None:
+        global_settings, global_error = check.load_toml(check.global_config_path(), str(check.global_config_path()))
+        if global_error:
+            print(global_error, file=sys.stderr)
+            return 1
+        approver, problem = resolve_approver(given.gate, unit, local, global_settings, terminal, ask)
+        if problem:
+            print(problem, file=sys.stderr)
+            return 1
+    entry["approver"] = approver
     if given.author:
         entry["author"] = given.author
     entry["date"] = given.date
