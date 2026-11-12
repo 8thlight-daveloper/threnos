@@ -11,6 +11,7 @@ These exist because of the regenerative process, and assume its structure.
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | [behavior-judge](behavior-judge/SKILL.md)         | Decide an open product behavior question, or escalate it                                                | The project's product principles file                                                            |
 | [contract-hardening](contract-hardening/SKILL.md) | Remove ambiguity from a contract with broken variants, mutation, a second build, and a differential run | The contract, the mutation tool, the [dump format](contract-hardening/references/dump-format.md) |
+| [independent-approval-review](independent-approval-review/SKILL.md) | Review a gated unit as a session that did not write it, and approve only when nothing is left to reject | The artifact and the records it depends on, not the author's account |
 | [writing-issues](writing-issues/SKILL.md)         | Write, split, and size issues so each is reviewable in one sitting                                      | The issue templates                                                                              |
 
 ## Code and craft skills
