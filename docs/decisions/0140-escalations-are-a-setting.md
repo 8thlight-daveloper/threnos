@@ -1,7 +1,7 @@
 ---
 category: regenerative-process
-status: proposed
-approval: unrecorded
+status: accepted
+approval: person
 builds-on: ['0040', '0080', '0110', '0120']
 note: Makes the cases that go to a person a list a project can extend. Adds a review procedure for an agent that approves, and a model axis to independence.
 ---
