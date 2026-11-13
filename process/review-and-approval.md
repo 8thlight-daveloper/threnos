@@ -43,6 +43,20 @@ wrote. The identifiers are written by the approving agent and cannot be verified
 careless self-approval. They do not prove independence. The mutation tool and the second independent build still test a
 contract on its merits.
 
+`independence_model` under `[approvals]` is `"off"` by default or `"differ"`. Under `"differ"`, an agent approval names
+a `model` for the approver and the author, and the two must differ. A different vendor is the strongest case. A
+different model id from the same vendor is weaker, because the models may share training data and habits, and the check
+compares ids as strings. The model is self-reported, like a session identifier. It leaves a trail and does not prove
+which model ran.
+
+An agent whose gate lists `agent` approves without asking a person, after a review from a session that did not write the
+unit. [independent-approval-review](../skills/independent-approval-review/SKILL.md) says what that review reads and
+looks for. Some cases still go to a person whatever a gate lists: the built-in cases of
+[ADR 0040](../docs/decisions/0040-behavior-judgment.md), and any sentence in `escalations` under `[approvals]`. A
+project writes its own stops there, such as a push, an edit to its settings, or a new dependency. The text is natural
+language, so no check matches it, and a person reading the change is the check. See
+[ADR 0140](../docs/decisions/0140-escalations-are-a-setting.md).
+
 A person at a terminal records an approval without typing a name. `nix run .#approve -- <gate> [unit]` uses
 `identity.name` from `.threnos/local.toml` for that project, then from the global file,
 `$XDG_CONFIG_HOME/threnos/config.toml` or `~/.config/threnos/config.toml`. With neither it asks for a name. Then it asks

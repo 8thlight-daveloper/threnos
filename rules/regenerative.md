@@ -113,7 +113,13 @@ records check until a new approval covers it.
   terminal runs `approve` without `--approver` and confirms under the name they set. Without a terminal the tool
   refuses, and you must not work around that.
 - Approve a gate only when `approvals.<gate>` in `.threnos/config.toml`, or in `.threnos/local.toml` for this person,
-  lists `agent`. Otherwise stop and ask a person.
+  lists `agent`. Otherwise stop and ask a person. When it lists `agent`, do not stop to ask a person. Get a review from
+  a session that did not write the unit, using `.agents/skills/independent-approval-review/SKILL.md`, and approve only
+  when it leaves no finding it cannot answer.
+- Stop and ask a person for a case in `approvals.escalations` in `.threnos/config.toml`, whatever a gate lists. It adds
+  to the cases below and removes none of them.
+- When `approvals.independence_model` is `"differ"`, name your `model` in the approver identity, and never approve work
+  whose author's model is the same. Name the model you are, and do not guess.
 - Never approve your own work. An agent approver names its harness and session, and its session must differ from the
   author's. Do not invent a session identifier or reuse the author's.
 - Set `approval: agent` on a decision record only when `approvals.decisions` lists `agent`. Add `approver` and `author`
