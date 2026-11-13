@@ -25,6 +25,10 @@ Only ADRs are numbered. The rest are named for their topic.
 - Write the context, the decision, the consequences, and the alternatives considered.
   [templates/decisions/adr.md](../templates/decisions/adr.md) is the skeleton for a project record.
 - The language-specific half of a decision goes in the stack docs, so a change of language leaves the ADR in place.
+- An ADR is a record of a point in time. Once it is accepted, do not edit what it says. A decision that changes gets a
+  new ADR that supersedes the old one, and a wrong or stale statement is answered the same way. An accepted record
+  changes only in its front matter: `status`, the approval fields, `note`, and the links to other records. A record that
+  is still `proposed` can be rewritten freely.
 
 ## Stack docs
 

@@ -15,6 +15,9 @@ citedByRules = true
 [skills.commit-message]
 citedByRules = true
 
+[skills.independent-approval-review]
+citedByRules = true
+
 [skills.writing-issues]
 citedByRules = true
 
