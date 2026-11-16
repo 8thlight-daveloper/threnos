@@ -18,7 +18,5 @@ jobs:
           summarize: false
       - name: Evaluate the flake for every system
         run: nix flake check --all-systems --no-build
-      - name: Build the checks for this runner
-        run: nix flake check
-      - name: Check links
-        run: nix develop --quiet --command lychee --offline --include-fragments --no-progress "**/*.md"
+      - name: Run the checks for this runner
+        run: nix develop --quiet --command just check

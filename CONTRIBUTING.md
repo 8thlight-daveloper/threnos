@@ -41,7 +41,10 @@ When you edit prose, keep the technical meaning, requirements, exceptions, evide
 `nix develop` gives everyone the same tools, including `markdownlint-cli2`, `mdformat`, and `lychee`. Run these before
 you push:
 
+- `just check` runs `nix flake check` and the offline link check. CI and the pre-commit hook run it.
 - `nix flake check --all-systems` checks that the flake evaluates and the scaffold resolves its skill manifest.
+- `cd tools/records && python -B -m unittest`, inside `nix develop`, runs the records tests. System Python lacks `yaml`.
+  `nix flake check` runs the same tests.
 - `lychee --offline --include-fragments "**/*.md"` checks that relative links and anchors resolve.
 - `markdownlint-cli2 <files>` checks Markdown rules, with lines wrapped at 120 columns.
 - `mdformat --check <files>` checks Markdown formatting, wrapped at 120 columns.
