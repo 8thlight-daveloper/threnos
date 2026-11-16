@@ -60,7 +60,7 @@ language, so no check matches it, and a person reading the change is the check. 
 A person at a terminal records an approval without typing a name. `nix run .#approve -- <gate> [unit]` uses
 `identity.name` from `.threnos/local.toml` for that project, then from the global file,
 `$XDG_CONFIG_HOME/threnos/config.toml` or `~/.config/threnos/config.toml`. With neither it asks for a name. Then it asks
-"Approve <gate> <unit> as <name>? [y/N]". Without a terminal it refuses and says to pass `--approver`, so an agent's
+"`Approve <gate> <unit> as <name>? [y/N]`". Without a terminal it refuses and says to pass `--approver`, so an agent's
 shell cannot take the default. `--approver` always wins. The name is a plain label. The tool never reads an email
 address. It stops an accident and not a deliberate false claim, because an agent can still pass `person:<name>`, so a
 person reading the ledger in review is the check. See

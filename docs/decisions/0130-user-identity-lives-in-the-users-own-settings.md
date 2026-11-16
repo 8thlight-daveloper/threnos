@@ -42,7 +42,7 @@ since the name belongs to a person and not to the project.
 1. Otherwise it asks "Your name:".
 
 **A default applies only at a terminal.** When `--approver` is missing and standard input is a terminal, `approve`
-resolves a name by steps 2 to 4 and asks "Approve <gate> <unit> as <name>? [y/N]". Anything but `y` or `yes` writes
+resolves a name by steps 2 to 4 and asks "`Approve <gate> <unit> as <name>? [y/N]`". Anything but `y` or `yes` writes
 nothing. When standard input is not a terminal, it refuses and says to pass `--approver`. An agent's shell is not a
 terminal, so an agent cannot take the default by accident. It still records an agent approval by passing its own harness
 and session.
