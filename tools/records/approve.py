@@ -43,7 +43,7 @@ def party(text):
 
 def effective(config, local):
     merged = dict(config.get("approvals") or {})
-    merged.update(local.get("approvals") or {})
+    merged.update({key: value for key, value in (local.get("approvals") or {}).items() if key != "escalations"})
     return {"approvals": merged}
 
 

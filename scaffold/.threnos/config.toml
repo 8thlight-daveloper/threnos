@@ -18,13 +18,15 @@ mutation_cadence = "nightly"
 # the project's choice.
 # The gates are principles, decisions, contracts, acceptance, architecture, model, and build. A project that adopts
 # .threnos/approvals.yaml has each protected unit approved there. independence says what must differ between an agent
-# approver and the author: "session" (the default) or "harness".
+# approver and the author: "session" (the default) or "harness". escalations lists cases that go to a person
+# whatever a gate lists, each a sentence. It adds to the built-in cases and removes none. It is project-only.
 # Your name for approvals is not set here. A person sets `[identity] name = "..."` in the global file
 # ~/.config/threnos/config.toml, or for one project in .threnos/local.toml. Neither file is committed.
 # [approvals]
 # principles = ["person"]
 # contracts = ["person", "agent"]
 # independence = "session"
+# escalations = ["A push to a remote.", "A new dependency."]
 
 # Seeds are written once and recorded in .threnos/seeded. To keep one out from the first sync, list its path.
 # [seeds]

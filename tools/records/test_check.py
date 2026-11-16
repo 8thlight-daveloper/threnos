@@ -224,6 +224,21 @@ class ApprovalSettings(unittest.TestCase):
         (problems, _), _ = self.project("", local='[rules]\nregenerative = "ejected"\n')
         self.assertProblem(problems, "rules is project-only")
 
+    def test_escalations_are_a_list_of_nonempty_strings(self):
+        (problems, _), _ = self.project('[approvals]\nescalations = ["A push.", "A new dependency."]\n')
+        self.assertEqual(problems, [])
+        for bad in ('"a push"', '["ok", ""]', '["ok", 3]', '["  "]'):
+            (problems, _), _ = self.project(f"[approvals]\nescalations = {bad}\n")
+            self.assertProblem(problems, "approvals.escalations must be a list of non-empty strings")
+
+    def test_escalations_are_not_a_gate_and_do_not_warn(self):
+        (problems, warnings), _ = self.project('[approvals]\nescalations = ["agent"]\n')
+        self.assertEqual((problems, warnings), ([], []))
+
+    def test_escalations_are_project_only(self):
+        (problems, _), _ = self.project("", local='[approvals]\nescalations = ["A push."]\n')
+        self.assertProblem(problems, "local.toml: approvals.escalations is project-only")
+
     def test_a_bad_value_in_the_user_file_is_reported(self):
         (problems, _), _ = self.project("", local='[approvals]\nprinciples = []\n')
         self.assertProblem(problems, "local.toml: approvals.principles")

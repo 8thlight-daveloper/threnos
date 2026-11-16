@@ -37,11 +37,13 @@ let
       mutationCadence = (manifest.rules or { }).mutation_cadence or "nightly";
       seedSkip = (manifest.seeds or { }).skip or [ ];
       approvals = manifest.approvals or { };
-      badGates = builtins.filter (gate: gate != "independence" && !(builtins.elem gate gates)) (builtins.attrNames approvals);
+      notGates = [ "independence" "escalations" ];
+      badGates = builtins.filter (gate: !(builtins.elem gate notGates) && !(builtins.elem gate gates)) (builtins.attrNames approvals);
       badApprovers = builtins.filter
         (gate: let who = approvals.${gate}; in !(builtins.isList who && who != [ ] && builtins.all (each: builtins.elem each approvers) who))
-        (builtins.filter (gate: gate != "independence") (builtins.attrNames approvals));
+        (builtins.filter (gate: !(builtins.elem gate notGates)) (builtins.attrNames approvals));
       independence = approvals.independence or "session";
+      escalations = approvals.escalations or [ ];
 
       missing = lib.concatMap
         (name: map (needed: { inherit name needed; }) (builtins.filter (needed: !(present needed)) (requiresOf name)))
@@ -58,6 +60,9 @@ let
     assert lib.assertMsg (badGates == [ ]) "approvals names gates that do not exist: ${toString badGates}. Gates: ${toString gates}";
     assert lib.assertMsg (badApprovers == [ ]) "approvals.${toString badApprovers} must be a non-empty list of person or agent";
     assert lib.assertMsg (builtins.elem independence [ "session" "harness" ]) "approvals.independence must be session or harness";
+    assert lib.assertMsg
+      (builtins.isList escalations && builtins.all (each: builtins.isString each && builtins.match "[[:space:]]*" each == null) escalations)
+      "approvals.escalations must be a list of non-empty strings";
     assert lib.assertMsg (builtins.isList seedSkip && builtins.all builtins.isString seedSkip) "seeds.skip must be a list of paths";
     assert lib.assertMsg (missing == [ ])
       (lib.concatMapStringsSep "; " (each: "${each.name} requires ${each.needed}, which is off") missing);

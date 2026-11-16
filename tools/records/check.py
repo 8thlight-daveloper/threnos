@@ -43,6 +43,7 @@ GATES = ["principles", "decisions"] + ledger.LEDGER_GATES
 GATED_STATUSES = ["accepted", "superseded"]
 UNRECORDED = "approval is unrecorded"
 DEFAULT_APPROVERS = ["person"]
+NOT_GATES = {"independence", "escalations"}
 USER_SETTINGS = {"approvals", "identity"}
 GLOBAL_SETTINGS = {"identity"}
 RECORD_FILE = re.compile(r"^(\d{4})-.+\.md$")
@@ -259,13 +260,24 @@ def identity_name(*files):
     return None
 
 
-def approvals_problems(settings, label):
+def escalations_problems(value, label):
+    if isinstance(value, list) and all(isinstance(each, str) and each.strip() for each in value):
+        return []
+    return [f"{label}: approvals.escalations must be a list of non-empty strings"]
+
+
+def approvals_problems(settings, label, user_layer=False):
     problems = []
     table = settings.get("approvals") or {}
     if not isinstance(table, dict):
         return [f"{label}: approvals must be a table of gates"]
     for gate, who in table.items():
-        if gate == "independence":
+        if gate == "escalations":
+            if user_layer:
+                problems.append(f"{label}: approvals.escalations is project-only. Set it in .threnos/config.toml")
+            else:
+                problems += escalations_problems(who, label)
+        elif gate == "independence":
             if who not in ledger.INDEPENDENCE:
                 problems.append(f"{label}: approvals.independence must be {' or '.join(ledger.INDEPENDENCE)}")
         elif gate not in GATES:
@@ -280,7 +292,7 @@ def local_problems(local):
         f".threnos/local.toml: {key} is project-only. A user file may set only {', '.join(sorted(USER_SETTINGS))}"
         for key in sorted(set(local) - USER_SETTINGS)
     ]
-    return problems + approvals_problems(local, ".threnos/local.toml") + identity_problems(local, ".threnos/local.toml")
+    return problems + approvals_problems(local, ".threnos/local.toml", user_layer=True) + identity_problems(local, ".threnos/local.toml")
 
 
 def global_problems(path):
@@ -309,7 +321,7 @@ def settings_problems(root):
         f"{label}: approvals.{gate} lists only agent, so a person may not approve"
         for label, settings in ((".threnos/config.toml", config), (".threnos/local.toml", local))
         for gate, who in (settings.get("approvals") or {}).items()
-        if gate != "independence" and who == ["agent"]
+        if gate not in NOT_GATES and who == ["agent"]
     ]
     warnings += [
         f"{label}: approvals.build lists agent, so no person reviews a running build"
