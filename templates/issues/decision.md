@@ -2,6 +2,7 @@
 name: Decision
 about: Settle one question, ending in an ADR, a doc change, or a stack row
 labels: decision
+title: 'Decision: '
 ---
 
 ## Question

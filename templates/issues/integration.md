@@ -2,6 +2,7 @@
 name: Integration
 about: Wire components together in the entry point
 labels: integration
+title: 'Integration: '
 ---
 
 ## Goal

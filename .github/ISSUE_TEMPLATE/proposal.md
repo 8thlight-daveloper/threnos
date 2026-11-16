@@ -2,6 +2,7 @@
 name: Proposal
 about: Change the process, the shared rules, or what a skill tells an agent to do
 labels: proposal
+title: 'Proposal: '
 ---
 
 ## Change

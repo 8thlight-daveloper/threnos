@@ -2,6 +2,7 @@
 name: Problem
 about: A broken link, a wrong instruction, or a flake or mutation tool that misbehaves
 labels: problem
+title: 'Problem: '
 ---
 
 ## What happened

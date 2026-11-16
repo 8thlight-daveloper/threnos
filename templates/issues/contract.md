@@ -2,6 +2,7 @@
 name: Contract
 about: Draft the contract for one component, for a person to approve
 labels: contract
+title: 'Contract: '
 ---
 
 ## Component

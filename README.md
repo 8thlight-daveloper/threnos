@@ -1,4 +1,9 @@
-# <picture><source media="(prefers-color-scheme: dark)" srcset="images/threnos-lockup-dark.svg"><img src="images/threnos-lockup.svg" alt="Threnos" width="420"></picture>
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="images/threnos-lockup-dark.svg">
+    <img src="images/threnos-lockup.svg" alt="Threnos" width="420">
+  </picture>
+</h1>
 
 A process for building software that an agent or a person can delete and rebuild, one component at a time, without
 losing what the software is supposed to do.

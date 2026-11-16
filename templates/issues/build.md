@@ -2,6 +2,7 @@
 name: Build
 about: Build one component from its approved contract
 labels: build
+title: 'Build: '
 ---
 
 ## Component
