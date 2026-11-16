@@ -9,23 +9,22 @@ note: Makes the cases that go to a person a list a project can extend. Adds a re
 # 0140. Escalations are a setting
 
 Builds on [0040](0040-behavior-judgment.md), [0080](0080-approval-gates-are-settings.md),
-[0110](0110-core-approval-gates-and-the-approvals-ledger.md), and
-[0120](0120-decision-records-are-an-approval-gate.md).
+[0110](0110-core-approval-gates-and-the-approvals-ledger.md), and [0120](0120-decision-records-are-an-approval-gate.md).
 
 ## Context
 
 Each gate in `[approvals]` lists who may approve it. [0080](0080-approval-gates-are-settings.md),
-[0110](0110-core-approval-gates-and-the-approvals-ledger.md), and
-[0120](0120-decision-records-are-an-approval-gate.md) each add that a new privacy, security, ownership, destructive,
-stored-format, or hash-compatibility consequence still goes to a person. That list lives in prose, in three records and
-the shared rules. A project cannot add to it. A project with its own stops, such as a push, an edit to its settings, or a
-new dependency, keeps them in `AGENTS.md`, where no check reads them and no setting says they outrank a gate.
+[0110](0110-core-approval-gates-and-the-approvals-ledger.md), and [0120](0120-decision-records-are-an-approval-gate.md)
+each add that a new privacy, security, ownership, destructive, stored-format, or hash-compatibility consequence still
+goes to a person. That list lives in prose, in three records and the shared rules. A project cannot add to it. A project
+with its own stops, such as a push, an edit to its settings, or a new dependency, keeps them in `AGENTS.md`, where no
+check reads them and no setting says they outrank a gate.
 
 Two things are also missing for a project that lists `agent` on its gates. The rules say an agent approves only when its
 gate lists `agent`, and say nothing about how the approver reviews, so an approval can be a rubber stamp from a session
 that happened to differ from the author's. `independence` also cannot tell two sessions of the same model from two
-different models, and a reviewer that shares the author's model shares its blind spots. They also do not say whether an agent should pause to ask a person when its
-gate allows an agent, so each project writes that down itself.
+different models, and a reviewer that shares the author's model shares its blind spots. They also do not say whether an
+agent should pause to ask a person when its gate allows an agent, so each project writes that down itself.
 
 ## Decision
 
@@ -61,9 +60,9 @@ using the `independent-approval-review` skill, and approves only when that revie
 stops when the case is built in or listed under `escalations`. When the gate lists only `person`, the agent stops, as
 today.
 
-**Model is a separate axis.** `independence` keeps its values, `session` and `harness`. A harness can run several
-models and a model can run in several harnesses, so a `model` value would overlap `harness`. The approver and author
-identities of [0110](0110-core-approval-gates-and-the-approvals-ledger.md) and
+**Model is a separate axis.** `independence` keeps its values, `session` and `harness`. A harness can run several models
+and a model can run in several harnesses, so a `model` value would overlap `harness`. The approver and author identities
+of [0110](0110-core-approval-gates-and-the-approvals-ledger.md) and
 [0120](0120-decision-records-are-an-approval-gate.md) gain an optional `model` field on an agent, such as
 `{kind: agent, harness, session, model}`. A new setting, `independence_model`, is `"off"` by default or `"differ"`.
 
@@ -97,8 +96,8 @@ reasoning, and goes in looking for a reason to reject.
 - The identity schema gains `model`, and the records checker gains the model rule. Sync validates `independence_model`.
   The decision record front matter template and `rules/regenerative.md` document the field.
 - The independence rule is still self-reported, and the review's quality is not checkable. A weak review passes the
-  check the same as a strong one. The mutation tool, the second independent build, and the human step on a running
-  build of [0110](0110-core-approval-gates-and-the-approvals-ledger.md) still carry the weight there.
+  check the same as a strong one. The mutation tool, the second independent build, and the human step on a running build
+  of [0110](0110-core-approval-gates-and-the-approvals-ledger.md) still carry the weight there.
 - A listed case is only as reliable as the agent's reading of it. A narrow, concrete sentence works better than a broad
   one.
 - The shared rules and the sync tool need edits once this is accepted: the `Approvals` section of
@@ -113,8 +112,8 @@ reasoning, and goes in looking for a reason to reject.
 - **A `model` value for `independence`.** It would read as a stricter step above `harness`, and it is not one. A project
   may run one harness with several models, or one model across harnesses, so the two axes need separate settings.
 - **A record of each review.** It helps only when something evaluates review quality, and nothing does yet. Scoring a
-  reviewer on artifacts with known defects, as the wrong-implementation variants of
-  [0030](0030-contracts-and-tests.md) do for tests, is the better test if quality becomes a worry.
+  reviewer on artifacts with known defects, as the wrong-implementation variants of [0030](0030-contracts-and-tests.md)
+  do for tests, is the better test if quality becomes a worry.
 - **A per-gate escalation list.** A stop that matters for one gate usually matters for all of them, and a second matrix
   is harder to read than one list.
 - **Let the user layer add or remove entries.** Adding is harmless, and removing defeats the list. A person who wants

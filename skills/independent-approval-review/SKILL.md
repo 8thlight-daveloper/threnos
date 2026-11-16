@@ -14,9 +14,9 @@ the escalations below.
 
 ## Start from a separate session
 
-The approver's `(harness, session)` must differ from the author's, and under `independence = "harness"` the harness
-must differ too. Do not review work from your own session. Do not invent or reuse a session identifier. If the only
-available session is the author's, stop and say so.
+The approver's `(harness, session)` must differ from the author's, and under `independence = "harness"` the harness must
+differ too. Do not review work from your own session. Do not invent or reuse a session identifier. If the only available
+session is the author's, stop and say so.
 
 Work from what the gate stores, not from the author's account of it:
 
@@ -30,15 +30,15 @@ Work from what the gate stores, not from the author's account of it:
 Go through the artifact for each question below that applies to its gate. Write each finding down with the line or
 section it concerns.
 
-| Gate | Ask |
-| ---- | --- |
-| `contracts` | Can two builds satisfy every rule and still differ in observable behavior? Is any rule unfalsifiable? Does a fixture agree with the rule it illustrates? Does it contradict an accepted decision or principle? |
-| `acceptance` | Would a plausible wrong build pass each scenario? Is the expected result computed independently of the code it judges? Does a scenario need behavior no contract states? |
-| `architecture` | Does a dependency rule hold up against the components and the decisions it cites? Does it allow what an accepted decision forbids? |
-| `model` | Do names and relations match the contracts? Does it add stored state no decision accounts for? |
-| `decisions` | Do the context, decision, and alternatives agree with the cited records? Does it change a stored format, ownership, privacy, or security rule without saying so? Is a superseded record still cited as live? |
-| `principles` | Does the edit follow from the records it cites? Does it widen what an agent may decide alone? |
-| `build` | Does the running program do what the acceptance scenarios and principles say? Run it and use it. Reading the code is not enough. |
+| Gate           | Ask                                                                                                                                                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contracts`    | Can two builds satisfy every rule and still differ in observable behavior? Is any rule unfalsifiable? Does a fixture agree with the rule it illustrates? Does it contradict an accepted decision or principle? |
+| `acceptance`   | Would a plausible wrong build pass each scenario? Is the expected result computed independently of the code it judges? Does a scenario need behavior no contract states?                                       |
+| `architecture` | Does a dependency rule hold up against the components and the decisions it cites? Does it allow what an accepted decision forbids?                                                                             |
+| `model`        | Do names and relations match the contracts? Does it add stored state no decision accounts for?                                                                                                                 |
+| `decisions`    | Do the context, decision, and alternatives agree with the cited records? Does it change a stored format, ownership, privacy, or security rule without saying so? Is a superseded record still cited as live?   |
+| `principles`   | Does the edit follow from the records it cites? Does it widen what an agent may decide alone?                                                                                                                  |
+| `build`        | Does the running program do what the acceptance scenarios and principles say? Run it and use it. Reading the code is not enough.                                                                               |
 
 Run the checks the project already has (`nix flake check`, the contract tests, the mutation tool) when the gate rests on
 them. A passing check is evidence. It does not replace the questions above.
@@ -63,5 +63,5 @@ artifact is correct.
 
 ## Report
 
-Keep the report short: the gate and unit, the session you reviewed as, the records you read, the findings or "none",
-and whether anything went to a person. Do not praise the work.
+Keep the report short: the gate and unit, the session you reviewed as, the records you read, the findings or "none", and
+whether anything went to a person. Do not praise the work.

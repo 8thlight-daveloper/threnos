@@ -130,8 +130,8 @@ records check until a new approval covers it.
 
 ## Decision records
 
-- Never edit the text of an accepted decision record. A changed decision needs a new record that supersedes the old
-  one. Edit an accepted record only in its front matter: `status`, the approval fields, `note`, and the links to other
+- Never edit the text of an accepted decision record. A changed decision needs a new record that supersedes the old one.
+  Edit an accepted record only in its front matter: `status`, the approval fields, `note`, and the links to other
   records. A `proposed` record can be rewritten.
 
 ## Where files go
