@@ -17,10 +17,9 @@ distribution. Start with one program. Revisit for a component whose isolation is
 
 ## Choosing boundaries
 
-[Choosing component boundaries](decomposition.md) gives proposed guidance and a worked example. Group behavior by its
-reason to change, keep domain policy independent of external mechanisms, and check whether each implementation can be
-regenerated without changing neighboring contracts. Dependency positions and pace layers describe different aspects of
-the design.
+[Choosing component boundaries](decomposition.md) gives guidance and a worked example. Group behavior by its reason to
+change, keep domain policy independent of external mechanisms, and check whether each implementation can be regenerated
+without changing neighboring contracts. Dependency positions and pace layers describe different aspects of the design.
 
 ## Folders by role
 

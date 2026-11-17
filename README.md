@@ -69,7 +69,7 @@ since the rules and the project's own ADRs hold what an agent needs.
 
 ## Start a project
 
-1. Read [principles](process/principles.md), [structure](process/structure.md), and the proposed
+1. Read [principles](process/principles.md), [structure](process/structure.md), and the
    [decomposition guidance](process/decomposition.md).
 1. Run `nix flake init -t <threnos>` in the new repo, then `nix run .#sync`. That installs the
    [shared rules](rules/regenerative.md) and every [skill](skills/README.md) read-only into `.agents/`, links the skills

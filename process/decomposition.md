@@ -1,6 +1,6 @@
 # Choosing component boundaries
 
-Status: proposed guidance. The example below illustrates the reasoning; it is not a record of a decomposition tested on
+Status: approved guidance. The example below illustrates the reasoning; it is not a record of a decomposition tested on
 a second project.
 
 Choose boundaries that contain likely changes and let each implementation be regenerated from its own contract. Small
