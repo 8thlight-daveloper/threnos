@@ -14,6 +14,9 @@ contracts is the main design work of a regenerative project. Thin contracts let 
 
 A change of language rewrites the tests' setup and the binding. The description and the fixtures stay.
 
+Call the tests in a contract *contract tests*. They judge one component through its interface. Acceptance scenarios
+judge the whole program from outside.
+
 ## The description
 
 [templates/contract/contract.md](../templates/contract/contract.md) is the skeleton. Its sections:
