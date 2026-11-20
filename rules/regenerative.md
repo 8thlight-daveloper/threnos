@@ -56,6 +56,9 @@ A project may add folders in `AGENTS.md`.
   missed one can slot in between.
 - `docs/stack/README.md` records language, libraries, and tooling. Change a row there and move the old row to Retired.
   Do not write an ADR for a stack change unless it forces a test change.
+- Do not read every ADR. The filenames in `docs/decisions/` name each decision. Open a record when the contract you
+  build from cites it, when your task writes or revises a contract, or when you revisit a behavior. Then read the whole
+  record, because its context and alternatives matter.
 
 ## Writing
 

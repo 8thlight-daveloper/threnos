@@ -2,8 +2,9 @@
 
 <!-- Template. Replace each <placeholder>, then delete this line. -->
 
-Read first: `README.md`, `docs/architecture/README.md`, `docs/stack/README.md`, the ADRs in `docs/decisions/`, and
-`.agents/rules/regenerative.md`.
+Read first: `README.md`, `docs/architecture/README.md`, `docs/stack/README.md`, and `.agents/rules/regenerative.md`.
+List `docs/decisions/` as the index of records. Open a record when a contract you work from cites it, when the task
+writes or revises a contract, or when it revisits a behavior.
 
 The rules in `.agents/rules/regenerative.md` are part of these instructions and apply to every task. This file adds the
 project's document pointers and its own rules. It may add to those rules and may not relax them.
