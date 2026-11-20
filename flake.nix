@@ -56,6 +56,11 @@
             ${threnos.recordsPython pkgs}/bin/python -B -m unittest
             touch $out
           '';
+          contract-imports-tests = pkgs.runCommand "contract-imports-tests" { } ''
+            cd ${./languages/go/contract-imports}
+            ${threnos.recordsPython pkgs}/bin/python -B -m unittest
+            touch $out
+          '';
           dependency-check-tests = pkgs.runCommand "dependency-check-tests" { nativeBuildInputs = [ pkgs.go ]; } ''
             export HOME=$TMPDIR GOCACHE=$TMPDIR/gocache GOFLAGS=-mod=mod GOTOOLCHAIN=local
             cd ${./languages/go/dependency-check}
