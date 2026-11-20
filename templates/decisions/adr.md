@@ -19,7 +19,7 @@ Builds on `<NNNN>`. Relates to <issue link>.
 
 ## Decision
 
-<What we chose, as rules a reader can apply. Use headings for parts. Put language-specific details in the stack docs, not here.>
+<What we chose, as rules a reader can apply. Use headings for parts. State each rule in terms any language can implement: algorithms, byte formats, hash and encoding names, limits, and error cases. Name no function, type, package, field, or standard library call. Test: a rebuild in another language could keep the sentence unchanged. Put language-specific details in the stack docs, not here.>
 
 ## Consequences
 
