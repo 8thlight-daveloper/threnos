@@ -133,6 +133,10 @@ records check until a new approval covers it.
 - Never edit the text of an accepted decision record. A changed decision needs a new record that supersedes the old one.
   Edit an accepted record only in its front matter: `status`, the approval fields, `note`, and the links to other
   records. A `proposed` record can be rewritten.
+- State a decision in terms any language can implement: algorithms, byte formats, hash and encoding names, limits, and
+  error cases. Name no function, type, package, field, or standard library call. The test is whether a rebuild in
+  another language could keep the sentence unchanged. Put the language-specific half in `docs/stack/`. A record may name
+  a language when the language is itself the decision.
 
 ## Where files go
 
