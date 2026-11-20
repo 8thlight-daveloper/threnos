@@ -5,17 +5,18 @@ contracts is the main design work of a regenerative project. Thin contracts let 
 
 ## Four parts
 
-| Part              | Is                                                                | Language-specific? |
-| ----------------- | ----------------------------------------------------------------- | ------------------ |
-| Description       | `contract.md`: the behavior in plain words                        | No                 |
-| Fixtures          | Plain data: inputs and expected outputs, with a manifest of cases | No                 |
-| Contract tests    | Code that feeds each fixture to the component and compares        | Yes, but thin      |
-| Interface binding | The interface and its data types, in the implementation language  | Yes                |
+| Part              | Is                                                                           | Language-specific? | Lives in                                                                                         |
+| ----------------- | ---------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------ |
+| Description       | `contract.md`: the behavior in plain words                                   | No                 | `contracts/specifications/<noun>/<role>/`                                                        |
+| Fixtures          | Plain data: inputs and expected outputs, with a manifest of cases            | No                 | `contracts/fixtures/<noun>/<role>/`                                                              |
+| Contract tests    | Code that feeds each fixture to the component and compares                   | Yes, but thin      | `contract-tests/runner/<noun>/<role>/`, and the wiring in `contract-tests/wiring/<noun>/<role>/` |
+| Interface binding | The operations the suite calls, declared in the suite where the language can | Yes                | With the contract tests                                                                          |
 
-A change of language rewrites the tests' setup and the binding. The description and the fixtures stay.
+A change of language replaces `contract-tests/`. The description and the fixtures stay.
 
 Call the tests in a contract *contract tests*. They judge one component through its interface. Acceptance scenarios
-judge the whole program from outside.
+judge the whole program from outside. The drafter writes the contract tests and the wiring. A builder reads the
+description and the suite's declaration of the operations, runs the suite, and never edits either.
 
 ## The description
 
@@ -49,8 +50,8 @@ of how it was checked. Those go stale with every edit. Put them in the issue.
 - **Every case expects something.** A case with an empty list of expected problems passes for an implementation that
   reports nothing. Keep a test that every case expects an output or at least one problem.
 - **A manifest** (`cases.json` or similar) names each case, its inputs, its expected result, and its source.
-- **Shared test code**, such as a function that turns fixture data into domain values, lives in one protected place
-  beside the contracts.
+- **Shared test code**, such as a function that turns fixture data into domain values, lives in
+  `contract-tests/harness/`, protected like a contract.
 
 ## Drafting
 

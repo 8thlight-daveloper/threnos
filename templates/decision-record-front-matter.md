@@ -110,6 +110,13 @@ A check also reports, without failing, a record whose prose has a backticked nam
 misses plain words such as a bare `Now`, and a record that chooses a language may name it. A reviewer judges each note
 against the language-neutral rule in the shared rules.
 
+The same run checks folder layout, with no parser. `acceptance/` holds only `scenarios/`, `fixtures/`, and `runner/`.
+When the project has `contracts/specifications/` or `contract-tests/`, every `contract.md` has a matching path in
+`contracts/fixtures/`, `contract-tests/runner/`, and `contract-tests/wiring/`, and a path with no specification is an
+error. `specifications/` holds Markdown only, and `fixtures/` holds data suffixes, with more allowed by
+`contracts.fixture_suffixes` in `architecture.yaml`. An older layout, one folder per contract, passes without these
+checks. ADR 0150 in Threnos gives the rules.
+
 ## Open points
 
 - Whether a product record that spans many components lists them all or only the ones it changes most.

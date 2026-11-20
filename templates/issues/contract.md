@@ -7,7 +7,7 @@ title: 'Contract: '
 
 ## Component
 
-Name and path, for example `section/selector` and `contracts/section/selector/`.
+Name and path, for example `section/selector` and `contracts/specifications/section/selector/`.
 
 ## Inputs
 

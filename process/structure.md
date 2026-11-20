@@ -27,7 +27,8 @@ without changing neighboring contracts. Dependency positions and pace layers des
 | ----------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------ |
 | Components, grouped `<noun>/<role>` | One component each, such as `section/selector`                                             | Rebuilt freely                 |
 | Domain model                        | The shared types                                                                           | By ADR only                    |
-| `contracts/`                        | One folder per component, mirroring the component folders                                  | A person approves              |
+| `contracts/`                        | Specifications and fixtures, one path per component, mirroring the component folders       | A person approves              |
+| `contract-tests/`                   | The language-bound suite and wiring for each contract, and a shared harness                | A person approves              |
 | `acceptance/`                       | Scenarios as data, their fixtures, and a replaceable runner                                | A person approves              |
 | Entry point                         | Wiring only                                                                                | Rebuilt with whatever it wires |
 | `docs/`                             | Decisions, reference, architecture, stack. See [docs and decisions](docs-and-decisions.md) | Each at its own pace           |
@@ -38,16 +39,29 @@ Name a unit for what it acts on and what it does: the noun, then the role. A nam
 docs, write plain spaced words, such as "section selector". In code, the parent folder carries the noun and the module
 carries the role. Spell words out or use a common short form such as `config`. Do not coin abbreviations.
 
-## The contract folder
+## The contract
 
-Each component has a contract folder, and the contract outlives the component.
+A component's contract is four mirrored paths, and it outlives the component.
+[ADR 0150](../docs/decisions/0150-contracts-hold-data-and-contract-tests-hold-the-code.md) gives the reasons.
 
-- The **interface** lives in the contract folder, not in the component. Deleting the component does not delete its
-  specification. The component imports its own contract to implement it.
-- A **wiring test** is the only place a contract touches its implementation, through one constructor call. A rebuild
-  that changes the entry point fails there. It makes the permanent folder depend on the disposable one, but only in one
-  test file.
-- Contract folders may import only the domain model and shared test code. A type that several contracts need must
+| Path                            | Holds                                                                         | Language-bound |
+| ------------------------------- | ----------------------------------------------------------------------------- | -------------- |
+| `contracts/specifications/<c>/` | `contract.md`, the behavior in plain words                                    | No             |
+| `contracts/fixtures/<c>/`       | The cases, as data                                                            | No             |
+| `contract-tests/runner/<c>/`    | The suite: loads the cases, calls the component's operations, and judges them | Yes            |
+| `contract-tests/wiring/<c>/`    | The connection from the suite to one implementation                           | Yes            |
+
+`<c>` is `<noun>/<role>`. `contract-tests/harness/` holds test code that suites share, such as turning fixture data into
+model values.
+
+- `contracts/` holds Markdown and data, so a change of language replaces `contract-tests/` and leaves `contracts/`
+  alone.
+- The **suite** declares the operations it calls, where the language has a way to declare them. The drafter writes it
+  with the wiring, and the builder does neither. The component does not import the suite, so deleting the component
+  deletes nothing that a rebuild needs.
+- The **wiring** is the only code that imports a component, through one constructor call. A rebuild that changes the
+  entry point fails there. It keeps the call that runs the suite in the protected tree, where a rebuild cannot drop it.
+- The suite and the harness import only the domain model and the harness. A type that several contracts need must
   therefore live in the domain model.
 
 [contracts.md](contracts.md) covers what goes in one.
@@ -80,9 +94,11 @@ rules.
 - **An extractor** reads the source and emits a plain graph: each component and what it imports. It is the only
   language-specific part, along with the map from each banned category to that language's libraries.
 - **A checker** compares the graph with the rules, and reports each violation with the import that proves it. It also
-  checks that `acceptance/` imports only what `acceptance.may_import` lists, never the project's own implementation.
-- **File system checks** need no parser: the folder layout, the naming, that every component has a contract folder, and
-  that the docs' tables match `architecture.yaml`.
+  checks that `acceptance/` imports only what `acceptance.may_import` lists, never the project's own implementation, and
+  that the contract tests import only what their role allows.
+- **File system checks** need no parser: the folder layout, the naming, that every specification has fixtures, a suite,
+  and a wiring path and the reverse, that `acceptance/` holds only its three folders, and that the docs' tables match
+  `architecture.yaml`.
 
 Start with the language's own tooling for the extractor, because it resolves imports exactly.
 

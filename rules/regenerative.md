@@ -78,9 +78,12 @@ exceptions. Spell words out or use a common short form such as `config`. Do not 
 - A component is one module under the components folder (`components_root`). Rebuilding a component means deleting its
   folder and regenerating it from its contract, its architecture doc, and the dependency rules in `architecture.yaml`.
 - A rebuild touches only that component's folder.
-- Never edit `contracts/`, `acceptance/`, `architecture.yaml`, or the domain model in the model folder (`model`) as part
-  of a rebuild. Stop and ask a person.
+- Never edit `contracts/`, `contract-tests/`, `acceptance/`, `architecture.yaml`, or the domain model in the model
+  folder (`model`) as part of a rebuild. Stop and ask a person.
 - Never write or change the tests that judge your own build.
+- To build a component, read its `contracts/specifications/<noun>/<role>/contract.md` and the operations its suite
+  declares in `contract-tests/runner/<noun>/<role>/`. A project that has not moved to that layout keeps both in
+  `contracts/<noun>/<role>/`. Run the suite. Open the suite and the fixtures only to debug a failure.
 - When you find that a contract conflicts with another document, is incomplete, or looks wrong, stop and report it. Do
   not edit the contract unless a person authorizes that specific change.
 - When building a component, first run its contract tests against a stub and confirm that every test that exercises the
@@ -105,8 +108,8 @@ exceptions. Spell words out or use a common short form such as `config`. Do not 
 ## Approvals
 
 When the project has `.threnos/approvals.yaml`, it holds an approval for each protected unit: a component's contract
-folder, `acceptance/`, `architecture.yaml`, and the model folder. A unit that changes after its approval fails the
-records check until a new approval covers it.
+(its specification, fixtures, suite, and wiring), `acceptance/`, `architecture.yaml`, and the model folder. A unit that
+changes after its approval fails the records check until a new approval covers it.
 
 - Record an approval only with `nix run .#approve -- <gate> [unit] --approver <who>`, which writes the unit's hash.
   Never edit the ledger by hand. When a unit was renamed or deleted, its old entry fails the check. Drop it with
