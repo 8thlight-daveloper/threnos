@@ -30,40 +30,23 @@ func splitProject(t *testing.T) string {
 	return root
 }
 
-func TestTheSplitLayoutIsDetectedFromTheSpecificationsFolder(t *testing.T) {
-	if !defaultLayout().detect(splitProject(t)).split {
-		t.Error("a project with contracts/specifications was not split")
-	}
-	older := t.TempDir()
-	writeFile(t, older, "contracts/noun/role/contract.md", "x")
-	if defaultLayout().detect(older).split {
-		t.Error("a project with one folder per contract was called split")
-	}
-}
-
-func TestTheWiringPackageRunsTheTestsInTheSplitLayout(t *testing.T) {
-	place := defaultLayout().detect(splitProject(t))
+func TestTheWiringPackageRunsTheTests(t *testing.T) {
+	place := defaultLayout()
 	if got, want := contractPathFrom(place, "noun/role"), "../../../contract-tests/wiring/noun/role/"; got != want {
 		t.Errorf("contractPathFrom = %q, want %q", got, want)
 	}
 }
 
-func TestTheOlderLayoutStillRunsTheContractFolder(t *testing.T) {
-	if got, want := contractPathFrom(defaultLayout(), "noun/role"), "../../../contracts/noun/role/"; got != want {
-		t.Errorf("contractPathFrom = %q, want %q", got, want)
-	}
-}
-
 func TestACustomTestsFolderMovesTheWiringPackage(t *testing.T) {
-	place := layout{components: "src/parts", contracts: "specs", tests: "judge", split: true}
+	place := layout{components: "src/parts", contracts: "specs", tests: "judge"}
 	if got, want := contractPathFrom(place, "record/joiner"), "../../../../judge/wiring/record/joiner/"; got != want {
 		t.Errorf("contractPathFrom = %q, want %q", got, want)
 	}
 }
 
-func TestAComponentNeedsAWiringPackageInTheSplitLayout(t *testing.T) {
+func TestAComponentNeedsAWiringPackage(t *testing.T) {
 	root := splitProject(t)
-	place := defaultLayout().detect(root)
+	place := defaultLayout()
 	if err := checkComponent(root, place, "noun/role"); err != nil {
 		t.Fatal(err)
 	}
@@ -76,9 +59,9 @@ func TestAComponentNeedsAWiringPackageInTheSplitLayout(t *testing.T) {
 	}
 }
 
-func TestSuiteDigestCoversEveryFolderOfTheSplitLayoutAndTheHarness(t *testing.T) {
+func TestSuiteDigestCoversEveryFolderAndTheHarness(t *testing.T) {
 	root := splitProject(t)
-	place := defaultLayout().detect(root)
+	place := defaultLayout()
 	first, err := suiteDigest(root, place, "noun/role")
 	if err != nil {
 		t.Fatal(err)
@@ -106,9 +89,9 @@ func TestSuiteDigestCoversEveryFolderOfTheSplitLayoutAndTheHarness(t *testing.T)
 	}
 }
 
-func TestSuiteDigestIgnoresAnotherComponentInTheSplitLayout(t *testing.T) {
+func TestSuiteDigestIgnoresAnotherComponent(t *testing.T) {
 	root := splitProject(t)
-	place := defaultLayout().detect(root)
+	place := defaultLayout()
 	first, _ := suiteDigest(root, place, "noun/role")
 	writeFile(t, root, "contracts/fixtures/noun/other/cases.json", "[1]")
 	second, _ := suiteDigest(root, place, "noun/role")
@@ -122,7 +105,7 @@ func TestAMissingHarnessDoesNotStopTheDigest(t *testing.T) {
 	if err := os.RemoveAll(filepath.Join(root, "contract-tests", "harness")); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := suiteDigest(root, defaultLayout().detect(root), "noun/role"); err != nil {
+	if _, err := suiteDigest(root, defaultLayout(), "noun/role"); err != nil {
 		t.Fatal(err)
 	}
 }

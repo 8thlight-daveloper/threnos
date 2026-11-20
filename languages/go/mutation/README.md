@@ -40,16 +40,14 @@ Build gomu with the same Go version that runs the tests. A gomu built with Go 1.
 | `bar.sh`        | none             | Draws the time bar that the summary and the report use                                     |
 | `seedfloors.sh` | none             | Writes a score floor for each component from a set of results                              |
 
-## Two layouts
+## The contract layout
 
-In the split layout of [ADR 0150](../../../docs/decisions/0150-contracts-hold-data-and-contract-tests-hold-the-code.md),
-`contracts/` holds `specifications/` and `fixtures/`, and `contract-tests/` holds `runner/`, `wiring/`, and `harness/`.
-`gomurun` runs the tests of `contract-tests/wiring/<component>`, because that package holds the test that calls the
-suite. The cache key covers the component's four folders and the harness. `plan.sh` treats a change in any of them as a
-change to the component, and a change to the harness as a change to every component.
-
-A project is in the split layout when `contracts/specifications/` exists. Otherwise `gomurun` runs the tests of
-`contracts/<component>`, as before.
+[ADR 0150](../../../docs/decisions/0150-contracts-hold-data-and-contract-tests-hold-the-code.md) puts `specifications/`
+and `fixtures/` under `contracts/`, and `runner/`, `wiring/`, and `harness/` under `contract-tests/`. `gomurun` runs the
+tests of `contract-tests/wiring/<component>`, because that package holds the test that calls the suite. The cache key
+covers the component's four folders and the harness. `plan.sh` treats a change in any of them as a change to the
+component, and a change to the harness as a change to every component. A project that keeps one folder per contract does
+not work with this adapter. It keeps the Threnos version that supports it.
 
 ## What `gomurun` does
 

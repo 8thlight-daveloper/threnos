@@ -35,8 +35,8 @@ func run(args []string) int {
 	defaults := defaultLayout()
 	place := layout{}
 	options.StringVar(&place.components, "components", defaults.components, "folder that holds the components")
-	options.StringVar(&place.contracts, "contracts", defaults.contracts, "folder that holds the contracts, or the contract packages in the older layout")
-	options.StringVar(&place.tests, "contract-tests", defaults.tests, "folder that holds the contract tests in the split layout")
+	options.StringVar(&place.contracts, "contracts", defaults.contracts, "folder that holds the specifications and the fixtures")
+	options.StringVar(&place.tests, "contract-tests", defaults.tests, "folder that holds the suites, the wiring, and the harness")
 	options.StringVar(&place.accepted, "accepted", defaults.accepted, "folder that holds the accepted survivor lists")
 	options.StringVar(&place.gomuVersion, "gomu-version", defaults.gomuVersion, "gomu version, which is part of the cache key")
 	if options.Parse(args) != nil || options.NArg() != 1 {
@@ -54,7 +54,6 @@ func run(args []string) int {
 		fmt.Fprintln(os.Stderr, err)
 		return exitProblem
 	}
-	place = place.detect(root)
 	if problem := checkComponent(root, place, component); problem != nil {
 		fmt.Fprintln(os.Stderr, problem)
 		return exitUsage

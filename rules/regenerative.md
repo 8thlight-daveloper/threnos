@@ -82,8 +82,8 @@ exceptions. Spell words out or use a common short form such as `config`. Do not 
   folder (`model`) as part of a rebuild. Stop and ask a person.
 - Never write or change the tests that judge your own build.
 - To build a component, read its `contracts/specifications/<noun>/<role>/contract.md` and the operations its suite
-  declares in `contract-tests/runner/<noun>/<role>/`. A project that has not moved to that layout keeps both in
-  `contracts/<noun>/<role>/`. Run the suite. Open the suite and the fixtures only to debug a failure.
+  declares in `contract-tests/runner/<noun>/<role>/`. Run the suite. Open the suite and the fixtures only to debug a
+  failure.
 - When you find that a contract conflicts with another document, is incomplete, or looks wrong, stop and report it. Do
   not edit the contract unless a person authorizes that specific change.
 - When building a component, first run its contract tests against a stub and confirm that every test that exercises the

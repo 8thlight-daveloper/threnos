@@ -89,12 +89,6 @@ def contract_roots(architecture):
     return (architecture.get("contracts_root") or "contracts", architecture.get("contract_tests_root") or "contract-tests")
 
 
-def uses_split_layout(root, architecture):
-    """True when the project has moved to specifications/ or contract-tests/. Older projects keep one folder per contract."""
-    contracts, tests = contract_roots(architecture)
-    return (Path(root) / contracts / SPECIFICATIONS).is_dir() or (Path(root) / tests).is_dir()
-
-
 def specification_ids(root, architecture):
     """Return the component ids that have a contract.md under specifications/."""
     contracts, _ = contract_roots(architecture)
@@ -121,12 +115,12 @@ def under_a_component(relative, ids):
 
 
 def contracts_problems(root, architecture):
-    """Return problems with the layout of the contracts and the contract tests. An older layout has none."""
-    if not uses_split_layout(root, architecture):
-        return []
+    """Return problems with the layout of the contracts and the contract tests. A project with neither folder has none."""
     root = Path(root)
     contracts, tests = contract_roots(architecture)
     base, tests_base = root / contracts, root / tests
+    if not base.is_dir() and not tests_base.is_dir():
+        return []
     problems = []
     for folder, allowed in ((base, CONTRACT_FOLDERS), (tests_base, TEST_FOLDERS)):
         if not folder.is_dir():

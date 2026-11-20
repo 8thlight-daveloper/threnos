@@ -22,33 +22,6 @@ func TestCacheKeyChangesWithTheSourceTheSuiteAndShortRuns(t *testing.T) {
 	}
 }
 
-func TestSuiteDigestChangesWhenAnyContractFileChanges(t *testing.T) {
-	root := t.TempDir()
-	folder := filepath.Join(root, "contracts", "noun", "role", "testdata")
-	if err := os.MkdirAll(folder, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	write := func(name string, text string) {
-		if err := os.WriteFile(filepath.Join(root, "contracts", "noun", "role", name), []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	write("a_test.go", "one")
-	write("testdata/fixture.yaml", "x")
-	first, err := suiteDigest(root, defaultLayout(), "noun/role")
-	if err != nil {
-		t.Fatal(err)
-	}
-	write("testdata/fixture.yaml", "y")
-	second, err := suiteDigest(root, defaultLayout(), "noun/role")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if first == second {
-		t.Fatal("a changed fixture kept the digest")
-	}
-}
-
 func TestSourceFilesLeavesOutTestsAndFolders(t *testing.T) {
 	root := t.TempDir()
 	folder := filepath.Join(root, "internal", "noun", "role")
@@ -75,7 +48,7 @@ func TestCachedResultsMutateEveryFileWhenAnySourceFileChanges(t *testing.T) {
 	if err := os.MkdirAll(folder, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Join(root, "contracts", "noun", "role"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, "contract-tests", "wiring", "noun", "role"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	for name, text := range map[string]string{"a.go": "package role", "b.go": "package role"} {

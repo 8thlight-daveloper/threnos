@@ -48,7 +48,7 @@ def digest(path):
 
 
 def unit_digest(root, architecture, unit):
-    """Return the hash of a unit. A contract in the split layout spans four folders, hashed together in a fixed order."""
+    """Return the hash of a unit. A contract spans four folders, hashed together in a fixed order."""
     contracts_root, _ = layout.contract_roots(architecture)
     prefix = f"{contracts_root}/{layout.SPECIFICATIONS}/"
     if not unit.startswith(prefix):
@@ -66,9 +66,7 @@ def units(root, architecture):
     """Return {gate: [unit path, ...]} for the protected units that exist, except `build`."""
     contracts_root, _ = layout.contract_roots(architecture)
     model = (architecture.get("model") or "").strip("/")
-    base = root / contracts_root
-    if (base / layout.SPECIFICATIONS).is_dir():
-        base = base / layout.SPECIFICATIONS
+    base = root / contracts_root / layout.SPECIFICATIONS
     contracts = sorted(each.parent.relative_to(root).as_posix() for each in base.rglob("contract.md")) if base.is_dir() else []
     return {
         "contracts": contracts,

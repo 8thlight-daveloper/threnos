@@ -7,28 +7,15 @@ components_dir="${COMPONENTS_DIR:-internal}"
 contracts_dir="${CONTRACTS_DIR:-contracts}"
 tests_dir="${CONTRACT_TESTS_DIR:-contract-tests}"
 model_dir="${MODEL_DIR:-$components_dir/model}"
-# The split layout of record 0150 has a specifications folder. The older layout has one folder per contract.
-split=false
-[ -d "$contracts_dir/specifications" ] && split=true
-shared_default="$model_dir go.mod go.sum tools/mutation flake.nix flake.lock justfile .github/workflows/mutate.yml"
-[ "$split" = true ] && shared_default="$shared_default $tests_dir/harness"
-read -ra shared_paths <<< "${SHARED_PATHS:-$shared_default}"
+read -ra shared_paths <<< "${SHARED_PATHS:-$model_dir go.mod go.sum tools/mutation flake.nix flake.lock justfile .github/workflows/mutate.yml $tests_dir/harness}"
 
-# The folders that decide a component's results, besides its own source.
+# The folders that decide a component's results, besides its own source. Record 0150 sets them.
 suite_paths() {
-    if [ "$split" = true ]; then
-        echo "$contracts_dir/specifications/$1" "$contracts_dir/fixtures/$1" "$tests_dir/runner/$1" "$tests_dir/wiring/$1"
-    else
-        echo "$contracts_dir/$1"
-    fi
+    echo "$contracts_dir/specifications/$1" "$contracts_dir/fixtures/$1" "$tests_dir/runner/$1" "$tests_dir/wiring/$1"
 }
 
 has_suite() {
-    if [ "$split" = true ]; then
-        [ -d "$tests_dir/wiring/$1" ]
-    else
-        [ -d "$contracts_dir/$1" ]
-    fi
+    [ -d "$tests_dir/wiring/$1" ]
 }
 
 components() {

@@ -123,10 +123,8 @@ def load_architecture(root):
 
 
 def load_contracts(root, contracts_root):
-    base = root / contracts_root
+    base = root / contracts_root / layout.SPECIFICATIONS
     contracts = {}
-    if (base / layout.SPECIFICATIONS).is_dir():
-        base = base / layout.SPECIFICATIONS
     if not base.is_dir():
         return contracts
     for path in sorted(base.rglob("contract.md")):

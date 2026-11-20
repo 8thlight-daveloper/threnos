@@ -2,8 +2,8 @@
 
 The mapping for the contract layout of
 [ADR 0150](../docs/decisions/0150-contracts-hold-data-and-contract-tests-hold-the-code.md). Copy it to
-`docs/stack/code-layout.md` in a Go project. The checks still accept the older layout, one folder per contract with
-`api.go`, `contract.md`, the tests, and `testdata/` together, until a project moves.
+`docs/stack/code-layout.md` in a Go project. The checks require this layout. A project that has not moved keeps the
+Threnos version it pins.
 
 ## Mapping
 

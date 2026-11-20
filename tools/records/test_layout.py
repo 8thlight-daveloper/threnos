@@ -106,8 +106,12 @@ class ContractLayout(unittest.TestCase):
     def assertProblem(self, found, fragment):
         self.assertTrue(any(fragment in each for each in found), f"{fragment!r} not in {found}")
 
-    def test_the_older_layout_has_no_problems(self):
-        self.assertEqual(contract_problems({"contracts/plan/decoder/contract.md": "x\n", "contracts/plan/decoder/a.go": ""}), [])
+    def test_a_project_with_neither_folder_has_no_problems(self):
+        self.assertEqual(contract_problems({"README.md": ""}), [])
+
+    def test_one_folder_per_contract_is_no_longer_accepted(self):
+        found = contract_problems({"contracts/plan/decoder/contract.md": "x\n", "contracts/plan/decoder/a.go": ""})
+        self.assertProblem(found, "contracts/plan: contracts/ holds only specifications/, fixtures/")
 
     def test_a_complete_split_layout_passes(self):
         self.assertEqual(contract_problems(SPLIT), [])

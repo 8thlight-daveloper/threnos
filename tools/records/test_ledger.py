@@ -37,10 +37,23 @@ def write(root, files):
         path.write_text(text)
 
 
+UNIT = "contracts/specifications/plan/decoder"
+ARCH = {"contracts_root": "contracts", "contract_tests_root": "contract-tests", "model": "model"}
+
+
+def contract_files(text, component="plan/decoder"):
+    return {
+        f"contracts/specifications/{component}/contract.md": text,
+        f"contracts/fixtures/{component}/cases.json": "[]\n",
+        f"contract-tests/runner/{component}/suite.go": "package suite\n",
+        f"contract-tests/wiring/{component}/wire_test.go": "package wiring\n",
+    }
+
+
 def entry(root, gate, unit, approver=PERSON, author=None, **changes):
     found = {"gate": gate, "unit": unit, "approver": approver, "date": datetime.date(2026, 11, 11)}
     if gate != "build":
-        found["hash"] = ledger.digest(Path(root) / unit)
+        found["hash"] = ledger.unit_digest(Path(root), ARCH, unit)
     if author:
         found["author"] = author
     return {**found, **changes}
@@ -53,16 +66,15 @@ class LedgerChecks(unittest.TestCase):
         self.root = Path(folder.name)
         write(self.root, {
             "architecture.yaml": ARCHITECTURE,
-            "contracts/plan/decoder/contract.md": "Decodes.\n",
-            "contracts/plan/decoder/cases.json": "[]\n",
-            "contracts/harness/helper.go": "package harness\n",
+            **contract_files("Decodes.\n"),
+            "contract-tests/harness/helper.go": "package harness\n",
             "acceptance/scenarios/a.yaml": "name: a\n",
             "model/model.go": "package model\n",
         })
 
     def everything(self, **per_gate):
         return [
-            entry(self.root, "contracts", "contracts/plan/decoder", **per_gate.get("contracts", {})),
+            entry(self.root, "contracts", UNIT, **per_gate.get("contracts", {})),
             entry(self.root, "acceptance", "acceptance", **per_gate.get("acceptance", {})),
             entry(self.root, "architecture", "architecture.yaml", **per_gate.get("architecture", {})),
             entry(self.root, "model", "model", **per_gate.get("model", {})),
@@ -86,9 +98,9 @@ class LedgerChecks(unittest.TestCase):
     def test_a_complete_ledger_passes(self):
         self.assertEqual(self.problems(self.everything()), [])
 
-    def test_a_contract_folder_is_a_unit_and_a_shared_helper_folder_is_not(self):
+    def test_a_specification_folder_is_a_unit_and_the_harness_is_not(self):
         known = ledger.units(self.root, {"model": "model"})
-        self.assertEqual(known["contracts"], ["contracts/plan/decoder"])
+        self.assertEqual(known["contracts"], [UNIT])
 
     def test_a_unit_with_no_entry_is_reported(self):
         problems = self.problems(self.everything()[:3])
@@ -96,8 +108,8 @@ class LedgerChecks(unittest.TestCase):
 
     def test_a_unit_that_changed_after_approval_is_reported(self):
         entries = self.everything()
-        write(self.root, {"contracts/plan/decoder/cases.json": "[1]\n"})
-        self.assertProblem(self.problems(entries), "contracts contracts/plan/decoder changed since it was approved on 2026-11-11")
+        write(self.root, {"contracts/fixtures/plan/decoder/cases.json": "[1]\n"})
+        self.assertProblem(self.problems(entries), f"contracts {UNIT} changed since it was approved on 2026-11-11")
 
     def test_a_new_file_in_a_unit_changes_its_hash(self):
         entries = self.everything()
@@ -105,7 +117,7 @@ class LedgerChecks(unittest.TestCase):
         self.assertProblem(self.problems(entries), "acceptance acceptance changed")
 
     def test_an_unknown_unit_is_reported(self):
-        entries = self.everything() + [{**entry(self.root, "contracts", "contracts/plan/decoder"), "unit": "contracts/ghost"}]
+        entries = self.everything() + [{**entry(self.root, "contracts", UNIT), "unit": "contracts/ghost"}]
         self.assertProblem(self.problems(entries), "is not a contracts unit in this project")
 
     def test_two_entries_for_one_unit_are_reported(self):
@@ -172,7 +184,7 @@ class LedgerChecks(unittest.TestCase):
     def test_the_records_check_runs_the_ledger(self):
         write(self.root, {".threnos/approvals.yaml": "approvals: []\n"})
         problems, _ = check.check(self.root)
-        self.assertProblem(problems, "contracts contracts/plan/decoder has no approval")
+        self.assertProblem(problems, f"contracts {UNIT} has no approval")
 
     def test_identity_is_validated_where_a_user_may_set_it(self):
         self.assertEqual(check.local_problems({"identity": {"name": "Dana"}}), [])
@@ -221,7 +233,7 @@ class Approve(unittest.TestCase):
         self.addCleanup(patch.stop)
         write(self.root, {
             "architecture.yaml": ARCHITECTURE,
-            "contracts/plan/decoder/contract.md": "Decodes.\n",
+            **contract_files("Decodes.\n"),
             "model/model.go": "package model\n",
         })
 
@@ -285,22 +297,22 @@ class Approve(unittest.TestCase):
         self.assertEqual(self.run_approve("contracts", "contracts/ghost", "--approver", "person:Dana"), 1)
 
     def test_a_gate_with_many_units_needs_a_name(self):
-        write(self.root, {"contracts/plan/other/contract.md": "Other.\n"})
+        write(self.root, contract_files("Other.\n", "plan/other"))
         self.assertEqual(self.run_approve("contracts", "--approver", "person:Dana"), 1)
 
     def stale_entry(self):
-        self.run_approve("contracts", "contracts/plan/decoder", "--approver", "person:Dana")
+        self.run_approve("contracts", UNIT, "--approver", "person:Dana")
         self.run_approve("model", "--approver", "person:Dana")
-        (self.root / "contracts/plan/decoder/contract.md").rename(self.root / "contracts/plan/decoder/old.md")
-        write(self.root, {"contracts/plan/codec/contract.md": "Codec.\n"})
+        write(self.root, contract_files("Codec.\n", "plan/codec"))
         import shutil
-        shutil.rmtree(self.root / "contracts/plan/decoder")
+        for folder in ("contracts/specifications", "contracts/fixtures", "contract-tests/runner", "contract-tests/wiring"):
+            shutil.rmtree(self.root / folder / "plan/decoder")
 
     def test_remove_drops_the_entry_of_a_unit_that_is_gone_and_keeps_the_others(self):
         self.stale_entry()
         problems, _ = check.check(self.root)
-        self.assertTrue(any("run: nix run .#approve -- --remove contracts contracts/plan/decoder" in each for each in problems), problems)
-        self.assertEqual(self.run_approve("--remove", "contracts", "contracts/plan/decoder"), 0)
+        self.assertTrue(any(f"run: nix run .#approve -- --remove contracts {UNIT}" in each for each in problems), problems)
+        self.assertEqual(self.run_approve("--remove", "contracts", UNIT), 0)
         self.assertEqual([(each["gate"], each["unit"]) for each in self.read()], [("model", "model")])
 
     def test_remove_refuses_while_the_unit_exists(self):
@@ -425,13 +437,6 @@ class SplitContractUnit(unittest.TestCase):
         first = self.digest()
         write(self.root, {"contract-tests/harness/load.go": "package harness\n"})
         self.assertEqual(self.digest(), first)
-
-    def test_the_older_layout_hashes_its_one_folder_as_before(self):
-        write(self.root, {"older/plan/decoder/contract.md": "x\n"})
-        self.assertEqual(
-            ledger.unit_digest(self.root, {"contracts_root": "older"}, "older/plan/decoder"),
-            ledger.digest(self.root / "older/plan/decoder"),
-        )
 
     def test_the_ledger_reports_a_change_after_approval(self):
         entries = [entry(self.root, "contracts", self.UNIT, hash=self.digest())]

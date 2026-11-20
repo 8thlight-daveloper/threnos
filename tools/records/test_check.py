@@ -28,6 +28,15 @@ def record(number, front, title="Title"):
     return f"---\n{front}---\n\n# {number}. {title}\n\n## Context\n"
 
 
+def contract(text, component="plan/decoder"):
+    return {
+        f"contracts/specifications/{component}/contract.md": text,
+        f"contracts/fixtures/{component}/cases.json": "[]\n",
+        f"contract-tests/runner/{component}/suite.go": "package suite\n",
+        f"contract-tests/wiring/{component}/wire_test.go": "package wiring\n",
+    }
+
+
 def run(files, architecture=ARCHITECTURE):
     with tempfile.TemporaryDirectory() as root:
         files = dict(files)
@@ -105,7 +114,7 @@ class RecordChecks(unittest.TestCase):
     def test_a_contract_that_cites_a_product_record_must_be_in_its_affects(self):
         files = {
             "docs/decisions/0010-first.md": record("0010", "category: behavior\nstatus: proposed\naffects: [tui]\n"),
-            "contracts/plan/decoder/contract.md": "Follows [0010].\n",
+            **contract("Follows [0010].\n"),
         }
         problems, _ = run(files)
         self.assertProblem(problems, "the contract of plan/decoder cites this record")
@@ -114,7 +123,7 @@ class RecordChecks(unittest.TestCase):
         files = {
             "docs/decisions/0010-first.md": record("0010", "category: architecture\nstatus: proposed\n"),
             "docs/decisions/0020-second.md": record("0020", "category: regenerative-process\nstatus: proposed\n"),
-            "contracts/plan/decoder/contract.md": "See [0010] and ADR 0020.\n",
+            **contract("See [0010] and ADR 0020.\n"),
         }
         problems, _ = run(files)
         self.assertEqual(problems, [])
@@ -122,7 +131,7 @@ class RecordChecks(unittest.TestCase):
     def test_a_file_mode_is_not_a_citation(self):
         files = {
             "docs/decisions/0640-first.md": record("0640", "category: behavior\nstatus: proposed\naffects: [tui]\n"),
-            "contracts/plan/decoder/contract.md": "Writes the file with mode 0640.\n",
+            **contract("Writes the file with mode 0640.\n"),
         }
         problems, _ = run(files)
         self.assertEqual(problems, [])
@@ -130,7 +139,7 @@ class RecordChecks(unittest.TestCase):
     def test_a_listed_component_that_does_not_cite_the_record_is_only_a_note(self):
         files = {
             "docs/decisions/0010-first.md": record("0010", "category: behavior\nstatus: proposed\naffects: [plan/decoder]\n"),
-            "contracts/plan/decoder/contract.md": "No citation here.\n",
+            **contract("No citation here.\n"),
         }
         problems, notes = run(files)
         self.assertEqual(problems, [])

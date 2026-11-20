@@ -116,10 +116,10 @@ func TestAMissingAcceptedListAcceptsNothing(t *testing.T) {
 	}
 }
 
-func TestTheContractFolderIsFoundFromTheComponentFolder(t *testing.T) {
+func TestTheWiringPackageIsFoundFromTheComponentFolder(t *testing.T) {
 	cases := map[string]string{
-		"record/joiner": "../../../contracts/record/joiner/",
-		"secrets":       "../../contracts/secrets/",
+		"record/joiner": "../../../contract-tests/wiring/record/joiner/",
+		"secrets":       "../../contract-tests/wiring/secrets/",
 	}
 	for component, want := range cases {
 		if got := contractPathFrom(defaultLayout(), component); got != want {
@@ -155,7 +155,7 @@ func TestAReportThatIsNotJSONIsRefused(t *testing.T) {
 
 func TestTheTestBinaryGetsItsOwnTimeoutSoAHungMutantCannotOutliveTheRun(t *testing.T) {
 	arguments := gomuArguments(".direnv/bin/gomu", defaultLayout(), "./internal/record/joiner", "record/joiner", 1, 30, false)
-	want := []string{"--", "-count=1", "-failfast", "-timeout=30s", "../../../contracts/record/joiner/"}
+	want := []string{"--", "-count=1", "-failfast", "-timeout=30s", "../../../contract-tests/wiring/record/joiner/"}
 	tail := arguments[len(arguments)-len(want):]
 	if strings.Join(tail, " ") != strings.Join(want, " ") {
 		t.Fatalf("test flags are %v, want %v", tail, want)
@@ -174,16 +174,16 @@ func TestGomuWaitsLongerThanTheTestBinaryDoes(t *testing.T) {
 
 func TestShortRunsPassShortToTheTestBinaryBeforeThePackage(t *testing.T) {
 	arguments := gomuArguments(".direnv/bin/gomu", defaultLayout(), "./internal/secrets", "secrets", 1, 30, true)
-	want := []string{"--", "-count=1", "-failfast", "-timeout=30s", "-short", "../../contracts/secrets/"}
+	want := []string{"--", "-count=1", "-failfast", "-timeout=30s", "-short", "../../contract-tests/wiring/secrets/"}
 	tail := arguments[len(arguments)-len(want):]
 	if strings.Join(tail, " ") != strings.Join(want, " ") {
 		t.Fatalf("test flags are %v, want %v", tail, want)
 	}
 }
 
-func TestAnotherLayoutMovesTheContractFolderAndTheTarget(t *testing.T) {
-	place := layout{components: "src/parts", contracts: "specs", accepted: "mutation/accepted", gomuVersion: "v0.3.0"}
-	if got, want := contractPathFrom(place, "record/joiner"), "../../../../specs/record/joiner/"; got != want {
+func TestAnotherLayoutMovesTheWiringFolderAndTheTarget(t *testing.T) {
+	place := layout{components: "src/parts", contracts: "specs", tests: "judge", accepted: "mutation/accepted", gomuVersion: "v0.3.0"}
+	if got, want := contractPathFrom(place, "record/joiner"), "../../../../judge/wiring/record/joiner/"; got != want {
 		t.Errorf("contractPathFrom = %q, want %q", got, want)
 	}
 	if got, want := componentTarget(place, "record/joiner"), "./src/parts/record/joiner"; got != want {
@@ -193,11 +193,11 @@ func TestAnotherLayoutMovesTheContractFolderAndTheTarget(t *testing.T) {
 
 func TestFolderFlagsAreCleanedBeforeTheContractPathIsBuilt(t *testing.T) {
 	for _, components := range []string{"internal", "./internal", "internal/", "./internal/"} {
-		place, err := layout{components: components, contracts: "./contracts/", accepted: "tools/mutation/accepted"}.normalized()
+		place, err := layout{components: components, contracts: "./contracts/", tests: "./contract-tests/", accepted: "tools/mutation/accepted"}.normalized()
 		if err != nil {
 			t.Fatalf("%q: %v", components, err)
 		}
-		if got, want := contractPathFrom(place, "record/joiner"), "../../../contracts/record/joiner/"; got != want {
+		if got, want := contractPathFrom(place, "record/joiner"), "../../../contract-tests/wiring/record/joiner/"; got != want {
 			t.Errorf("components %q: contractPathFrom = %q, want %q", components, got, want)
 		}
 		if got, want := componentTarget(place, "record/joiner"), "./internal/record/joiner"; got != want {
@@ -208,7 +208,7 @@ func TestFolderFlagsAreCleanedBeforeTheContractPathIsBuilt(t *testing.T) {
 
 func TestAFolderFlagOutsideTheProjectIsRefused(t *testing.T) {
 	for _, bad := range []string{"/abs/internal", "../internal", ".."} {
-		if _, err := (layout{components: bad, contracts: "contracts", accepted: "accepted"}).normalized(); err == nil {
+		if _, err := (layout{components: bad, contracts: "contracts", tests: "contract-tests", accepted: "accepted"}).normalized(); err == nil {
 			t.Errorf("--components %q was accepted", bad)
 		}
 	}
