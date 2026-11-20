@@ -4,7 +4,7 @@ status: accepted
 approval: person
 builds-on: ['0020', '0030', '0060', '0110']
 partly-supersedes: ['0020', '0030']
-note: Replaces where the parts of a contract live, in the Layout of 0020 and the table of 0030. The rest of both stays. A paper sketch of a language without interfaces is still owed.
+note: Replaces where the parts of a contract live, in the Layout of 0020 and the table of 0030. The rest of both stays. languages/README.md holds a paper sketch of a language without interfaces, not yet tried.
 ---
 
 # 0150. Contracts hold data and contract tests hold the code
