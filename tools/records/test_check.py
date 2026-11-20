@@ -136,6 +136,21 @@ class RecordChecks(unittest.TestCase):
         self.assertEqual(problems, [])
         self.assertEqual(notes, ["0010-first.md: contracts of plan/decoder do not cite it"])
 
+    def test_a_record_that_names_a_language_construct_is_only_a_note(self):
+        text = record("0010", "category: operations\nstatus: proposed\n") + "Nothing calls `time.Now` or `read_all()` or `ClockSource`.\n"
+        problems, notes = run({"docs/decisions/0010-first.md": text})
+        self.assertEqual(problems, [])
+        self.assertEqual(
+            notes,
+            ["0010-first.md: names language-specific constructs: `time.Now`, `read_all()`, `ClockSource`"],
+        )
+
+    def test_neutral_backticks_and_fenced_code_raise_no_language_note(self):
+        body = "Set `approval: person` in `architecture.yaml`. Run `just check`.\n\n```go\nfmt.Println(time.Now())\n```\n"
+        text = record("0010", "category: operations\nstatus: proposed\n") + body
+        _, notes = run({"docs/decisions/0010-first.md": text})
+        self.assertEqual(notes, [])
+
     def test_a_map_of_components_is_read_as_well_as_a_list(self):
         problems, _ = run(
             {"docs/decisions/0010-first.md": record("0010", "category: behavior\nstatus: proposed\naffects: [plan/decoder]\n")},

@@ -105,6 +105,11 @@ A check also reports, without failing, an `affects` component whose contract doe
 rules and fixtures and keep no history, so many never cite the decision that shaped them. Components with no contract,
 such as the thin entry point, are skipped.
 
+A check also reports, without failing, a record whose prose has a backticked name that looks language-specific:
+`name()`, `pkg.Name`, CamelCase, `::`, or a source file extension. Fenced code is skipped. The scan is a heuristic. It
+misses plain words such as a bare `Now`, and a record that chooses a language may name it. A reviewer judges each note
+against the language-neutral rule in the shared rules.
+
 ## Open points
 
 - Whether a product record that spans many components lists them all or only the ones it changes most.

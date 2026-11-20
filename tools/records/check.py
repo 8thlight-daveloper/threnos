@@ -47,15 +47,22 @@ NOT_GATES = {"independence", "escalations"}
 USER_SETTINGS = {"approvals", "identity"}
 GLOBAL_SETTINGS = {"identity"}
 RECORD_FILE = re.compile(r"^(\d{4})-.+\.md$")
+LANGUAGE = "names language-specific constructs"
+FENCE = re.compile(r"^```.*?^```", re.DOTALL | re.MULTILINE)
+BACKTICKED = re.compile(r"`([^`\n]+)`")
+LANGUAGE_SHAPES = re.compile(
+    r"\w\(\)|\b[a-z]\w*\.[A-Z]\w*|\b[A-Z][a-z0-9]+[A-Z]\w*|::|\.(?:go|py|rs|ts|js|java|rb|swift|kt|cpp|c|h)\b"
+)
 CITATION = re.compile(r"\[(\d{4})\]|decisions/(\d{4})-|\bADRs? (\d{4})\b")
 
 
 class Record:
-    def __init__(self, number, file, heading, front):
+    def __init__(self, number, file, heading, front, body=""):
         self.number = number
         self.file = file
         self.heading = heading
         self.front = front
+        self.body = body
 
     def list_of(self, field):
         return [str(each) for each in (self.front.get(field) or [])]
@@ -81,7 +88,7 @@ def parse_record(number, file, text):
     if unknown:
         return None, f"{file}: front matter has unknown fields: {', '.join(unknown)}"
     heading = next((line for line in body.split("\n") if line.startswith("# ")), "")
-    return Record(number, file, heading, front), None
+    return Record(number, file, heading, front, body), None
 
 
 def load_records(root):
@@ -174,6 +181,15 @@ def unrecorded_note(one):
     if one.front.get("status") in GATED_STATUSES and one.front.get("approval") == "unrecorded":
         return f"{one.file}: {UNRECORDED}"
     return None
+
+
+def language_note(one):
+    prose = FENCE.sub("", one.body)
+    found = []
+    for span in BACKTICKED.findall(prose):
+        if LANGUAGE_SHAPES.search(span) and span not in found:
+            found.append(span)
+    return f"{one.file}: {LANGUAGE}: " + ", ".join(f"`{each}`" for each in found) if found else None
 
 
 def affects_problems(one, components):
@@ -417,7 +433,7 @@ def check(root, require_architecture=True):
     for one in records:
         problems += field_problems(one) + affects_problems(one, components) + link_problems(one, by_number)
         problems += citation_problems(one, contracts) + approval_gate_problems(one, config)
-        notes += [note for note in (uncited_note(one, contracts), unrecorded_note(one)) if note]
+        notes += [note for note in (uncited_note(one, contracts), unrecorded_note(one), language_note(one)) if note]
     problems += approvals_problems(config, ".threnos/config.toml") + principles_problems(root, records, config)
     if "identity" in config:
         problems.append(".threnos/config.toml: identity is user-only. Set it in .threnos/local.toml or the global file")
@@ -443,7 +459,8 @@ def main(args):
         return main_settings(Path(paths[0]) if paths else Path("."))
     problems, notes = check(Path(paths[0]) if paths else Path("."), require_architecture="--framework" not in args)
     unrecorded = [note for note in notes if note.endswith(UNRECORDED)]
-    uncited = [note for note in notes if note not in unrecorded]
+    language = [note for note in notes if LANGUAGE in note]
+    uncited = [note for note in notes if note not in unrecorded and note not in language]
     if verbose:
         for note in notes:
             print("note:", note)
@@ -452,6 +469,8 @@ def main(args):
             print(f"records that list a component whose contract does not cite them: {len(uncited)}, see check.py -v")
         if unrecorded:
             print(f"accepted records with approval unrecorded: {len(unrecorded)}, see check.py -v")
+        if language:
+            print(f"records that name language-specific constructs: {len(language)}, see check.py -v")
     if problems:
         print("found problems:\n  " + "\n  ".join(problems), file=sys.stderr)
         return 1
