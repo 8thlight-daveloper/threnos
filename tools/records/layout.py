@@ -21,9 +21,19 @@ def is_source(path):
     return path.suffix in SOURCE_SUFFIXES
 
 
+DATA_SCENARIO_SUFFIXES = {".yaml", ".yml"}
+SAMPLE_SUFFIX = ".example"
+
+
+def is_sample_or_note(path):
+    return path.suffix == SAMPLE_SUFFIX or path.name in ALLOWED_FILES
+
+
 def is_scenario(path, form):
-    """A data scenario is a `.yaml` file. A code scenario is a source file. A `.example` file is a sample."""
-    return is_source(path) if form == "code" else path.suffix in {".yaml", ".yml"}
+    """A data scenario is a YAML file. In code form every file that is not a sample or a README is scenario code."""
+    if is_sample_or_note(path):
+        return False
+    return path.suffix in DATA_SCENARIO_SUFFIXES if form == "data" else True
 
 
 def acceptance_problems(root, architecture):
@@ -49,10 +59,10 @@ def acceptance_problems(root, architecture):
             problems.append(f"{path.relative_to(root).as_posix()}: testdata holds data, not source files")
     if form == "data" and scenarios.is_dir():
         for path in files_under(scenarios):
-            if is_source(path):
+            if not is_sample_or_note(path) and path.suffix not in DATA_SCENARIO_SUFFIXES:
                 problems.append(
-                    f"{path.relative_to(root).as_posix()}: scenarios are data in this project. "
-                    "Put the code in runner/, or set acceptance.scenarios to code"
+                    f"{path.relative_to(root).as_posix()}: scenarios are YAML data in this project. "
+                    "Put code in runner/, or set acceptance.scenarios to code"
                 )
     has_scenarios = scenarios.is_dir() and any(is_scenario(path, form) for path in files_under(scenarios))
     has_runner = runner.is_dir() and any(path.name not in ALLOWED_FILES for path in files_under(runner))

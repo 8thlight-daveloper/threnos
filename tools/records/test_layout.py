@@ -60,7 +60,11 @@ class AcceptanceLayout(unittest.TestCase):
 
     def test_source_in_data_scenarios_fails(self):
         found = problems({"acceptance/scenarios/a_test.go": ""})
-        self.assertProblem(found, "scenarios are data in this project")
+        self.assertProblem(found, "scenarios are YAML data in this project")
+
+    def test_any_non_yaml_file_in_data_scenarios_fails_whatever_the_language(self):
+        found = problems({"acceptance/scenarios/a.rb": "", "acceptance/scenarios/b.exs": ""})
+        self.assertEqual(len([each for each in found if "scenarios are YAML data" in each]), 2)
 
     def test_code_scenarios_pass_with_a_runner(self):
         files = {
