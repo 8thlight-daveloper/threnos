@@ -17,6 +17,7 @@ from pathlib import Path
 
 import yaml
 
+import layout
 import ledger
 
 DECISIONS = "docs/decisions"
@@ -439,6 +440,7 @@ def check(root, require_architecture=True):
         problems.append(".threnos/config.toml: identity is user-only. Set it in .threnos/local.toml or the global file")
     architecture = yaml.safe_load((root / "architecture.yaml").read_text()) or {} if (root / "architecture.yaml").is_file() else {}
     problems += ledger.ledger_problems(root, config, architecture)
+    problems += layout.acceptance_problems(root, architecture)
     return sorted(problems), notes
 
 
