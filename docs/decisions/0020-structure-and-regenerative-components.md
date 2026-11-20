@@ -4,6 +4,7 @@ status: accepted
 approval: unrecorded
 builds-on: ['0010']
 note: Generalized from onboard-kit 0020, which is accepted there. Its component table is project state and is not part of this record.
+partly-superseded-by: ['0150']
 ---
 
 # 0020. Structure and regenerative components

@@ -3,7 +3,7 @@ category: regenerative-process
 status: accepted
 approval: unrecorded
 builds-on: ['0010', '0020']
-partly-superseded-by: ['0060']
+partly-superseded-by: ['0060', '0150']
 note: Generalized from onboard-kit 0025, which is accepted there. 0060 replaces the rule that scenarios are data.
 ---
 
