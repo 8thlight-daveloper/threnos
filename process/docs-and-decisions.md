@@ -24,7 +24,10 @@ Only ADRs are numbered. The rest are named for their topic.
   restate them.
 - Write the context, the decision, the consequences, and the alternatives considered.
   [templates/decisions/adr.md](../templates/decisions/adr.md) is the skeleton for a project record.
-- The language-specific half of a decision goes in the stack docs, so a change of language leaves the ADR in place.
+- State a decision in terms any language can implement: algorithms, byte formats, hash and encoding names, limits, and
+  error cases. Name no function, type, package, field, or standard library call. A rebuild in another language could
+  keep each sentence unchanged. The language-specific half of a decision goes in the stack docs, so a change of language
+  leaves the ADR in place. A record may name a language when the language is itself the decision.
 - An ADR is a record of a point in time. Once it is accepted, do not edit what it says. A decision that changes gets a
   new ADR that supersedes the old one, and a wrong or stale statement is answered the same way. An accepted record
   changes only in its front matter: `status`, the approval fields, `note`, and the links to other records. A record that
