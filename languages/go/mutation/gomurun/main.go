@@ -35,11 +35,12 @@ func run(args []string) int {
 	defaults := defaultLayout()
 	place := layout{}
 	options.StringVar(&place.components, "components", defaults.components, "folder that holds the components")
-	options.StringVar(&place.contracts, "contracts", defaults.contracts, "folder that holds the contract packages")
+	options.StringVar(&place.contracts, "contracts", defaults.contracts, "folder that holds the contracts, or the contract packages in the older layout")
+	options.StringVar(&place.tests, "contract-tests", defaults.tests, "folder that holds the contract tests in the split layout")
 	options.StringVar(&place.accepted, "accepted", defaults.accepted, "folder that holds the accepted survivor lists")
 	options.StringVar(&place.gomuVersion, "gomu-version", defaults.gomuVersion, "gomu version, which is part of the cache key")
 	if options.Parse(args) != nil || options.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: gomurun [--workers N] [--timeout S] [--short] [--cached] [--gomu PATH] [--components DIR] [--contracts DIR] [--accepted DIR] [--gomu-version V] <noun>/<role>")
+		fmt.Fprintln(os.Stderr, "usage: gomurun [--workers N] [--timeout S] [--short] [--cached] [--gomu PATH] [--components DIR] [--contracts DIR] [--contract-tests DIR] [--accepted DIR] [--gomu-version V] <noun>/<role>")
 		return exitUsage
 	}
 	place, err := place.normalized()
@@ -53,6 +54,7 @@ func run(args []string) int {
 		fmt.Fprintln(os.Stderr, err)
 		return exitProblem
 	}
+	place = place.detect(root)
 	if problem := checkComponent(root, place, component); problem != nil {
 		fmt.Fprintln(os.Stderr, problem)
 		return exitUsage
@@ -133,9 +135,9 @@ func checkComponent(root string, place layout, component string) error {
 	if !insideProject(component) || component == "." {
 		return fmt.Errorf("%q is not a component folder", component)
 	}
-	for _, folder := range []string{place.components, place.contracts} {
-		if info, err := os.Stat(filepath.Join(root, folder, component)); err != nil || !info.IsDir() {
-			return fmt.Errorf("%s/%s is not a folder", folder, component)
+	for _, folder := range []string{path.Join(place.components, component), place.testPackage(component)} {
+		if info, err := os.Stat(filepath.Join(root, folder)); err != nil || !info.IsDir() {
+			return fmt.Errorf("%s is not a folder", folder)
 		}
 	}
 	return nil
@@ -147,7 +149,7 @@ func componentTarget(place layout, component string) string {
 
 func contractPathFrom(place layout, component string) string {
 	depth := segments(place.components) + segments(component)
-	return strings.Repeat("../", depth) + place.contracts + "/" + component + "/"
+	return strings.Repeat("../", depth) + place.testPackage(component) + "/"
 }
 
 func gomuArguments(gomu string, place layout, target string, component string, workers int, timeout int, short bool) []string {

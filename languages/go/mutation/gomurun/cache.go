@@ -47,27 +47,34 @@ func sourceDigest(root string, place layout, component string, names []string) (
 }
 
 func suiteDigest(root string, place layout, component string) (string, error) {
-	base := filepath.Join(root, place.contracts, component)
-	var paths []string
-	err := filepath.WalkDir(base, func(path string, entry fs.DirEntry, err error) error {
-		if err == nil && !entry.IsDir() {
-			paths = append(paths, path)
-		}
-		return err
-	})
-	if err != nil {
-		return "", err
-	}
-	sort.Strings(paths)
 	hash := sha256.New()
-	for _, path := range paths {
-		data, err := os.ReadFile(path)
+	for _, folder := range place.suiteFolders(component) {
+		base := filepath.Join(root, filepath.FromSlash(folder))
+		hash.Write([]byte(folder + cacheSeparator))
+		var paths []string
+		err := filepath.WalkDir(base, func(path string, entry fs.DirEntry, err error) error {
+			if err == nil && !entry.IsDir() {
+				paths = append(paths, path)
+			}
+			return err
+		})
+		if errors.Is(err, fs.ErrNotExist) {
+			hash.Write([]byte("missing" + cacheSeparator))
+			continue
+		}
 		if err != nil {
 			return "", err
 		}
-		hash.Write([]byte(strings.TrimPrefix(path, base) + cacheSeparator))
-		hash.Write(data)
-		hash.Write([]byte(cacheSeparator))
+		sort.Strings(paths)
+		for _, path := range paths {
+			data, err := os.ReadFile(path)
+			if err != nil {
+				return "", err
+			}
+			hash.Write([]byte(strings.TrimPrefix(path, base) + cacheSeparator))
+			hash.Write(data)
+			hash.Write([]byte(cacheSeparator))
+		}
 	}
 	return hex.EncodeToString(hash.Sum(nil)), nil
 }

@@ -4,6 +4,7 @@
 
 components_dir := "internal"
 contracts_dir := "contracts"
+contract_tests_dir := "contract-tests"
 accepted_dir := "tools/mutation/accepted"
 gomu_version := "v0.3.0"
 
@@ -11,11 +12,11 @@ gomu_version := "v0.3.0"
 mutate component *flags:
     mkdir -p .direnv/bin
     stamp="{{ gomu_version }} $(go env GOVERSION)"; if [ ! -x .direnv/bin/gomu ] || [ "$(cat .direnv/bin/gomu.stamp 2>/dev/null)" != "$stamp" ]; then GOBIN="$(pwd)/.direnv/bin" go install github.com/sivchari/gomu/cmd/gomu@{{ gomu_version }} && echo "$stamp" > .direnv/bin/gomu.stamp; fi
-    go run ./tools/mutation/gomurun --components {{ components_dir }} --contracts {{ contracts_dir }} --accepted {{ accepted_dir }} --gomu-version {{ gomu_version }} {{ flags }} {{ component }}
+    go run ./tools/mutation/gomurun --components {{ components_dir }} --contracts {{ contracts_dir }} --contract-tests {{ contract_tests_dir }} --accepted {{ accepted_dir }} --gomu-version {{ gomu_version }} {{ flags }} {{ component }}
 
 # Print a JSON array of the components to mutate, from the changes since a Git revision. An empty or unknown revision plans every component.
 mutate-plan base="":
-    COMPONENTS_DIR={{ components_dir }} CONTRACTS_DIR={{ contracts_dir }} bash tools/mutation/plan.sh "{{ base }}"
+    COMPONENTS_DIR={{ components_dir }} CONTRACTS_DIR={{ contracts_dir }} CONTRACT_TESTS_DIR={{ contract_tests_dir }} bash tools/mutation/plan.sh "{{ base }}"
 
 # Summarize one mutation run from its log, and write result.json.
 mutate-summary component log seconds:

@@ -20,8 +20,9 @@ Build gomu with the same Go version that runs the tests. A gomu built with Go 1.
 
 1. Copy this folder to `tools/mutation/` in the project.
 1. Add `import "tools/mutation/mutation.just"` to the project's justfile.
-1. Set the variables at the top of `mutation.just` to the project's components folder, contracts folder, accepted
-   folder, and gomu version. The defaults are `internal`, `contracts`, `tools/mutation/accepted`, and `v0.3.0`.
+1. Set the variables at the top of `mutation.just` to the project's components folder, contracts folder, contract tests
+   folder, accepted folder, and gomu version. The defaults are `internal`, `contracts`, `contract-tests`,
+   `tools/mutation/accepted`, and `v0.3.0`.
 1. Put `go`, `jq`, `just`, and `git` in the dev shell. `gomurun` runs gomu under `nice`.
 1. Edit `SHARED_PATHS` in `plan.sh`, or set it in the environment, to the paths whose change should mutate every
    component. The default covers the domain model, the Go module files, the mutation tooling, the justfile, the dev
@@ -29,30 +30,41 @@ Build gomu with the same Go version that runs the tests. A gomu built with Go 1.
 
 ## Files
 
-| File            | Recipe           | Does                                                                                         |
-| --------------- | ---------------- | -------------------------------------------------------------------------------------------- |
-| `mutation.just` | all four         | Defines the recipes and their folder variables                                               |
-| `gomurun/`      | `mutate`         | Runs gomu on one component against its contract package, then prints survivors and the score |
-| `plan.sh`       | `mutate-plan`    | Prints the components that changed since a revision as a JSON array                          |
-| `summarize.sh`  | `mutate-summary` | Reads a run's log, prints Markdown, and writes `result.json`                                 |
-| `report.sh`     | `mutate-report`  | Combines every `result.json` into one Markdown report with a time chart                      |
-| `bar.sh`        | none             | Draws the time bar that the summary and the report use                                       |
-| `seedfloors.sh` | none             | Writes a score floor for each component from a set of results                                |
+| File            | Recipe           | Does                                                                                       |
+| --------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `mutation.just` | all four         | Defines the recipes and their folder variables                                             |
+| `gomurun/`      | `mutate`         | Runs gomu on one component against its contract tests, then prints survivors and the score |
+| `plan.sh`       | `mutate-plan`    | Prints the components that changed since a revision as a JSON array                        |
+| `summarize.sh`  | `mutate-summary` | Reads a run's log, prints Markdown, and writes `result.json`                               |
+| `report.sh`     | `mutate-report`  | Combines every `result.json` into one Markdown report with a time chart                    |
+| `bar.sh`        | none             | Draws the time bar that the summary and the report use                                     |
+| `seedfloors.sh` | none             | Writes a score floor for each component from a set of results                              |
+
+## Two layouts
+
+In the split layout of [ADR 0150](../../../docs/decisions/0150-contracts-hold-data-and-contract-tests-hold-the-code.md),
+`contracts/` holds `specifications/` and `fixtures/`, and `contract-tests/` holds `runner/`, `wiring/`, and `harness/`.
+`gomurun` runs the tests of `contract-tests/wiring/<component>`, because that package holds the test that calls the
+suite. The cache key covers the component's four folders and the harness. `plan.sh` treats a change in any of them as a
+change to the component, and a change to the harness as a change to every component.
+
+A project is in the split layout when `contracts/specifications/` exists. Otherwise `gomurun` runs the tests of
+`contracts/<component>`, as before.
 
 ## What `gomurun` does
 
-It mutates `<components>/<component>` over an overlay, so no source file changes. It runs the contract package's tests
-against each mutant, with `-count=1` and `-failfast`, one mutant at a time unless you pass `--workers`. Survivors that a
-person accepted in `<accepted>/<component>.txt` are counted as accepted and left off the list.
+It mutates `<components>/<component>` over an overlay, so no source file changes. It runs the contract tests against
+each mutant, with `-count=1` and `-failfast`, one mutant at a time unless you pass `--workers`. Survivors that a person
+accepted in `<accepted>/<component>.txt` are counted as accepted and left off the list.
 
-| Flag                                        | Does                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--workers <n>`                             | Tests this many mutants at once                                                                                                                                                                                                                                                                                                                                               |
-| `--timeout <s>`                             | Seconds one mutant's tests may take                                                                                                                                                                                                                                                                                                                                           |
-| `--short`                                   | Runs the tests with `-short`. A mutant that only a skipped test kills shows as a survivor                                                                                                                                                                                                                                                                                     |
-| `--cached`                                  | Reuses the results when the component's source files, contract suite, and gomu version are all unchanged. A change to any one source file mutates the whole component again, because a file's mutants are judged by tests that run the rest of the component. A change outside the component and its contract folder, such as the shared model, does not invalidate the cache |
-| `--components`, `--contracts`, `--accepted` | The folders, set by the recipe variables                                                                                                                                                                                                                                                                                                                                      |
-| `--gomu-version`                            | Part of the cache key, set by the recipe variable                                                                                                                                                                                                                                                                                                                             |
+| Flag                                                            | Does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--workers <n>`                                                 | Tests this many mutants at once                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `--timeout <s>`                                                 | Seconds one mutant's tests may take                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `--short`                                                       | Runs the tests with `-short`. A mutant that only a skipped test kills shows as a survivor                                                                                                                                                                                                                                                                                                                                                                                               |
+| `--cached`                                                      | Reuses the results when the component's source files, contract suite, and gomu version are all unchanged. The suite is the whole contract, which in the split layout means its four folders and the shared harness. A change to any one source file mutates the whole component again, because a file's mutants are judged by tests that run the rest of the component. A change outside the component and its contract folder, such as the shared model, does not invalidate the cache |
+| `--components`, `--contracts`, `--contract-tests`, `--accepted` | The folders, set by the recipe variables                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `--gomu-version`                                                | Part of the cache key, set by the recipe variable                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 ## The log format
 
