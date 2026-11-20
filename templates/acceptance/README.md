@@ -11,12 +11,12 @@ in Threnos explains why scenarios are data.
 
 - A scenario is one file, `acceptance/scenarios/<name>.yaml`. A file ending in `.example` is a sample the runner
   ignores. Rename it to `.yaml` to use it.
-- Files a scenario starts with, and golden outputs, live under `acceptance/testdata/`. A scenario may also point at an
+- Files a scenario starts with, and golden outputs, live under `acceptance/fixtures/`. A scenario may also point at an
   example under `docs/`.
 - The runner lives in `acceptance/runner/`. It is the only language-specific part.
 - Nothing else sits in `acceptance/` except a README. A project that writes scenarios as code keeps them in
   `scenarios/`, and keeps its helpers and driver in `runner/`. The records check fails on a stray file, on source in
-  `testdata/`, and on scenarios with no runner.
+  `fixtures/`, and on scenarios with no runner.
 
 ## A scenario
 

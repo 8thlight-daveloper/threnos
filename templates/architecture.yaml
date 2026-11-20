@@ -4,6 +4,7 @@
 components_root: <components>
 model: <model>
 contracts_root: contracts
+contract_tests_root: contract-tests
 entry_point: <entry point folder>
 
 naming:
@@ -52,9 +53,12 @@ components:
     position: 4
     depends_on: [question/finder]
 
+# The contract tests are language-bound code. The suite and the harness import the model, the harness, and the libraries
+# listed here. A wiring test imports its own component and its own suite, and nothing else. fixture_suffixes adds data
+# suffixes that the layout check accepts in contracts/fixtures/.
 contracts:
-  may_import: [model, contracts/harness]
-  wiring_test_may_import: own_component
+  may_import: []
+  fixture_suffixes: []
 
 # Acceptance scenarios drive the built program from outside. They never import the project's own implementation.
 # scenarios is data (the default) or code. may_import lists test libraries and runner helpers only.

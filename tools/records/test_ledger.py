@@ -386,5 +386,62 @@ class Approve(unittest.TestCase):
             self.run_approve("model", "--approver", "agent:claude-code")
 
 
+class SplitContractUnit(unittest.TestCase):
+    FILES = {
+        "contracts/specifications/plan/decoder/contract.md": "Decodes.\n",
+        "contracts/fixtures/plan/decoder/cases.json": "[]\n",
+        "contract-tests/runner/plan/decoder/suite.go": "package decoder\n",
+        "contract-tests/wiring/plan/decoder/wire_test.go": "package decoder\n",
+    }
+    ARCHITECTURE = {"contracts_root": "contracts", "contract_tests_root": "contract-tests", "model": "model"}
+    UNIT = "contracts/specifications/plan/decoder"
+
+    def setUp(self):
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.root = Path(folder.name)
+        write(self.root, self.FILES)
+
+    def digest(self):
+        return ledger.unit_digest(self.root, self.ARCHITECTURE, self.UNIT)
+
+    def test_the_specification_folder_is_the_unit(self):
+        self.assertEqual(ledger.units(self.root, self.ARCHITECTURE)["contracts"], [self.UNIT])
+
+    def test_a_change_in_any_of_the_four_folders_changes_the_hash(self):
+        first = self.digest()
+        for name in self.FILES:
+            write(self.root, {name: "changed\n"})
+            self.assertNotEqual(self.digest(), first, name)
+            write(self.root, {name: self.FILES[name]})
+            self.assertEqual(self.digest(), first, name)
+
+    def test_a_missing_folder_changes_the_hash(self):
+        first = self.digest()
+        (self.root / "contract-tests/wiring/plan/decoder/wire_test.go").unlink()
+        self.assertNotEqual(self.digest(), first)
+
+    def test_the_harness_is_not_part_of_the_unit(self):
+        first = self.digest()
+        write(self.root, {"contract-tests/harness/load.go": "package harness\n"})
+        self.assertEqual(self.digest(), first)
+
+    def test_the_older_layout_hashes_its_one_folder_as_before(self):
+        write(self.root, {"older/plan/decoder/contract.md": "x\n"})
+        self.assertEqual(
+            ledger.unit_digest(self.root, {"contracts_root": "older"}, "older/plan/decoder"),
+            ledger.digest(self.root / "older/plan/decoder"),
+        )
+
+    def test_the_ledger_reports_a_change_after_approval(self):
+        entries = [entry(self.root, "contracts", self.UNIT, hash=self.digest())]
+        import yaml
+        write(self.root, {".threnos/approvals.yaml": yaml.safe_dump({"approvals": entries}, sort_keys=False)})
+        self.assertEqual(ledger.ledger_problems(self.root, {}, self.ARCHITECTURE), [])
+        write(self.root, {"contract-tests/runner/plan/decoder/suite.go": "package decoder // edited\n"})
+        found = ledger.ledger_problems(self.root, {}, self.ARCHITECTURE)
+        self.assertTrue(any("changed since it was approved" in each for each in found), found)
+
+
 if __name__ == "__main__":
     unittest.main()

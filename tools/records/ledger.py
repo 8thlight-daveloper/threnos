@@ -14,6 +14,8 @@ from pathlib import Path
 
 import yaml
 
+import layout
+
 LEDGER = ".threnos/approvals.yaml"
 LEDGER_GATES = ["contracts", "acceptance", "architecture", "model", "build"]
 KINDS = ["person", "agent"]
@@ -45,11 +47,28 @@ def digest(path):
     return "sha256:" + total.hexdigest()
 
 
+def unit_digest(root, architecture, unit):
+    """Return the hash of a unit. A contract in the split layout spans four folders, hashed together in a fixed order."""
+    contracts_root, _ = layout.contract_roots(architecture)
+    prefix = f"{contracts_root}/{layout.SPECIFICATIONS}/"
+    if not unit.startswith(prefix):
+        return digest(root / unit)
+    folders = layout.mirror_folders(root, architecture, unit[len(prefix):])
+    total = hashlib.sha256()
+    for folder in folders:
+        label = folder.relative_to(root).as_posix()
+        found = digest(folder) if folder.exists() else "missing"
+        total.update(label.encode() + b"\0" + found.encode() + b"\0")
+    return "sha256:" + total.hexdigest()
+
+
 def units(root, architecture):
     """Return {gate: [unit path, ...]} for the protected units that exist, except `build`."""
-    contracts_root = architecture.get("contracts_root") or "contracts"
+    contracts_root, _ = layout.contract_roots(architecture)
     model = (architecture.get("model") or "").strip("/")
     base = root / contracts_root
+    if (base / layout.SPECIFICATIONS).is_dir():
+        base = base / layout.SPECIFICATIONS
     contracts = sorted(each.parent.relative_to(root).as_posix() for each in base.rglob("contract.md")) if base.is_dir() else []
     return {
         "contracts": contracts,
@@ -147,7 +166,7 @@ def ledger_problems(root, config, architecture):
         if (gate, unit) in seen:
             problems.append(f"{LEDGER}: {gate} {unit} has more than one entry")
         seen[(gate, unit)] = entry
-        if gate in known and unit in known[gate] and entry.get("hash") != digest(root / unit):
+        if gate in known and unit in known[gate] and entry.get("hash") != unit_digest(root, architecture, unit):
             problems.append(f"{LEDGER}: {gate} {unit} changed since it was approved on {entry.get('date')}. Review it and approve it again")
     for gate, found in known.items():
         for unit in found:

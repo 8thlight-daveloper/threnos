@@ -142,7 +142,7 @@ def main(args, terminal=is_terminal, ask=input):
         if unit not in known[given.gate]:
             print(f"{unit} is not a {given.gate} unit. Units: {', '.join(known[given.gate]) or 'none exist'}", file=sys.stderr)
             return 1
-        entry["hash"] = ledger.digest(root / unit)
+        entry["hash"] = ledger.unit_digest(root, architecture, unit)
     approver = given.approver
     if approver is None:
         global_settings, global_error = check.load_toml(check.global_config_path(), str(check.global_config_path()))

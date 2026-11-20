@@ -125,6 +125,8 @@ def load_architecture(root):
 def load_contracts(root, contracts_root):
     base = root / contracts_root
     contracts = {}
+    if (base / layout.SPECIFICATIONS).is_dir():
+        base = base / layout.SPECIFICATIONS
     if not base.is_dir():
         return contracts
     for path in sorted(base.rglob("contract.md")):
@@ -440,7 +442,7 @@ def check(root, require_architecture=True):
         problems.append(".threnos/config.toml: identity is user-only. Set it in .threnos/local.toml or the global file")
     architecture = yaml.safe_load((root / "architecture.yaml").read_text()) or {} if (root / "architecture.yaml").is_file() else {}
     problems += ledger.ledger_problems(root, config, architecture)
-    problems += layout.acceptance_problems(root, architecture)
+    problems += layout.acceptance_problems(root, architecture) + layout.contracts_problems(root, architecture)
     return sorted(problems), notes
 
 

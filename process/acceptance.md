@@ -59,11 +59,11 @@ chooses code accepts a rewrite of its scenarios if it ever changes language. ADR
 | Folder       | Holds                                                                                                                                 |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `scenarios/` | Data form: one `.yaml` file per scenario. Code form: the scenario code, grouped by subject                                            |
-| `testdata/`  | The files a scenario starts from and the outputs it compares with. Data only, never source files                                      |
+| `fixtures/`  | The files a scenario starts from and the outputs it compares with. Data only, never source files                                      |
 | `runner/`    | What runs the scenarios in this repository. Data form: the runner. Code form: the shared helpers and the driver for the built program |
 
 Nothing else sits in `acceptance/` except a README. The records check fails on a stray file or folder, on source in
-`testdata/`, on source in the `scenarios/` of a data project, and on scenarios with no runner beside them. In code form
+`fixtures/`, on source in the `scenarios/` of a data project, and on scenarios with no runner beside them. In code form
 a scenario imports the runner like any package under `acceptance/`, which the import check already allows, and the same
 check keeps the runner from importing the implementation. Nothing checks that a scenario uses the runner.
 
